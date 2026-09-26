@@ -51,3 +51,10 @@ def test_fixture_objectives(fixture_root, validator_for):
 
     doc = yaml.safe_load((fixture_root / "case" / "03-fanout" / "objectives.yaml").read_text())
     assert not _errors(validator_for("objectives.schema.json"), doc)
+
+
+def test_lake_example_matches_engine_schema(validator_for):
+    import yaml
+
+    doc = yaml.safe_load((Path(__file__).parents[1] / "lake.example.yaml").read_text())
+    assert not _errors(validator_for("lake-pointer.schema.json"), doc)

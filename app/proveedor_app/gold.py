@@ -255,7 +255,8 @@ def load_store(repo_root: Path, env: dict[str, str] | None = None) -> GoldStore:
     case_id = case_id or lake.get("case_id")
     template = bronze.get("key_template", template)
     if bronze.get("kind") in ("file", "local"):  # local dev / cached fallback run, same layout as the bucket
-        root = Path(os.path.expandvars(str(bronze.get("root") or bronze.get("path"))))
+        raw_root = os.path.expandvars(str(bronze.get("root") or bronze.get("path")))
+        root = Path(raw_root.removeprefix("file://"))
         return GoldStore(LocalSource(root if root.is_absolute() else lake_path.parent / root), case_id, template)
     if bronze.get("kind") != "s3":
         raise ValueError(f"unsupported bronze kind in {lake_path}: {bronze.get('kind')!r}")

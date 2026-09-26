@@ -9,11 +9,12 @@ Run it: `uv run pa-app serve --fixtures` (synthetic data), or point `PA_GOLD_DIR
 |--------|-------|-------------------|
 | Supplier index | `/` | `web.py`, `templates/index.html` |
 | Supplier dossier: every field with value, confidence, status and evidence (link + screenshot) | `/suppliers/<id>` | `templates/dossier.html`, `_evidence.html` |
-| Red-flag explainer: rule, evidence, plain-language explanation, dispute path | `/signals` | planned (P3) |
-| Relationship view: shared address, representative or procedure | `/relationships` | planned (P3) |
-| Case journal: value → step → TDD → objective → ontology → PRD → brief | `/journal/<value_id>` | planned (P3) |
-| Watchlist + export (OCDS JSON, CSV, RDF) | `/watchlist`, `/export/*` | planned (P3) |
-| Per-field completeness + taxonomy coverage | `/completeness` | planned (P2) |
+| Red-flag explainer: rule, evidence, plain-language explanation, dispute path | `/signals`, `/signals/<id>/<n>` | `investigate.py`, `templates/signals.html`, `signal.html` |
+| Relationship view: shared address, representative or procedure | `/relationships` | `investigate.clusters`, `templates/relationships.html` |
+| Case journal: value → step → TDD → objective → ontology → PRD → brief | `/journal`, `/journal/<value_id>` | `investigate.journal_chain`, `templates/journal.html` |
+| Watchlist + export (OCDS JSON, CSV, RDF) | `/watchlist`, `/export/{ocds.json,suppliers.csv,gold.ttl}` | `export.py`, `templates/watchlist.html` |
+| Per-field completeness + taxonomy coverage | `/completeness`, `/api/completeness` | `dod.py`, `templates/completeness.html` |
+| Phase sign-off (approver role only) | `/approvals` | `investigate.approve`, `templates/approvals.html` |
 
 Roles (`PA_ROLE`, one process per role): `investigator` is read-only; `approver` adds phase sign-off
 (PRD, factors, ontology) that writes the engine's `APPROVED` file.
