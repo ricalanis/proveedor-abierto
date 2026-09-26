@@ -423,20 +423,25 @@ CASE_FILES = {
 
 
 def fixture_job(step: dict, n: int) -> dict:
-    """Synthetic sandbox proof checkpoints (CONTRACT section 8) for one step. Labelled as fixtures throughout."""
+    """Synthetic sandbox proof checkpoints (CONTRACT section 8a, jobs.schema.json). Labelled as fixtures throughout."""
     failed = "fail" in str(step.get("evaluated") or "").lower()
     return {
         "job_id": f"job:{step['step_id'].split(':', 1)[1]}", "run_id": step["run_id"], "step_id": step["step_id"],
-        "source_id": step.get("source_id"), "started_at": step.get("ts"),
+        "source_id": step.get("source_id"), "started_at": step.get("ts"), "ended_at": step.get("ts"),
+        "generated_by": GEN,
         "checkpoints": {
             "host": {"ok": True, "sandbox_host": "sandbox-fixture.example", "runtime": "runsc (synthetic fixture)",
-                     "virt": "n/a (fixture)"},
-            "task": {"ok": not failed, "requested": step.get("requested"), "result": step.get("executed"),
-                     "value_ids": step.get("value_ids") or []},
-            "where": {"ok": True, "hostname": f"fixture-pod-{n:04d}", "uname": "Linux 4.4.0 gVisor (synthetic fixture)"},
-            "isolation": {"ok": True, "probes": [{"probe": "GET https://blocked.invalid", "result": "BLOCKED"},
-                                                 {"probe": "write /host/escape-test", "result": "BLOCKED"}]},
-            "teardown": {"ok": True, "detail": "pod removed; 0 sandboxes running (synthetic fixture)"},
+                     "virt": {"cpu_virtualization_flags": [], "dev_kvm_present": False}},
+            "task": {"ok": not failed, "requested": {"step": step.get("requested")},
+                     "result": {"step": step.get("executed")}, "value_ids": step.get("value_ids") or []},
+            "where": {"ok": True, "hostname": f"fixture-pod-{n:04d}",
+                      "uname": {"system": "Linux", "release": "4.4.0 (synthetic fixture)", "machine": "x86_64"}},
+            "isolation": {"probes": [{"probe": "network_non_allowlisted", "result": "BLOCKED",
+                                      "detail": {"host": "blocked.invalid"}},
+                                     {"probe": "write_outside_pod", "result": "BLOCKED",
+                                      "detail": {"path": "/host/escape-test"}}]},
+            "teardown": {"ok": True, "detail": {"pod_gone": True, "proxy_gone": True, "network_removed": True,
+                                                "verified": True}},
         },
     }
 

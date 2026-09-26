@@ -174,3 +174,17 @@ def test_structured_engine_steps_are_not_misread():
         {"step_id": "e", "phase": 5, "mode": "S2", "parent_step_id": "f", "evaluated": {"status": "ok"}, "value_ids": ["w"]},
     ]
     assert [s["event"] for s in live.annotate(steps)] == [None, None, None, "failure", "escalation"]
+
+
+def test_fixture_jobs_match_engine_schema(lake, validator_for):
+    from pathlib import Path
+
+    if not (Path(__file__).parents[2] / "ontofill" / "schemas" / "jobs.schema.json").exists():
+        pytest.skip("engine jobs schema not present")
+    v = validator_for("jobs.schema.json")
+    jobs = GoldStore(LocalSource(lake)).live_jobs("run-fixture-0001")
+    errors = [e.message for j in jobs[:30] for e in v.iter_errors(j)]
+    assert not errors, errors[:3]
+    live.Replayer(lake, "run-fixture-0001", duration=0.0, new_run_id="jobs-replay").play(sleep=lambda s: None)
+    raw = (lake / "runs" / "fixture-case" / "jobs-replay" / "jobs.jsonl").read_text().splitlines()
+    assert raw and not [e.message for line in raw[:30] for e in v.iter_errors(json.loads(line))]

@@ -235,7 +235,6 @@ class Replayer:
         live.write_text("")
         jobs_file = self.run_dir / "jobs.jsonl"
         jobs_file.write_text("")
-        open_jobs: list[dict] = []  # shown as in-progress for one step, then completed
         _write_atomic(self.target / "runs" / self.case_id / "latest.json", json.dumps({"run_id": self.new_run_id}))
         span = max(_ts(self.steps[-1]) - _ts(self.steps[0]), 1e-9) if self.steps else 1.0
         scale = 1.0 / self.speed if self.speed else self.duration / span
@@ -255,15 +254,9 @@ class Replayer:
                     rec["screenshot_key"] = thumb
             with live.open("a") as fh:
                 fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
-            with jobs_file.open("a") as fh:
-                for job in open_jobs:  # finish the previous step's jobs: isolation probe + teardown land now
+            with jobs_file.open("a") as fh:  # complete records only: jobs.schema.json requires all five checkpoints
+                for job in self.jobs_by_step.get(step.get("step_id"), []):
                     fh.write(json.dumps(dict(job, run_id=self.new_run_id), ensure_ascii=False) + "\n")
-                open_jobs = self.jobs_by_step.get(step.get("step_id"), [])
-                for job in open_jobs:
-                    cps = job.get("checkpoints") or {}
-                    started = {k: v for k, v in cps.items() if k in ("host", "where")}
-                    fh.write(json.dumps(dict(job, run_id=self.new_run_id, checkpoints=started),
-                                        ensure_ascii=False) + "\n")
             emitted.update(step.get("value_ids") or [])
             if step.get("phase") == 5 and step.get("source_id"):
                 h = health.setdefault(step["source_id"], {"ok": 0, "failed": 0, "yield": 0})
@@ -277,9 +270,6 @@ class Replayer:
                 _write_atomic(self.run_dir / "status.json",
                               json.dumps(self._status("running", step.get("phase") or 1, emitted, health)))
                 last_status = now
-        with jobs_file.open("a") as fh:
-            for job in open_jobs:
-                fh.write(json.dumps(dict(job, run_id=self.new_run_id), ensure_ascii=False) + "\n")
         done = not self._stop.is_set()
         _write_atomic(self.run_dir / "status.json", json.dumps(
             self._status("done" if done else "failed", 5, emitted, health)))
