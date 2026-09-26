@@ -3,3 +3,7 @@ lake.yaml
 __pycache__/
 node_modules/
 .venv/
+.cache/
+.pytest_cache/
+.ruff_cache/
+.hallmark/

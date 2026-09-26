@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Suppliers{% endblock %}
+{% block main %}
+<section class="page-head">
+  <h1>Suppliers</h1>
+  <p class="lede">{{ run.suppliers|length }} legal entities that received public contracts in this run. Open one to see every field with the capture it came from.</p>
+</section>
+
+<form class="finder" method="get" action="/" role="search">
+  <label class="finder__label" for="q">Name, RFC or ID</label>
+  <div class="finder__row">
+    <input id="q" name="q" type="search" value="{{ q }}" autocomplete="off" placeholder="e.g. Proveedor Ejemplo 07 or ZZZ…">
+    <input type="hidden" name="show" value="{{ show }}">
+    <button type="submit">Search</button>
+  </div>
+  <div class="filters" role="group" aria-label="Filter">
+    {% for key, label in [("all", "All"), ("signals", "With signals"), ("incomplete", "Core profile below 80%"), ("conflicts", "Conflicting sources")] %}
+      <a href="/?q={{ q|urlencode }}&show={{ key }}" {% if show == key %}aria-current="true"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </div>
+</form>
+
+<p class="count" aria-live="polite">{{ rows|length }} shown</p>
+{% if rows %}
+<div class="table-wrap">
+<table class="ledger ledger--index">
+  <thead>
+    <tr>
+      <th scope="col">Supplier</th>
+      <th scope="col">Core profile <span class="th-note">{% for f in CORE_FIELDS %}{{ f|field_label }}{% if not loop.last %} · {% endif %}{% endfor %}</span></th>
+      <th scope="col" class="num">Signals</th>
+      <th scope="col" class="num">Contracts</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in rows %}
+    {% set s = row.s %}
+    <tr>
+      <th scope="row">
+        <a class="entity" href="/suppliers/{{ s.id }}">{{ supplier_name(s) }}</a>
+        <span class="mono sub">{{ (row.fields.tax_id or {}).value or "RFC missing" }}</span>
+      </th>
+      <td>
+        <span class="cells" aria-label="Core profile {{ row.ratio|pct }} complete">
+          {% for f in CORE_FIELDS %}{% set st = (row.fields[f] or {}).status or "missing" %}<span class="cell cell--{{ st }}" title="{{ f|field_label }}: {{ st }}"></span>{% endfor %}
+        </span>
+        <span class="mono sub">{{ row.ratio|pct }}</span>
+      </td>
+      <td class="num">
+        {% if s.flags %}<span class="signal-count">{{ s.flags|length }}</span>{% else %}<span class="muted">0</span>{% endif %}
+      </td>
+      <td class="num">{{ (s.contract_ids or [])|length }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="empty">No supplier matches. Clear the search or pick another filter.</p>
+{% endif %}
+{% endblock %}

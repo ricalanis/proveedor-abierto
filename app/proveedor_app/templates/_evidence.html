@@ -1,0 +1,38 @@
+<div class="ev" data-value-id="{{ selected.value_id }}">
+  <p class="ev__what">
+    <span class="ev__field">{{ selected.field|field_label }}</span>
+    <span class="ev__value">{{ selected.data.value if selected.data.value is not none else "not found" }}</span>
+  </p>
+  <p class="ev__meta">
+    <span class="status status--{{ selected.data.status }}">{{ selected.data.status }}</span>
+    <span class="mono">confidence {{ "%.2f"|format(selected.data.confidence or 0) }}</span>
+    <a href="/journal/{{ selected.value_id|urlencode }}">Trace this value to the brief</a>
+  </p>
+  {% if selected.data.status == "conflict" %}
+  <p class="ev__conflict">Sources disagree. Each capture below shows what that source says; the value shown is the refiner's best candidate.</p>
+  {% endif %}
+  <ol class="captures">
+  {% for e in selected.data.evidence or [] %}
+    <li class="capture">
+      <p class="capture__src">
+        <span class="capture__type">{{ SOURCE_TYPE_LABELS.get(e.source_type, e.source_type) }}</span>
+        {% set href = safe_url(e.url) %}
+        {% if href %}<a class="source-link" href="{{ href }}" target="_blank" rel="noopener noreferrer nofollow">{{ host_of(e.url) }}<span class="mono path">{{ e.url[(e.url.find(host_of(e.url)) + host_of(e.url)|length):] }}</span></a>{% else %}<span class="mono">{{ e.url }}</span>{% endif %}
+      </p>
+      {% if e.screenshot_key %}
+      <figure class="shot">
+        <a href="/bronze/{{ e.screenshot_key|urlencode }}" target="_blank" rel="noopener"><img src="/bronze/{{ e.screenshot_key|urlencode }}" alt="Screenshot of {{ host_of(e.url) }} captured {{ e.captured_at }}" loading="lazy" width="640" height="360"></a>
+      </figure>
+      {% endif %}
+      <dl class="capture__facts">
+        <div><dt>Captured</dt><dd class="mono">{{ e.captured_at }}</dd></div>
+        <div><dt>Selector</dt><dd class="mono">{{ e.selector or "—" }}</dd></div>
+        <div><dt>Raw capture</dt><dd>{% if e.bronze_key %}<a class="mono" href="/bronze/{{ e.bronze_key|urlencode }}" target="_blank" rel="noopener">{{ e.bronze_key[:19] }}…</a>{% else %}—{% endif %}</dd></div>
+        <div><dt>Source ID</dt><dd class="mono">{{ e.source_id }}</dd></div>
+      </dl>
+    </li>
+  {% else %}
+    <li class="muted">No captures back this value.</li>
+  {% endfor %}
+  </ol>
+</div>
