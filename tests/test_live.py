@@ -244,3 +244,10 @@ def test_jev_only_gold_is_flagged_and_not_counted(lake, fixture_root):
     assert "backend--jev" in c.get(f"/suppliers/{rows[0]['id']}").text
     card = c.get("/engine").text
     assert "rests on a Jev decision alone" in card
+
+
+def test_isolation_tier_ladder():
+    assert live.isolation_tier("runsc")["tier"] == 3
+    assert live.isolation_tier("runc")["ok"] is False
+    assert live.isolation_tier("kata-fc")["tier"] == 4
+    assert live.isolation_tier(None) is None

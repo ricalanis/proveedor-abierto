@@ -123,6 +123,20 @@ def checkpoint_state(job: dict, key: str) -> str:
     return "pass" if cp.get("ok") else "fail"
 
 
+def isolation_tier(runtime: str | None) -> dict | None:
+    """Where a runtime sits on the track deck's isolation ladder ("a container is not a sandbox")."""
+    r = (runtime or "").lower()
+    if not r:
+        return None
+    if any(k in r for k in ("firecracker", "kata", "microvm", "libkrun")):
+        return {"tier": 4, "name": "microVM", "ok": True, "note": "own kernel; the VM is thrown away"}
+    if "runsc" in r or "gvisor" in r:
+        return {"tier": 3, "name": "gVisor user-space kernel", "ok": True, "note": "syscalls intercepted; only the sandbox process can die"}
+    if "runc" in r or "docker" in r:
+        return {"tier": 2, "name": "container (runc)", "ok": False, "note": "shared kernel: a container is not a sandbox"}
+    return {"tier": None, "name": runtime, "ok": False, "note": "runtime not on the ladder"}
+
+
 def proof(jobs: list[dict]) -> dict:
     """Aggregate proof over all jobs, plus the latest job whose checkpoints all resolved (the one to show judges)."""
     counts = {key: {"pass": 0, "fail": 0, "pending": 0} for key, _, _ in CHECKPOINTS}
@@ -131,8 +145,9 @@ def proof(jobs: list[dict]) -> dict:
             counts[key][checkpoint_state(job, key)] += 1
     complete = [j for j in jobs if all(checkpoint_state(j, k) != "pending" for k, _, _ in CHECKPOINTS)]
     featured = complete[-1] if complete else (jobs[-1] if jobs else None)
+    runtime = (((featured or {}).get("checkpoints") or {}).get("host") or {}).get("runtime")
     return {"jobs": len(jobs), "counts": counts, "featured": featured, "recent": jobs[-8:][::-1],
-            "checkpoints": CHECKPOINTS, "state": checkpoint_state}
+            "checkpoints": CHECKPOINTS, "state": checkpoint_state, "tier": isolation_tier(runtime)}
 
 
 # Replayer ------------------------------------------------------------------------------------------------------

@@ -348,6 +348,9 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .provenance { font-size: var(--text-sm); }
 
 /* Sandbox proof */
+.tier { font-size: var(--text-sm); font-weight: 600; }
+.tier--weak { color: var(--color-signal); }
+.verifiable { display: block; margin-top: var(--space-3xs); }
 .proof { margin-top: var(--space-2xl); padding-top: var(--space-md); border-top: var(--rule-strong); display: grid; gap: var(--space-md); }
 .proof__head { display: grid; gap: var(--space-2xs); max-width: 80ch; }
 .proof__table { border-collapse: collapse; font-size: var(--text-sm); max-width: 760px; width: 100%; }

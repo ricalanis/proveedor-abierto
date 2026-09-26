@@ -2,7 +2,8 @@
 <section class="proof" aria-labelledby="proof-h">
   <header class="proof__head">
     <h2 id="proof-h">Sandbox proof</h2>
-    <p class="note">Every page the agents touch is opened in a throwaway sandbox pod, never in this app. Each job records five checkpoints. If an agent were told to run <span class="mono">rm -rf /</span>, only its pod would be affected, and the pod is deleted when the job ends.</p>
+    <p class="note"><strong>Two instances. One boundary.</strong> The control plane plans and dispatches; every page the agents touch is opened in a throwaway sandbox pod on the sandbox host, never in this app. Each job records five checkpoints. If an agent were told to run <span class="mono">rm -rf /</span>, only its pod would be affected, and the pod is deleted when the job ends.</p>
+    {% if pr.tier %}<p class="tier tier--{{ 'ok' if pr.tier.ok else 'weak' }}">Isolation tier {{ pr.tier.tier or "?" }} · {{ pr.tier.name }}: {{ pr.tier.note }}.</p>{% endif %}
   </header>
   {% if pr.jobs %}
   <table class="proof__table">
@@ -28,6 +29,8 @@
         <span class="cp__detail mono">
           {% if key == "host" %}{{ cp.sandbox_host or "—" }} · runtime {{ cp.runtime or "—" }}{% if cp.virt %} · {{ cp.virt|brief }}{% endif %}
           {% elif key == "task" %}{{ cp.requested|brief or "—" }} → {{ cp.result|brief or "—" }}
+            {% set res = cp.result if cp.result is mapping else {} %}
+            {% if res %}<span class="verifiable">{% if res.exit_code is defined %}exit code <strong>{{ res.exit_code }}</strong> · {% endif %}{% if res.stdout %}stdout <q>{{ res.stdout|brief(80) }}</q> · {% endif %}{% if res.status is defined %}status <strong>{{ res.status }}</strong> · {% endif %}{% for k in ("bronze_key", "html_key", "screenshot_key") if res[k] %}<a href="/bronze/{{ res[k]|urlencode }}" target="_blank" rel="noopener">{{ "screenshot" if k == "screenshot_key" else "file" }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</span>{% endif %}
           {% elif key == "where" %}{{ cp.hostname or "—" }} · {{ cp.uname|brief or "—" }}
           {% elif key == "isolation" %}{% for pb in cp.probes or [] %}{{ pb.probe }}: <strong>{{ pb.result }}</strong>{% if not loop.last %} · {% endif %}{% else %}—{% endfor %}
           {% elif key == "teardown" %}{{ cp.detail|brief or "—" }}{% endif %}

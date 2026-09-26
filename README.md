@@ -77,20 +77,19 @@ The role boundary is enforced in the app as well as at the gateway: the investig
 approval routes, refuses cross-origin approval posts, and runs in a container with the case mounted read-only.
 The proxy's `X-NetBird-User` header only prefills the approver's name; `APPROVED` records the name typed in.
 
-### NetBird evidence
+### NetBird: the Zero-Port Access bonus
 
-How it is deployed and gated: [`deploy/README.md`](deploy/README.md). Management is NetBird Cloud; the VMs
-allow zero public inbound ports, SSH included. The two containers bind to loopback only;
-`netbird expose` publishes one URL per role with its own credential (password or PIN for investigators, SSO
-restricted to an approvers group for approvers). `deploy/verify.sh` proves the gate.
+How it is deployed and gated: [`deploy/README.md`](deploy/README.md). Management is NetBird Cloud.
 
-- [x] `deploy/verify.sh local` passes on a local rehearsal: loopback-only listeners, investigator 403 on approval
-  routes, cross-origin approval refused, investigator container read-only. Binding to `0.0.0.0` makes it fail.
-- [ ] `deploy/verify.sh remote` from outside the mesh: every probed VM port closed (SSH included), unauthenticated
-  URLs refused *(pending VM)*
-- [ ] Reverse-proxy services and their authentication settings (screenshot) *(pending VM)*
-- [ ] Access groups: investigators vs approvers (screenshot) *(pending VM)*
-- [ ] Peer list: control-plane and sandbox VMs connected peer to peer (screenshot, engine side) *(pending VM)*
+| Bonus criterion (NetBird deck) | Our setup | Evidence |
+|---|---|---|
+| 1. No open ports | The app containers bind to loopback. The public URLs go through the NetBird reverse proxy. The VMs allow zero public inbound ports, SSH included (admin over NetBird). | `deploy/verify.sh local` ✓ (laptop rehearsal) · `deploy/verify.sh remote` *(pending VM)* |
+| 2. Gated access tied to a role | Two URLs, two credentials: investigator = password or PIN; approver = SSO restricted to the approvers group. The app enforces the same boundary (investigator process: 403 on approval routes, read-only container). | `verify.sh local` ✓ · proxy auth settings screenshot *(pending VM)* |
+| 3. Peer-to-peer | The control-plane VM and the sandbox VM talk over WireGuard; the sandbox host sits in its own group, which can reach only the control plane's ports (the deck's "fence in your agents"). | peers list + access policy screenshot *(pending VM; engine side)* |
+| 4. Lifecycle-bound URLs (clarification) | Each agent pod's live view is exposed with `netbird expose --with-pin` for exactly the pod's lifetime; the run view links it from `status.json.live_view_url`. | run view "Watch the agent's browser" link *(pending engine)* |
+
+Before any screenshot: every peer, group and service name on screen is neutral (no employer or client names),
+and no emails, keys or PIN fields are in frame.
 
 ## Built during the event
 

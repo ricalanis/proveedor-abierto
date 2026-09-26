@@ -51,20 +51,27 @@ approval routes from the investigator process, cross-origin approval refused, no
 IP, and the investigator container cannot write the case or its root filesystem. Binding to `0.0.0.0` makes it fail.
 `verify.sh remote` needs the VM and the NetBird URLs, so it has **not been run yet**.
 
-## Two ways to publish, and what is not yet verified
+## How the two URLs are protected (NetBird Cloud reverse proxy, **beta**)
 
-1. **`netbird expose` (scripted here).** Per the NetBird docs, `netbird expose <port>` publishes a local service
-   through the reverse proxy with `--with-password`, `--with-pin` or `--with-user-groups` (SSO), HTTP only, for as
-   long as the command runs (90 s TTL renewed every 30 s), up to 10 sessions per peer. It needs NetBird ≥ v0.66,
-   a connected client, and the Peer Expose feature enabled by the account admin.
-   Limitation: the credential is passed as a flag and is visible in the VM's process list. Prefer SSO groups for
-   the approver.
-2. **Cloud dashboard reverse-proxy services (persistent, custom domain; preferred for the demo).** Configured in
-   the NetBird Cloud dashboard (`app.netbird.io` → Reverse Proxy) with per-service
-   Authentication (SSO with distribution groups, password, PIN, header) and Access Control (CIDR/country).
-   The proxy tunnels to the target peer's NetBird address. **Unverified:** whether a dashboard service can reach a
-   port bound to the peer's loopback. If it cannot, set `PA_BIND_IP` to the VM's NetBird IP (`100.x.y.z`). That is
-   still not a public interface, and `verify.sh local` checks listeners against `PA_BIND_IP`.
+The proxy terminates TLS and enforces auth at the edge, then forwards over WireGuard to this VM; the VM has no
+public IP exposure for the app. Protection options offered: SSO/OIDC, password, 6-digit PIN, API-key header,
+NetBird-peers-only, IP and country rules, CrowdSec reputation. **Our choice:**
+
+| URL | Protection | Why |
+|-----|------------|-----|
+| investigator | password (or 6-digit PIN) + optional country rule | read-only, shareable with the judges on the day |
+| approver | SSO/OIDC restricted to the `approvers` group | signs off phases; tied to a named person in the IdP |
+
+1. **Primary: two reverse-proxy services in the Cloud dashboard** (`app.netbird.io` → Reverse Proxy), each
+   targeting the control-plane peer on its port (8400 / 8401), with the protection above. Persistent URLs,
+   optional custom domain via CNAME.
+   **Unverified:** whether a proxy service can reach a port bound to the peer's loopback. If it cannot, set
+   `PA_BIND_IP` to the VM's NetBird IP (`100.x.y.z`), which is still not a public interface; `verify.sh local`
+   checks listeners against `PA_BIND_IP`.
+2. **Fallback: `netbird expose`** (`netbird-expose.sh`): `--with-password`/`--with-pin` for the investigator,
+   `--with-user-groups approvers` for the approver. URLs live only while the command runs ("gone on Ctrl+C"),
+   up to 10 sessions per peer. **Prerequisite for both:** an account admin enables **Peer Expose** in the Cloud
+   account settings. Limitation: the credential is passed as a flag and is visible in the VM's process list.
 
 The proxy stamps `X-NetBird-User` and `X-NetBird-Groups` on forwarded requests and strips client-supplied copies.
 The approver process uses `X-NetBird-User` only to prefill the name field. `APPROVED` stores the typed name
