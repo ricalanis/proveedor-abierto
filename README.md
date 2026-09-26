@@ -60,20 +60,24 @@ Neither VM opens an inbound port.
 | Role | Process | Can | NetBird access policy |
 |------|---------|-----|-----------------------|
 | Investigator | `PA_ROLE=investigator` (default) | Read everything and export. Server side is read-only; the watchlist lives in the browser. | investigators group → investigator URL |
-| Approver | `PA_ROLE=approver` | Everything above, plus phase sign-off in `/approvals`, which writes `case/<phase>/APPROVED` | approvers group → approver URL |
+| Approver | `PA_ROLE=approver` | Everything above, plus phase sign-off in `/approvals`, which writes `case/<phase>/APPROVED` | SSO restricted to the approvers group → approver URL |
 
 The role boundary is enforced in the app as well as at the gateway: the investigator process returns 403 for
-approval routes, refuses cross-origin approval posts, and never writes files. When the proxy forwards the
-signed-in user (`PA_IDENTITY_HEADER`), the approval is recorded under that identity.
+approval routes, refuses cross-origin approval posts, and runs in a container with the case mounted read-only.
+The proxy's `X-NetBird-User` header only prefills the approver's name; `APPROVED` records the name typed in.
 
 ### NetBird evidence
 
-*Pending: added once the gateway is live on the Vultr VMs.*
+How it is deployed and gated: [`deploy/README.md`](deploy/README.md). The two containers bind to loopback only;
+`netbird expose` publishes one URL per role with its own credential (password or PIN for investigators, SSO
+restricted to an approvers group for approvers). `deploy/verify.sh` proves the gate.
 
-- [ ] Reverse-proxy configuration for the two URLs (screenshot)
-- [ ] Access policies: investigators → investigator URL, approvers → approver URL (screenshot)
-- [ ] Peer list showing the control-plane and sandbox VMs, connected peer to peer (screenshot)
-- [ ] `ss -tlnp` / firewall listing on both VMs showing zero inbound ports
+- [x] `deploy/verify.sh local` passes on a local rehearsal: loopback-only listeners, investigator 403 on approval
+  routes, cross-origin approval refused, investigator container read-only. Binding to `0.0.0.0` makes it fail.
+- [ ] `deploy/verify.sh remote` from outside the mesh: VM app ports closed, unauthenticated URLs refused *(pending VM)*
+- [ ] Reverse-proxy services and their authentication settings (screenshot) *(pending VM)*
+- [ ] Access groups: investigators vs approvers (screenshot) *(pending VM)*
+- [ ] Peer list: control-plane and sandbox VMs connected peer to peer (screenshot, engine side) *(pending VM)*
 
 ## Built during the event
 

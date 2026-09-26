@@ -1,0 +1,49 @@
+# Two app processes on the control-plane VM, one per role. Host ports bind to loopback (or the NetBird
+# interface IP) only, so the VM opens no public app port; NetBird's reverse proxy is the only way in.
+name: proveedor-abierto
+
+x-app: &app
+  build:
+    context: ..
+    dockerfile: deploy/Dockerfile
+  image: proveedor-abierto-app:local
+  restart: unless-stopped
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  environment: &env
+    # File lake: PA_GOLD_DIR=/lake (mounted below). S3 lake: set PA_GOLD_DIR to empty in .env and provide
+    # lake.yaml (mounted at /config/lake.yaml) plus AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY.
+    PA_GOLD_DIR: ${PA_GOLD_DIR_IN_CONTAINER-/lake}
+    PA_LAKE_YAML: /config/lake.yaml
+    PA_CASE_DIR: /case
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+    AWS_REGION: ${AWS_REGION:-}
+
+services:
+  investigator:
+    <<: *app
+    environment:
+      <<: *env
+      PA_ROLE: investigator
+    volumes:
+      - ${PA_LAKE_DIR:-../.lake}:/lake:ro
+      - ${PA_CASE_HOST_DIR:-../case}:/case:ro          # read-only: the investigator process cannot write anything
+      - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
+    ports:
+      - "${PA_BIND_IP:-127.0.0.1}:${PA_INVESTIGATOR_PORT:-8400}:8400"
+
+  approver:
+    <<: *app
+    environment:
+      <<: *env
+      PA_ROLE: approver
+      PA_IDENTITY_HEADER: X-NetBird-User              # prefills the approver's name; nothing depends on it
+    volumes:
+      - ${PA_LAKE_DIR:-../.lake}:/lake:ro
+      - ${PA_CASE_HOST_DIR:-../case}:/case:rw          # only the approver writes, and only APPROVED markers
+      - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
+    ports:
+      - "${PA_BIND_IP:-127.0.0.1}:${PA_APPROVER_PORT:-8401}:8400"

@@ -1,0 +1,15 @@
+[Unit]
+Description=Proveedor Abierto: publish the investigator and approver URLs through NetBird
+After=network-online.target netbird.service docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Credentials: put PA_INVESTIGATOR_PASSWORD / PA_APPROVER_GROUPS in this root-only file (chmod 600).
+EnvironmentFile=/etc/proveedor-abierto/expose.env
+ExecStart=/opt/proveedor-abierto/deploy/netbird-expose.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

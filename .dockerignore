@@ -1,0 +1,11 @@
+.venv
+.cache
+.lake
+.pytest_cache
+.ruff_cache
+.hallmark
+**/__pycache__
+.git
+lake.yaml
+.env
+deploy/.env

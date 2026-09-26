@@ -8,3 +8,4 @@ node_modules/
 .ruff_cache/
 .hallmark/
 .lake/
+deploy/.env
