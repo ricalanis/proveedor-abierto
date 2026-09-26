@@ -30,6 +30,7 @@
         <div><dt>Evaluated</dt><dd>{{ st.evaluated|brief(600) }}</dd></div>
       </dl>
       <p class="stop__meta mono muted">{{ st.step_id }} · {{ st.ts }}{% if st.source_id %} · {{ st.source_id }}{% endif %}{% if st.objective_id %} · objective {{ st.objective_id }}{% endif %}</p>
+      {% if stop.discovered_by %}<p class="note">How this source was found: <span class="mono">{{ stop.discovered_by }}</span></p>{% endif %}
       {% if stop.objective %}<pre class="record record--short">{{ stop.objective|tojson(indent=2) }}</pre>{% endif %}
       {% for d in stop.docs %}
       <details class="doc" {% if loop.first %}open{% endif %}>

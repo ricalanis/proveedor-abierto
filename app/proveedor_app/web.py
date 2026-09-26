@@ -280,6 +280,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         tdds = sorted({s["tdd_path"] for s in r.trace if s.get("tdd_path")})
         sample = next((v for v in r.values.values() if r.steps_by_value.get(v.value_id)), None)
         return render(request, "journal_index.html", nav="journal", run=r, by_phase=by_phase, anchors=case.anchors(),
+                      sources=list(case.sources().values()),
                       tdds=[{"path": p, "exists": case.exists(p)} for p in tdds], sample=sample,
                       PHASE_NAMES=investigate.PHASE_NAMES)
 
@@ -393,7 +394,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(404, f"no live feed for run {run_id}")
         jobs = settings.store.live_jobs(run_id)
         backend = backend_of((status or {}).get("metrics"), [*steps, status or {}])
-        return {"run_id": run_id, "steps": steps, "new": steps[after:][::-1], "panel": live.summarize(steps, status),
+        panel = live.summarize(steps, status)
+        known = case.sources()
+        for src in panel["sources"]:
+            src.setdefault("discovered_by", investigate.discovered_by(src)
+                           or (known.get(src.get("source_id")) or {}).get("discovered_by"))
+        return {"run_id": run_id, "steps": steps, "new": steps[after:][::-1], "panel": panel,
                 "proof": live.proof(jobs), "backend": backend}
 
     @app.get("/run")

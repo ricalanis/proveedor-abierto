@@ -184,6 +184,15 @@ def diff_supplier(old: dict | None, new: dict | None) -> list[dict]:
 PHASE_NAMES = {1: "Scope", 2: "Ontology", 3: "Fan out", 4: "Local scoping", 5: "Execute"}
 
 
+def discovered_by(record: dict | None) -> str | None:
+    """How a source was found: `discovered_by` (contract), else the engine's earlier `discovery_provider`."""
+    record = record or {}
+    value = record.get("discovered_by") or record.get("discovery_provider")
+    if isinstance(value, dict):  # tolerate a structured form, e.g. {"provider": ..., "detail": ...}
+        value = value.get("provider") or value.get("name") or ", ".join(f"{k}: {v}" for k, v in value.items())
+    return str(value) if value else None
+
+
 class CaseDir:
     """Read-only, path-safe access to a case package directory."""
 
@@ -208,6 +217,29 @@ class CaseDir:
     def latest(self, pattern: str) -> str | None:
         found = sorted(self.root.glob(pattern))
         return str(found[-1].relative_to(self.root)) if found else None
+
+    def objectives(self) -> list[dict]:
+        text = self.read("03-fanout/objectives.yaml", limit=10**7)
+        if not text:
+            return []
+        try:
+            data = yaml.safe_load(text)
+        except yaml.YAMLError:
+            return []
+        items = data.get("objectives", []) if isinstance(data, dict) else data or []
+        return [o for o in items if isinstance(o, dict)]
+
+    def sources(self) -> dict[str, dict]:
+        """source_id -> {url, source_type, discovered_by, objectives} from the Phase 3 objectives."""
+        out: dict[str, dict] = {}
+        for o in self.objectives():
+            sid = o.get("source_id")
+            if not sid:
+                continue
+            s = out.setdefault(sid, {"source_id": sid, "url": o.get("source_url"), "source_type": o.get("source_type"),
+                                     "discovered_by": discovered_by(o), "objectives": []})
+            s["objectives"].append(o.get("id"))
+        return out
 
     def objective(self, objective_id: str | None, source_id: str | None = None) -> dict | None:
         text = self.read("03-fanout/objectives.yaml", limit=10**6)
@@ -243,6 +275,7 @@ def journal_chain(run: Run, case: CaseDir, value_id: str) -> list[dict]:
                                      "text": case.read(step["tdd_path"], limit=1800)})
             if step.get("phase") == 3 and step.get("objective_id"):
                 stop["objective"] = case.objective(step["objective_id"], step.get("source_id"))
+                stop["discovered_by"] = discovered_by(stop["objective"])
             stops.append(stop)
         replays.append(stops)
     return replays

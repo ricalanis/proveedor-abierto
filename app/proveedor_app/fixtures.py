@@ -467,8 +467,15 @@ def _write_live_record(lake: Path, run_id: str, suppliers: list[dict], trace: li
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "trace.live.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in live))
     (run_dir / "jobs.jsonl").write_text("".join(json.dumps(j, ensure_ascii=False) + "\n" for j in jobs))
+    health: dict[str, dict] = {}
+    for step in trace:
+        if step["phase"] == 5 and step.get("source_id"):
+            h = health.setdefault(step["source_id"], {"ok": 0, "failed": 0, "yield": 0})
+            h["failed" if "fail" in str(step.get("evaluated", "")).lower() else "ok"] += 1
+            h["yield"] += len(step.get("value_ids") or [])
+    sources = [{"source_id": sid, "source_type": SOURCES[sid][1], "health": h} for sid, h in health.items()]
     status = {"run_id": run_id, "state": "done", "phase": 5, "checkpoint_pending": None,
-              "updated_at": trace[-1]["ts"], "sources": [], "metrics": metrics, "generated_by": GEN}
+              "updated_at": trace[-1]["ts"], "sources": sources, "metrics": metrics, "generated_by": GEN}
     (run_dir / "status.json").write_text(json.dumps(status, indent=2))
     (lake / "runs" / CASE_ID / "latest.json").write_text(json.dumps({"run_id": run_id}))
 

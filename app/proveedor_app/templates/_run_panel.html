@@ -49,10 +49,11 @@
   <h2 id="sources-live-h">Sources</h2>
   {% if p.sources %}
   <table class="ledger ledger--sources">
-    <thead><tr><th scope="col">Source</th><th scope="col" class="num">OK</th><th scope="col" class="num">Failed</th><th scope="col" class="num">Values</th></tr></thead>
+    <thead><tr><th scope="col">Source</th><th scope="col">Found by</th><th scope="col" class="num">OK</th><th scope="col" class="num">Failed</th><th scope="col" class="num">Values</th></tr></thead>
     <tbody>
     {% for src in p.sources %}{% set h = src.health or {} %}
       <tr><th scope="row"><span class="mono">{{ src.source_id }}</span><span class="sub">{{ SOURCE_TYPE_LABELS.get(src.source_type, src.source_type or "") }}</span></th>
+        <td class="mono found-by" data-k="found-{{ src.source_id }}">{{ src.discovered_by or "—" }}</td>
         <td class="num mono" data-k="ok-{{ src.source_id }}">{{ h.ok or 0 }}</td>
         <td class="num mono{% if h.failed %} failed{% endif %}" data-k="failed-{{ src.source_id }}">{{ h.failed or 0 }}</td>
         <td class="num mono" data-k="yield-{{ src.source_id }}">{{ h.yield or 0 }}</td></tr>

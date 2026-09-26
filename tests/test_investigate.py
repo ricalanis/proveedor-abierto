@@ -194,3 +194,24 @@ def test_approver_works_before_any_gold(fixture_root, case_copy, tmp_path):
     r = c.get("/")
     assert r.status_code == 503 and "No gold export to read yet" in r.text
     assert c.get("/healthz").json()["run_id"] is None
+
+
+def test_discovered_by_shown_where_sources_appear(case_copy, store, fixture_root, lake_copy=None):
+    import yaml
+    from fastapi.testclient import TestClient
+    from proveedor_app.web import Settings, create_app
+
+    path = case_copy / "03-fanout" / "objectives.yaml"
+    doc = yaml.safe_load(path.read_text())
+    doc["objectives"][0]["discovered_by"] = "wikidata_official_website"
+    doc["objectives"][1]["discovery_provider"] = "ocds_catalog"  # earlier engine field name still renders
+    path.write_text(yaml.safe_dump(doc))
+    assert investigate.discovered_by({"discovered_by": {"provider": "model_proposal"}}) == "model_proposal"
+    c = TestClient(create_app(Settings(store=store, case_dir=case_copy)))
+    index = c.get("/journal").text
+    assert "wikidata_official_website" in index and "ocds_catalog" in index and "Found by" in index
+    ref = next(v for v in store.run().values.values()
+               if store.run().lineage(v.value_id) and v.data["evidence"]
+               and v.data["evidence"][0]["source_id"] == doc["objectives"][0]["source_id"])
+    assert "How this source was found" in c.get(f"/journal/{ref.value_id}").text
+    assert "Found by" in c.get("/run/run-fixture-0001").text
