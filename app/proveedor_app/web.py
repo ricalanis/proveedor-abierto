@@ -137,6 +137,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         r = ctx.get("run")
         ctx.setdefault("backend", r.inference_backend if r else None)
         ctx.setdefault("synthetic", bool(r and r.case_id.startswith("fixture")))
+        ctx.setdefault("preview", bool(r and r.metrics.get("preview")))
         return templates.TemplateResponse(request, name, ctx)
 
     @app.exception_handler(NoGold)
@@ -396,8 +397,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/run/{run_id}", response_class=HTMLResponse)
     def run_view(request: Request, run_id: str):
         m = run_view_model(run_id)
+        status = settings.store.live_status(run_id) or {}
         return render(request, "run.html", nav="run", run=None, live_run_id=run_id, m=m, recent=m["new"][:150],
                       backend=m["backend"], synthetic=settings.store.case_id.startswith("fixture"),
+                      preview=bool(status.get("preview") or (status.get("metrics") or {}).get("preview")),
                       PHASES=live.PHASES, MODE_NAMES=live.MODE_NAMES,
                       CHECKPOINT_PHASE=live.CHECKPOINT_PHASE, others=settings.store.live_run_ids())
 

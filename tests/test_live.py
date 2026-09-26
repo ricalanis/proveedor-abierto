@@ -188,3 +188,23 @@ def test_fixture_jobs_match_engine_schema(lake, validator_for):
     live.Replayer(lake, "run-fixture-0001", duration=0.0, new_run_id="jobs-replay").play(sleep=lambda s: None)
     raw = (lake / "runs" / "fixture-case" / "jobs-replay" / "jobs.jsonl").read_text().splitlines()
     assert raw and not [e.message for line in raw[:30] for e in v.iter_errors(json.loads(line))]
+
+
+def test_preview_output_is_labelled(lake, fixture_root):
+    run_dir = lake / "gold" / "fixture-case" / "run-fixture-0001"
+    metrics = json.loads((run_dir / "metrics.json").read_text())
+    (run_dir / "metrics.json").write_text(json.dumps({**metrics, "preview": True}))
+    status_path = lake / "runs/fixture-case/run-fixture-0001/status.json"
+    status_path.write_text(json.dumps({**json.loads(status_path.read_text()), "preview": True}))
+    c = _client(lake, fixture_root / "case")
+    assert "Preview past a checkpoint." in c.get("/").text
+    assert "Preview past a checkpoint." in c.get("/run/run-fixture-0001").text
+
+
+def test_evidence_format_is_shown(lake, fixture_root):
+    path = lake / "gold" / "fixture-case" / "run-fixture-0001" / "suppliers.jsonl"
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    rows[0]["fields"]["tax_id"]["evidence"][0]["format"] = "xlsx"
+    path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    frag = _client(lake, fixture_root / "case").get(f"/fragments/evidence/{rows[0]['fields']['tax_id']['value_id']}")
+    assert "Procurement portal" in frag.text and "xlsx" in frag.text
