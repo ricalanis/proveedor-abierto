@@ -1,0 +1,11 @@
+# Pointer to this case's external data lake on Vultr. Secrets come from env vars, never this file.
+bronze:
+  kind: s3            # Vultr Object Storage
+  bucket: <bucket-name>
+  endpoint: <region>.vultrobjects.com
+silver:
+  postgres_url_env: SILVER_DATABASE_URL
+  rdf_store_url_env: OXIGRAPH_URL
+gold:
+  rdf_store_url_env: OXIGRAPH_URL
+  export: [csv, rdf, ocds-json]
