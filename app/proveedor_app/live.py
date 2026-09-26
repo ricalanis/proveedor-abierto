@@ -57,6 +57,8 @@ def step_kind(step: dict) -> str | None:
     screen = step.get("screen") if isinstance(step.get("screen"), dict) else {}
     if ev == "quarantine" or screen.get("flagged") is True:
         return "quarantine"
+    if ev == "loop" or isinstance(step.get("loop"), dict):
+        return "loop"
     req = step.get("requested") if isinstance(step.get("requested"), dict) else {}
     evald = step.get("evaluated") if isinstance(step.get("evaluated"), dict) else {}
     if ev == "verify" or isinstance(step.get("verify"), dict) or "vision" in str(req.get("tool") or "") \
@@ -95,6 +97,8 @@ def _details(s: dict, kind: str) -> dict:
                 "outcome": g.get("outcome"), "approval_path": g.get("approval_path")}
     if kind == "kill":
         return {"reason": evald.get("reason") or ex.get("reason")}
+    if kind == "loop":
+        return _loop_details(s, evald, ex)
     if kind == "quarantine":
         sc = s.get("screen") if isinstance(s.get("screen"), dict) else {}
         return {"jev_choice": sc.get("jev_choice"), "jev_confidence": sc.get("jev_confidence"),
@@ -128,6 +132,119 @@ def annotate(steps: list[dict]) -> list[dict]:
     return out
 
 
+# --- phase loops (CONTRACT v0.9.6) ---------------------------------------------------------------------------
+LOOP_ROLES = ("gather", "propose", "critique", "revise", "check", "decide")
+STOP_LABELS = {"checks_passed": "checks passed", "budget": "budget reached", "human": "a person decided",
+               "max_iterations": "iteration cap"}
+
+
+def _loop_details(s: dict, evald: dict, ex: dict) -> dict:
+    lp = s.get("loop") if isinstance(s.get("loop"), dict) else {}
+    usage = s.get("usage") if isinstance(s.get("usage"), dict) else {}
+    gen = s.get("generated_by") if isinstance(s.get("generated_by"), dict) else {}
+    role = lp.get("role") if lp.get("role") in LOOP_ROLES else "propose"
+    phase = lp.get("phase") if lp.get("phase") == "outer" else (lp.get("phase") or s.get("phase"))
+    human = role == "revise" and (gen.get("backend") == "human" or evald.get("source") == "human")
+    objections = [str(o) for o in lp.get("objections") or [] if str(o).strip()]
+    return {"phase": phase, "iteration": lp.get("iteration") if isinstance(lp.get("iteration"), int) else 1,
+            "role": role, "model": lp.get("model") or usage.get("model") or (None if human else gen.get("model")),
+            "verdict": lp.get("verdict"), "objections": objections, "stop_reason": lp.get("stop_reason"),
+            "reopen": ex.get("reopen") if role == "decide" else None, "human": human,
+            "reason": evald.get("reason") or ex.get("reason"),
+            "usd": usage.get("est_usd") if isinstance(usage.get("est_usd"), (int, float)) else None}
+
+
+def is_reopen_marker(s: dict) -> bool:
+    """An outer-loop decision renders as its own marker row between execution rounds, not inside a thread."""
+    d = s.get("detail") or {}
+    return s.get("kind") == "loop" and d.get("phase") == "outer" and d.get("role") == "decide"
+
+
+def phase_name(n) -> str:
+    return dict(PHASES).get(n, str(n))
+
+
+def loop_threads(steps: list[dict]) -> list[dict]:
+    """Group annotated loop steps (chronological) into threads, one per run of a phase's loop. A thread continues while
+    iteration numbers do not go back; an iteration lower than the thread's highest starts a new thread (the phase was
+    run again, e.g. reopened by the gap loop). Thread ids are stable as steps are appended."""
+    threads: list[dict] = []
+    current: dict = {}
+    for idx, s in enumerate(steps):
+        if s.get("kind") != "loop" or is_reopen_marker(s):
+            continue
+        d = s["detail"]
+        phase, it = d["phase"], d["iteration"]
+        t = current.get(phase)
+        if t is None or it < t["max_iteration"]:
+            n = sum(1 for x in threads if x["phase"] == phase) + 1
+            key = "outer" if phase == "outer" else f"p{phase}"
+            t = {"id": f"loop-{key}-{n}", "phase": phase, "first": idx, "last": idx, "max_iteration": it,
+                 "by_iteration": {}, "step_ids": []}
+            threads.append(t)
+            current[phase] = t
+        t["last"], t["max_iteration"] = idx, max(t["max_iteration"], it)
+        t["step_ids"].append(s.get("step_id"))
+        t["by_iteration"].setdefault(it, []).append(s)
+    latest = max(threads, key=lambda t: t["last"]) if threads else None
+    for t in threads:
+        members = [x for it in sorted(t["by_iteration"]) for x in t["by_iteration"][it]]
+        t["iterations"] = [{"n": it, "steps": t["by_iteration"][it]} for it in sorted(t["by_iteration"])]
+        stops = [x["detail"]["stop_reason"] for x in members if x["detail"].get("stop_reason")]
+        t["stop_reason"] = stops[-1] if stops else None
+        t["stop_label"] = STOP_LABELS.get(t["stop_reason"], t["stop_reason"]) if t["stop_reason"] else None
+        costs = [x["detail"]["usd"] for x in members if x["detail"].get("usd") is not None]
+        t["usd"] = round(sum(costs), 4) if costs else None
+        t["objections"] = sum(len(x["detail"]["objections"]) for x in members)
+        t["label"] = "Gap loop" if t["phase"] == "outer" else f"Phase {t['phase']} loop"
+        t["open"] = t is latest
+        del t["by_iteration"]
+    return threads
+
+
+def stream_items(steps: list[dict], start: int = 0, threads: list[dict] | None = None,
+                 incremental: bool = False) -> tuple[list[dict], list[dict]]:
+    """The step stream from index `start` on, newest first: loop steps folded into their thread (placed at the thread's
+    first step at or after `start`), everything else as single steps. With `incremental` (the live poll, `start` = the
+    steps the page already has), a thread that began before `start` is not placed again: it is returned in the second
+    list so the page can re-render it in place."""
+    threads = loop_threads(steps) if threads is None else threads
+    member = {sid: t for t in threads for sid in t["step_ids"]}
+    items, placed, updated = [], set(), {}
+    for idx in range(max(start, 0), len(steps)):
+        s = steps[idx]
+        t = member.get(s.get("step_id")) if s.get("kind") == "loop" else None
+        if t is None:
+            items.append({"step": s})
+        elif incremental and t["first"] < start:
+            updated[t["id"]] = t
+        elif t["id"] not in placed:
+            placed.add(t["id"])
+            items.append({"thread": t})
+    return items[::-1], list(updated.values())
+
+
+def loop_summary(steps: list[dict], metrics: dict | None) -> dict:
+    """The panel's loop line: iterations and stop reason per phase (metrics.loops when the engine wrote it, else the
+    steps), and how often the gap loop reopened each phase."""
+    rows = []
+    for row in (metrics or {}).get("loops") or []:
+        if isinstance(row, dict):
+            rows.append({"phase": row.get("phase"), "iterations": row.get("iterations"),
+                         "stop_reason": row.get("stop_reason"),
+                         "stop_label": STOP_LABELS.get(row.get("stop_reason"), row.get("stop_reason")),
+                         "usd": row.get("usd")})
+    if not rows:
+        for t in loop_threads(steps):
+            rows.append({"phase": t["phase"], "iterations": len(t["iterations"]), "stop_reason": t["stop_reason"],
+                         "stop_label": t["stop_label"], "usd": t["usd"]})
+    reopened: dict = {}
+    for s in steps:
+        if is_reopen_marker(s) and s["detail"].get("reopen") is not None:
+            reopened[s["detail"]["reopen"]] = reopened.get(s["detail"]["reopen"], 0) + 1
+    return {"rows": rows, "reopened": sorted(reopened.items(), key=lambda kv: str(kv[0]))}
+
+
 def property_ratios(metrics: dict, domain: Domain | None) -> list[dict]:
     """Per-property completeness bars from metrics in §11 shape (or the pre-§11 per_field_completeness)."""
     if domain is None:
@@ -142,7 +259,7 @@ def summarize(steps: list[dict], status: dict | None, domain: Domain | None = No
     status = status or {}
     modes = {m: 0 for m in MODE_RANK}
     events = {"escalation": 0, "crystallization": 0, "repair": 0, "hard_stop": 0, "failure": 0, "verify": 0,
-              "action_gate": 0, "limit_kill": 0, "quarantine": 0}
+              "action_gate": 0, "limit_kill": 0, "quarantine": 0, "loop": 0}
     verdicts = {"achieved": 0, "not_achieved": 0, "uncertain": 0}
     values = 0
     for s in steps:
@@ -171,6 +288,7 @@ def summarize(steps: list[dict], status: dict | None, domain: Domain | None = No
         "verdicts": verdicts,
         "value_count": values,
         "step_count": len(steps),
+        "loops": loop_summary(steps, metrics),
     }
 
 

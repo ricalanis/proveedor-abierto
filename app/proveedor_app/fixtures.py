@@ -190,7 +190,8 @@ def _render_run(
             "value_ids": kw.get("value_ids", []),
             "ts": (ts0 + timedelta(seconds=len(trace) * 7)).isoformat(),
             "generated_by": GEN,
-            **{k: kw[k] for k in ("event", "verify", "repair", "gate", "screen", "screenshot_key") if k in kw},
+            **{k: kw[k] for k in ("event", "verify", "repair", "gate", "screen", "loop", "usage", "screenshot_key")
+               if k in kw},
         }
         trace.append(s)
         return s
@@ -211,8 +212,59 @@ def _render_run(
         mode_counts[action["mode"]] += 1
         return s
 
-    p1 = step(1, None, "case/brief.md", "draft personas, jobs and a global PRD with a DoD", "wrote 01-scope/prd.md",
-              "PRD approved", mode="S1")
+    loop_usd: dict = {}
+
+    def loop_step(phase, loop_phase, iteration, role, parent, observed, requested, executed, evaluated, model=None,
+                  tokens=(0, 0), **lp) -> dict:
+        """CONTRACT v0.9.6: one role of one iteration of a phase loop (gather → propose → critique → revise → check),
+        or an outer gap-loop decision."""
+        extra = {}
+        if model:
+            usd = round(tokens[0] * 0.4e-6 + tokens[1] * 1.6e-6, 5)
+            loop_usd[loop_phase] = loop_usd.get(loop_phase, 0) + usd
+            extra["usage"] = {"model": model, "backend": GEN["backend"], "input_tokens": tokens[0],
+                              "output_tokens": tokens[1], "est_usd": usd}
+        return step(phase, parent, observed, requested, executed, evaluated, mode="S1", event="loop",
+                    loop={"phase": loop_phase, "iteration": iteration, "role": role,
+                          **({"model": model} if model else {}), **lp}, **extra)
+
+    # Phase 1 as a bounded loop: the critic (a different model family) objects, the proposer revises, checks decide.
+    lp = loop_step(1, 1, 1, "gather", None, "case/brief.md and 6 public references",
+                   {"tool": "research.gather"}, "research ledger: 6 entries", {"status": "ok"},
+                   model="glm-5.3", tokens=(5200, 900))
+    lp = loop_step(1, 1, 1, "propose", lp["step_id"], "research ledger", {"tool": "prd.propose"},
+                   "PRD draft 1: 2 personas, 3 jobs, 4 definition-of-done criteria", {"status": "ok"},
+                   model="glm-5.3", tokens=(6100, 1800))
+    lp = loop_step(1, 1, 1, "critique", lp["step_id"], "PRD draft 1", {"tool": "prd.critique"},
+                   "critic review of draft 1", {"status": "objections"}, model="minimax-m3", tokens=(4300, 700),
+                   verdict="revise", objections=[
+                       "The definition of done has no per-property completeness criterion.",
+                       "Criterion d1 targets 1000 entities; the run budget covers about 60."])
+    lp = loop_step(1, 1, 1, "revise", lp["step_id"], "2 objections", {"tool": "prd.revise"},
+                   "PRD draft 2: added the 80% core-profile criterion; entity target lowered to 50 (proposed, "
+                   "with a feasibility note)", {"status": "ok"}, model="glm-5.3", tokens=(6800, 1900))
+    lp = loop_step(1, 1, 1, "check", lp["step_id"], "PRD draft 2", {"tool": "prd.check"},
+                   "compile each criterion to a query", {"status": "failed",
+                                                         "detail": "1 of 5 criteria is not testable as a query"},
+                   verdict="fail")
+    lp = loop_step(1, 1, 2, "revise", lp["step_id"], "check failure: criterion d4", {"tool": "prd.revise"},
+                   "PRD draft 3: criterion d4 rewritten as a count query", {"status": "ok"}, model="glm-5.3",
+                   tokens=(6900, 1200))
+    lp = loop_step(1, 1, 2, "check", lp["step_id"], "PRD draft 3", {"tool": "prd.check"},
+                   "compile each criterion to a query", {"status": "ok", "detail": "all 5 criteria compile"},
+                   verdict="pass", stop_reason="checks_passed")
+    # The approver denied that draft with a reason (v0.9.5): the reason enters the loop as a human revision.
+    lp = loop_step(1, 1, 3, "revise", lp["step_id"], "01-scope/APPROVED: decision deny", {"tool": "prd.revise"},
+                   "reason recorded as human revision 1", {"status": "ok", "source": "human",
+                                                           "reason": "DoD must follow the case definition"})
+    lp = loop_step(1, 1, 3, "propose", lp["step_id"], "PRD draft 3 + human revision 1", {"tool": "prd.propose"},
+                   "PRD draft 4: definition of done restated from the case definition", {"status": "ok"},
+                   model="glm-5.3", tokens=(7400, 1700))
+    lp = loop_step(1, 1, 3, "check", lp["step_id"], "PRD draft 4", {"tool": "prd.check"},
+                   "compile each criterion to a query", {"status": "ok", "detail": "all 5 criteria compile"},
+                   verdict="pass", stop_reason="checks_passed")
+    p1 = step(1, None, "case/brief.md", "draft personas, jobs and a global PRD with a DoD",
+              "wrote 01-scope/prd.md", "PRD approved", mode="S1")
     p2 = step(2, p1["step_id"], "01-scope/prd.md", "derive factors, taxonomies and schema",
               "wrote 02-ontology/versions/v1.md", "ontology v1 approved", mode="S1")
     tdd_steps: dict[str, dict] = {}
@@ -401,6 +453,26 @@ def _render_run(
         run_contracts.append(dict(c, evidence=[ev], generated_by=GEN))
     contracts = run_contracts
 
+    # The outer gap loop after execution (v0.9.6): a gold gap reopens discovery, a second round closes it.
+    last = trace[-1]["step_id"]
+    gap = loop_step(5, "outer", 1, "decide", last, "metrics on gold after round 1", {"tool": "gap.decide"},
+                    {"reopen": 3, "reason": "gold gap: founding_date below 80%"},
+                    {"status": "ok", "reason": "gold gap: founding_date below 80%"}, model="glm-5.3-flash",
+                    tokens=(3100, 200), verdict="reopen")
+    host, _st, objective, _m = SOURCES["registro-example"]
+    tdd_path = tdd_steps["registro-example"]["tdd_path"]
+    p3b = step(3, gap["step_id"], "gap query: founding_date", "targeted discovery for founding_date",
+               "1 new lead confirmed by a sandbox capture", "lead passes the authority check",
+               source_id="registro-example", objective_id=objective, mode="S1")
+    p5b = step(5, p3b["step_id"], f"company pages on {host}", "re-extract founding_date for 4 entities",
+               "emit.observation x4", "passed SHACL, promoted to gold", source_id="registro-example",
+               objective_id=objective, tdd_path=tdd_path, mode="S1")
+    loop_step(5, "outer", 2, "decide", p5b["step_id"], "metrics on gold after round 2", {"tool": "gap.decide"},
+              {"reopen": None, "reason": "every definition-of-done criterion met on gold"},
+              {"status": "ok", "reason": "every definition-of-done criterion met on gold"}, model="glm-5.3-flash",
+              tokens=(3000, 150), verdict="done", stop_reason="checks_passed")
+    mode_counts["S1"] += 4
+
     _add_flags_and_links(suppliers, contracts)
     metrics = {}  # layout-specific keys are added by generate()
     used = {n for s in suppliers for n in s["classified_as"]}
@@ -416,6 +488,9 @@ def _render_run(
             ]
         },
         mode_counts=mode_counts,
+        loops=[{"phase": 1, "iterations": 3, "stop_reason": "checks_passed", "usd": round(loop_usd.get(1, 0), 4)},
+               {"phase": "outer", "iterations": 2, "stop_reason": "checks_passed",
+                "usd": round(loop_usd.get("outer", 0), 4)}],
         jobs={"ok": sum(1 for s in trace if s["phase"] == 5), "failed_by_reason": {"timeout": 3, "captcha_stop": 1}},
     )
     return suppliers, contracts, trace, metrics

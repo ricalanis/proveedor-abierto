@@ -453,7 +453,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             src.setdefault("discovered_by", investigate.discovered_by(src)
                            or (known.get(src.get("source_id")) or {}).get("discovered_by"))
         return {"run_id": run_id, "steps": steps, "new": steps[after:][::-1], "panel": panel,
-                "proof": live.proof(jobs, steps), "backend": backend}
+                "threads": live.loop_threads(steps), "proof": live.proof(jobs, steps), "backend": backend}
 
     @app.get("/run")
     def run_latest():
@@ -467,7 +467,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         m = run_view_model(run_id)
         limit = max(1, min(limit, 2000))
         status = settings.store.live_status(run_id) or {}
-        return render(request, "run.html", nav="run", run=None, live_run_id=run_id, m=m, recent=m["new"][:limit],
+        items, _ = live.stream_items(m["steps"], max(0, len(m["steps"]) - limit), m["threads"])
+        return render(request, "run.html", nav="run", run=None, live_run_id=run_id, m=m, items=items,
                       limit=limit,
                       backend=m["backend"], synthetic=settings.store.case_id.startswith("fixture"),
                       preview=bool(status.get("preview") or (status.get("metrics") or {}).get("preview")),
@@ -479,14 +480,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         m = run_view_model(run_id, max(after, 0))
         env = templates.env
         d = current_domain()
-        steps_html = env.get_template("_steps.html").render(steps=m["new"][:150], MODE_NAMES=live.MODE_NAMES)
+        start = max(after, 0, len(m["steps"]) - 150)
+        items, updated = live.stream_items(m["steps"], start, m["threads"], incremental=after > 0)
+        steps_html = env.get_template("_steps.html").render(items=items, MODE_NAMES=live.MODE_NAMES)
+        thread_tpl = env.get_template("_loop_thread.html")
+        threads_html = [{"id": t["id"], "html": thread_tpl.render(t=t, MODE_NAMES=live.MODE_NAMES)} for t in updated]
         panel_html = env.get_template("_run_panel.html").render(
             m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE, MODE_NAMES=live.MODE_NAMES, domain=d)
         proof_html = env.get_template("_proof.html").render(m=m)
         timeline_html = env.get_template("_timeline.html").render(
             m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE)
         return {"count": len(m["steps"]), "state": m["panel"]["state"], "steps_html": steps_html,
-                "panel_html": panel_html, "timeline_html": timeline_html,
+                "threads_html": threads_html, "panel_html": panel_html, "timeline_html": timeline_html,
                 "proof_html": proof_html}
 
     @app.get("/bronze/{key}")

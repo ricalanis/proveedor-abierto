@@ -67,7 +67,10 @@ def test_section11_run_artifacts(fixture_root, validator_for):
 
 def test_metrics_and_latest(fixture_root, validator_for):
     run_dir = _run_dir(fixture_root)
-    assert not _errors(validator_for("metrics.schema.json"), json.loads((run_dir / "metrics.json").read_text()))
+    from conftest import s12_compat
+
+    v = validator_for("metrics.schema.json")
+    assert not _errors(v, s12_compat(json.loads((run_dir / "metrics.json").read_text()), v.schema, "metrics"))
     latest = run_dir.parent / "latest.json"
     assert not _errors(validator_for("latest.schema.json"), json.loads(latest.read_text()))
 

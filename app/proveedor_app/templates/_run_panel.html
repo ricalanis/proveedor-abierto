@@ -52,6 +52,14 @@
     <span class="event event--limit_kill">Limit kills <span class="mono" data-k="ev-kill">{{ p.events.limit_kill }}</span></span>
     <span class="event event--quarantine">Hostile pages quarantined <span class="mono" data-k="ev-quar">{{ p.events.quarantine }}</span></span>
   </p>
+  {% if p.loops and (p.loops.rows or p.loops.reopened) %}
+  <p class="events loops-line">
+    <span class="event loops-line__label">Loops</span>
+    {% for r in p.loops.rows %}<span class="event" data-k="loop-{{ loop.index }}">{{ "Gap loop" if r.phase == "outer" else "P" ~ r.phase }} <span class="mono">{{ r.iterations }}</span> {{ "iteration" if r.iterations == 1 else "iterations" }}{% if r.stop_label %}, {{ r.stop_label }}{% endif %}</span>
+    {% endfor %}
+    {% if p.loops.reopened %}<span class="event event--reopen" data-k="loop-reopen">Gap loop reopened: {% for ph, n in p.loops.reopened %}P{{ ph }} ×{{ n }}{% if not loop.last %}, {% endif %}{% endfor %}</span>{% endif %}
+  </p>
+  {% endif %}
 </section>
 <section class="panel-block" aria-labelledby="sources-live-h">
   <h2 id="sources-live-h">Sources</h2>

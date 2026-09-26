@@ -1,7 +1,20 @@
-{% set EVENT_LABELS = {"escalation": "Escalated: the cheaper mode failed its check", "crystallization": "Crystallized into a reusable macro", "repair": "Self-healing: code attempt", "hard_stop": "Hard stop: login, captcha or policy; flagged for a human", "failure": "Failed check", "verify": "Vision check", "action_gate": "Approve-before-submit gate", "limit_kill": "Stopped by a resource limit", "quarantine": "Hostile page quarantined: withheld from planning, kept as evidence"} %}
+{% set PHASE_NAMES = {1: "scope", 2: "ontology", 3: "fan out", 4: "local scoping", 5: "execute"} %}
+{% set STOP_LABELS = {"checks_passed": "checks passed", "budget": "budget reached", "human": "a person decided", "max_iterations": "iteration cap"} %}
+{% set EVENT_LABELS = {"escalation": "Escalated: the cheaper mode failed its check", "crystallization": "Crystallized into a reusable macro", "repair": "Self-healing: code attempt", "hard_stop": "Hard stop: login, captcha or policy; flagged for a human", "failure": "Failed check", "verify": "Vision check", "action_gate": "Approve-before-submit gate", "limit_kill": "Stopped by a resource limit", "quarantine": "Hostile page quarantined: withheld from planning, kept as evidence", "loop": "Loop step"} %}
 {% set VERDICT_LABELS = {"achieved": "achieved", "not_achieved": "not achieved", "uncertain": "uncertain"} %}
 {% set KILL_LABELS = {"timeout": "wall-clock timeout", "memory": "memory cap", "pids": "process cap", "max_steps": "step cap"} %}
-{% for s in steps %}{% set d = s.detail or {} %}
+{% for it in items %}{% if it.thread %}{% set t = it.thread %}{% include "_loop_thread.html" %}{% else %}{% set s = it.step %}{% set d = s.detail or {} %}
+{% if s.kind == "loop" and d.role == "decide" and d.phase == "outer" %}
+<li class="step step--reopen" data-step="{{ s.step_id }}">
+  <span class="step__time mono">{{ (s.ts or "")[11:19] }}</span>
+  <span class="mode-badge mode-badge--{{ s.mode }}" title="{{ MODE_NAMES.get(s.mode, s.mode) }}">{{ s.mode }}</span>
+  <div class="step__body">
+    {% if d.reopen %}<p class="step__what reopen">Reopened phase {{ d.reopen }} ({{ PHASE_NAMES.get(d.reopen, "") }}){% if d.reason %}: {{ d.reason }}{% endif %}</p>
+    {% else %}<p class="step__what reopen reopen--none">Gap loop: no reopen needed{% if d.reason %} · {{ d.reason }}{% endif %}</p>{% endif %}
+    <p class="step__did">Gap loop decision {{ d.iteration }}{% if d.stop_reason %} · stopped: {{ STOP_LABELS.get(d.stop_reason, d.stop_reason) }}{% endif %}{% if d.model %} · <span class="mono muted">{{ d.model }}</span>{% endif %}</p>
+  </div>
+</li>
+{% else %}
 <li class="step{% if s.event %} step--{{ s.event }}{% endif %}{% if s.kind == 'verify' %} step--verdict-{{ d.verdict }}{% endif %}" data-step="{{ s.step_id }}">
   <span class="step__time mono">{{ (s.ts or "")[11:19] }}</span>
   <span class="mode-badge mode-badge--{{ s.mode }}" title="{{ MODE_NAMES.get(s.mode, s.mode) }}">{{ s.mode }}</span>
@@ -36,4 +49,4 @@
   {% set shot = d.screenshot_key or s.screenshot_key %}
   {% if shot %}<a class="step__thumb" href="/bronze/{{ shot|urlencode }}" target="_blank" rel="noopener"><img src="/bronze/{{ shot|urlencode }}" alt="Capture from {{ s.source_id or 'this step' }}" width="112" height="63" loading="lazy"></a>{% endif %}
 </li>
-{% endfor %}
+{% endif %}{% endif %}{% endfor %}

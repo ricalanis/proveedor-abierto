@@ -179,6 +179,22 @@
         steps.prepend(...tmp.children);
         while (steps.children.length > 150) steps.lastElementChild.remove();
       }
+      // A loop thread that gained iterations is re-rendered in place, keeping whether the reader had it open.
+      for (const t of data.threads_html || []) {
+        const tmp = document.createElement("ol");
+        tmp.innerHTML = t.html;
+        const next = tmp.firstElementChild;
+        if (!next) continue;
+        const cur = document.getElementById(t.id);
+        if (cur) {
+          const was = cur.querySelector("details");
+          const now = next.querySelector("details");
+          if (was && now) now.open = was.open;
+          cur.replaceWith(next);
+        } else {
+          steps.prepend(next);
+        }
+      }
       count = data.count;
       morph(panel, data.panel_html);
       morph(timeline, data.timeline_html);

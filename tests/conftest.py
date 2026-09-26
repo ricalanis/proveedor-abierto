@@ -73,7 +73,7 @@ def s12_compat(doc: dict, schema: dict, kind: str) -> dict:
     doc = copy.deepcopy(doc)
     props = schema.get("properties") or {}
     if kind == "trace":
-        for key in ("verify", "repair", "gate", "screen"):
+        for key in ("verify", "repair", "gate", "screen", "loop"):  # loop: CONTRACT v0.9.6
             if key not in props:
                 doc.pop(key, None)
         if doc.get("event") not in (props.get("event") or {}).get("enum", [doc.get("event")]):
@@ -85,6 +85,9 @@ def s12_compat(doc: dict, schema: dict, kind: str) -> dict:
         cps = ((props.get("checkpoints") or {}).get("properties") or {})
         if "secrets" not in cps:
             (doc.get("checkpoints") or {}).pop("secrets", None)
+    elif kind == "metrics":  # v0.9.6 loops[]
+        if "loops" not in props:
+            doc.pop("loops", None)
     elif kind == "dod_queries":
         allowed = schema["$defs"]["query"]["properties"]["aggregate"]["enum"]
         doc["queries"] = [q for q in doc.get("queries") or [] if q.get("aggregate") in allowed]
