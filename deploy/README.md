@@ -19,6 +19,10 @@ Cloud dashboard. The VMs allow **zero public inbound ports, SSH included**; admi
 The role boundary holds at three layers: the proxy credential, the process role (routes), and the container
 mounts (the investigator container cannot write even if its code were compromised).
 
+**Secrets on the VM:** never put app or NetBird secrets in cloud-init `user_data`; anything there is readable from
+inside the VM at `169.254.169.254`. Provision them after boot over NetBird into root-only files (`chmod 600`), as
+`systemd/proveedor-expose.service` expects. NetBird Cloud (not self-hosted) also keeps inbound 80/443/UDP 3478 closed.
+
 ## Files
 
 | File | Purpose |
