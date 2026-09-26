@@ -12,6 +12,7 @@ Shared framing, in the deck's words:
   microVM), we run **tier 03, gVisor `runsc`**, for every agent pod, and a throwaway Vultr instance (tier 04) is
   the escalation for anything riskier.
 - **"Five checkpoints", each with verifiable output:** stdout / exit code / files / screenshot / hostname-uname.
+  We show six: the deck's five plus secret hygiene.
 
 ## 1. "Show me the instance."
 
@@ -60,18 +61,27 @@ the ontology and the PRD to the brief.
 
 ## 4. "If I paste `rm -rf /`, what dies?"
 
-**Say:** "Only that job's pod. It runs under gVisor behind an egress allowlist, the isolation probes are
-BLOCKED, and the pod is torn down when the job ends. Nothing runs inside this app."
+**Say:** "Only that job's pod. It runs under gVisor behind an egress allowlist with memory, CPU, process and time
+caps, it holds no secrets, and it is torn down when the job ends. Nothing runs inside this app."
 
-**Screen:** `/run` → **Sandbox proof**:
+**Screen:** `/run` → step stream, then **Sandbox proof**:
+- A **limit kill** badge in the step stream when the extractor loops forever or runs `rm -rf /`: the job is
+  stopped by its timeout or memory cap. The proof panel lists each job's limits (memory, CPU, processes, timeout,
+  steps) and the jobs a limit killed.
 - *Isolation probe*: a non-allowlisted domain, a write outside the pod, and a write outside the writable mount,
-  all **BLOCKED**, for every job;
-- *Teardown*: pod gone, proxy gone, network removed;
+  all **BLOCKED**, for every job.
+- *Secret hygiene*: no keys in the pod's environment or files (0 found); the cloud metadata IP and the NetBird
+  mesh are **BLOCKED** from inside the pod. Every model call is made by the control plane.
+- *Teardown*: pod gone, proxy gone, network removed.
 - *Task and real result*: the verifiable output (status or exit code, stdout when present, links to the captured
   file and screenshot).
 
 Backup: `deploy/verify.sh local`. The app listens on loopback only, and the investigator container cannot write
 the case or its own root filesystem.
+
+**Status:** the proof panel renders the six checks and the limits. The engine emits limits, secret hygiene and
+limit kills per CONTRACT §12 *(pending engine)*; the live Docker sandbox test already shows network and write
+probes BLOCKED and teardown verified.
 
 ## Likely follow-ups
 

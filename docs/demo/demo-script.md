@@ -17,18 +17,24 @@ the audience sees can be clicked back to its capture and to the brief. Show thin
   the same run view, fed by the recording. Say out loud that it is a replay of a recorded run.
 - Pre-pick the demo supplier (one with a signal and a conflict) and the value to replay. Write the IDs here
   once the real run exists: supplier `sup:…`, value `val:…`.
+- Check that the two containment scenarios (hostile page, `rm -rf /` or infinite loop) can be triggered on demand
+  from the engine *(pending engine)*, and rehearse them once.
 
 ## Beats
 
 | Time | Beat | Where | What to do and say |
 |------|------|-------|--------------------|
-| 0:00–0:20 | **Brief → PRD** | terminal, then approver URL `/approvals` | Show `case/brief.md`: one sentence and no dataset. The engine has written a PRD with personas, jobs and a testable definition of done, and is waiting. Open the PRD link, then click **Approve the PRD**. "Only the approver role can do this. The investigator URL returns 403." |
-| 0:20–0:40 | **Ontology** | approver URL `/approvals/02-ontology/factors`, then `/approvals/02-ontology` | Factors show with their evidence. Reject the one without evidence, accept the rest, approve. The taxonomy review shows soundness, coverage and critic labels: "approve numbers, not vibes." Approve. |
-| 0:40–1:05 | **Agents find sources, agree a TDD** | investigator `/journal` | The case package table lists the objectives and technical definition documents the agents produced; none were given. Open one TDD: allowed domains, starting mode and refresh rule. "Four or more public source types, all discovered." |
-| 1:05–1:50 | **Execution, bars climb** | investigator `/run` | Run `ontofill run case/`. Steps stream in with their mode: one D0 download covers the whole tax list; the procurement portal starts as an agentic loop (S1) and is crystallized into a D1 macro; a registry page that fails its check escalates to S2 vision. The per-field bars climb toward the 80% line. Scroll to **Sandbox proof**: "Two instances. One boundary." The tier line reads gVisor (tier 03), because a container is not a sandbox. Five checkpoints per job, each with verifiable output: result and captured file, screenshot, hostname/uname. The isolation probes are BLOCKED and the pods torn down. That answers "if I paste `rm -rf /`, what dies?" |
-| 1:50–2:20 | **Dossier + signal** | investigator `/suppliers/<id>` | Every field shows value, confidence and status. Click a value's captures to show the source link, the screenshot and the selector. Open the signal: rule, evidence, plain-language explanation, "how to verify", and the dispute path. "A signal, not an accusation." |
-| 2:20–2:40 | **Replay to the brief** | click "Trace this value to the brief" | Scroll the journal: value → capture step (mode) → TDD → objective → ontology → PRD → brief. "Any value in the app can do this." |
-| 2:40–3:00 | **Blast radius zero** | terminal / engine evidence | A poisoned page is blocked by the sandbox egress policy. NetBird's three bonus criteria in one breath: zero inbound ports (`verify.sh remote`), gated access per role (two URLs, two credentials), VMs peer to peer. Close on the open export (OCDS JSON) and "fork the case package". Closing line, from the deck: "Blast radius zero is the reason you can let your agent do anything." |
+| 0:00–0:15 | **Brief → PRD** | terminal, then approver URL `/approvals` | Show `case/brief.md`: one sentence and no dataset. The engine has written a PRD with personas, jobs and a testable definition of done, and is waiting. Open the PRD link, then click **Approve the PRD**. "Only the approver role can do this. The investigator URL returns 403." |
+| 0:15–0:35 | **Ontology + action gate** | approver URL `/approvals/02-ontology/factors`, `/approvals/02-ontology`, then an action request under `/approvals` | Reject the factor without evidence, accept the rest, approve. The taxonomy review shows soundness, coverage and critic labels: "approve numbers, not vibes." If an action request is waiting (approve-before-submit gate *(pending engine)*), open it: screenshot, intended action and risk tier; deny it. "Anything final needs a person." |
+| 0:35–0:55 | **Agents find sources, agree a TDD** | investigator `/journal` | The sources table lists what the agents found and how each was found; none were given. Open one TDD: allowed domains, starting mode and refresh rule. |
+| 0:55–1:35 | **Execution, bars climb** | investigator `/run` | Run `ontofill run case/`. Steps stream in with their mode. Point at a browser action followed by its **verify verdict** from a Vultr vision model (Pattern B), and at a **repair** attempt with its stderr and patch (Pattern A). The per-property bars climb. |
+| 1:35–2:05 | **Containment moment** *(scenarios runnable on demand: pending engine)* | investigator `/run`, then **Sandbox proof** | Trigger the hostile page: the verify/guard step flags the prompt injection, and its attempts to reach the metadata IP or another domain come back **BLOCKED** (hard-stop badge in the stream). Then the extractor that runs `rm -rf /` or loops forever: a **limit kill** badge appears (timeout or memory cap). Scroll to Sandbox proof: "Two instances. One boundary." Isolation probe BLOCKED, secret hygiene (no keys in the pod, metadata IP and mesh BLOCKED), the job's resource limits and the kill, teardown verified. "Only the pod died. The host is untouched." |
+| 2:05–2:30 | **Dossier + signal** | investigator `/entities/<id>` | Every property shows value, confidence and status. Click a value's captures: source link, screenshot, selector. Open the signal: rule, evidence, plain-language explanation, how to verify, dispute path. "A signal, not an accusation." |
+| 2:30–2:45 | **Replay to the brief** | click "Trace this value to the brief" | Scroll the journal: value → capture step (mode) → TDD → objective → ontology → PRD → brief. "Any value in the app can do this." |
+| 2:45–3:00 | **Zero-port access + close** | terminal / NetBird console | NetBird's three bonus criteria in one breath: zero inbound ports (`verify.sh remote`), gated access per role (two URLs, two credentials), VMs peer to peer. Close on the open export and "fork the case package". Closing line, from the deck: "Blast radius zero is the reason you can let your agent do anything." |
+
+If the containment scenarios are not runnable on the day, show the recorded ones through the snapshot replay and
+say that they are recorded. Never describe a containment you cannot show.
 
 ## If something breaks
 
@@ -41,6 +47,6 @@ the audience sees can be clicked back to its capture and to the brief. Show thin
 
 ## Numbers to say (fill from the live run, never invent)
 
-- Suppliers at ≥ 80% of core fields: __ / target 50
-- Distinct public source types: __ / target 4
+- Suppliers meeting the definition of done: __ / target 50
+- Distinct public source classes: __ / target 4
 - Gold values without evidence: __ (must be 0)
