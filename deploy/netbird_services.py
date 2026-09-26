@@ -16,6 +16,8 @@ Configuration comes from the environment (deploy/.env or the repo's .env, both g
     PA_INVESTIGATOR_PASSWORD or PA_INVESTIGATOR_PIN     investigator URL credential
     PA_APPROVER_GROUP           IdP distribution group for SSO on the approver URL (preferred), or PA_APPROVER_PIN
     PA_ALLOWED_COUNTRIES        optional, e.g. "US,MX": country allowlist on both services
+    PA_REPLAY_PORT              optional: also a third service <prefix>-replay (the demo-insurance replay role,
+                                compose profile `replay`), gated by the investigator credential
 
 API reference: https://docs.netbird.io/api/resources/services (reverse proxy is in beta). Per
 docs/reference/netbird.md the peer target type is `peer` and the proxy dials the peer's NetBird IP (not
@@ -104,7 +106,7 @@ def free_domain(api) -> str:
 
 
 def desired(api, env: dict[str, str]) -> list[dict]:
-    """The two service bodies we want to exist."""
+    """The service bodies we want to exist: investigator + approver, and replay when PA_REPLAY_PORT is set."""
     peer = find_peer(api, env["PA_CONTROL_PLANE_PEER"])
     host = env.get("PA_TARGET_HOST") or peer.get("ip")
     domain = env.get("PA_PROXY_DOMAIN") or free_domain(api)
@@ -137,8 +139,11 @@ def desired(api, env: dict[str, str]) -> list[dict]:
                 "targets": [{"target_id": peer["id"], "target_type": "peer", "protocol": "http", "host": host,
                              "port": port, "path": "/", "enabled": True}]}
 
-    return [service(prefix, int(env.get("PA_INVESTIGATOR_PORT", 8400)), inv_auth),
-            service(f"{prefix}-approver", int(env.get("PA_APPROVER_PORT", 8401)), app_auth)]
+    services = [service(prefix, int(env.get("PA_INVESTIGATOR_PORT", 8400)), inv_auth),
+                service(f"{prefix}-approver", int(env.get("PA_APPROVER_PORT", 8401)), app_auth)]
+    if env.get("PA_REPLAY_PORT"):  # read-only replay of a recorded run: same credential as the investigator
+        services.append(service(f"{prefix}-replay", int(env["PA_REPLAY_PORT"]), inv_auth))
+    return services
 
 
 def ours(api, names: set[str]) -> dict[str, dict]:

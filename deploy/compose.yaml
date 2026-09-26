@@ -37,6 +37,25 @@ services:
     ports:
       - "${PA_BIND_IP:-127.0.0.1}:${PA_INVESTIGATOR_PORT:-8400}:8400"
 
+  # Demo insurance (profile `replay`): replays a recorded run as live at /run, read-only, investigator role. The lake
+  # is mounted read-only and copied into a tmpfs at start, because a replay writes its live feed into the lake.
+  # Replay again: docker compose --profile replay up -d --no-build --force-recreate replay
+  replay:
+    <<: *app
+    profiles: [replay]
+    environment:
+      <<: *env
+      PA_ROLE: investigator
+      PA_GOLD_DIR: /work
+    tmpfs: ["/tmp", "/work:size=${PA_REPLAY_TMPFS:-1g},uid=10001,gid=10001"]
+    command: ["sh", "-c", "cp -a /lake-src/. /work/ && exec pa-app serve --host 0.0.0.0 --port 8400 --gold-dir /work --replay ${PA_REPLAY_RUN_ID:-} --duration ${PA_REPLAY_DURATION:-45} --delay ${PA_REPLAY_DELAY:-20}"]
+    volumes:
+      - ${PA_REPLAY_LAKE_DIR:-${PA_LAKE_DIR:-../.lake}}:/lake-src:ro
+      - ${PA_INVESTIGATOR_CASE_HOST_DIR:-${PA_CASE_HOST_DIR:-../case}}:/case:ro
+      - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
+    ports:
+      - "${PA_BIND_IP:-127.0.0.1}:${PA_REPLAY_PORT:-8402}:8400"
+
   approver:
     <<: *app
     environment:

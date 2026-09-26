@@ -106,3 +106,14 @@ def test_token_never_in_output(monkeypatch):
 
     code, text = run(failing, "plan")
     assert code == 1 and "tok-should-not-leak" not in text and json.dumps(ENV).find("tok") == -1
+
+
+def test_replay_service_only_when_configured_and_gated_like_the_investigator():
+    api = FakeApi([VM])
+    assert run(api, "apply")[0] == 0
+    assert not [s for s in api.services if s["name"].startswith("proveedor-replay")]
+    api = FakeApi([VM])
+    assert run(api, "apply", env={**ENV, "PA_REPLAY_PORT": "8402"})[0] == 0
+    replay = next(s for s in api.services if s["name"] == "proveedor-replay.eu1.netbird.services")
+    inv = next(s for s in api.services if s["name"] == "proveedor.eu1.netbird.services")
+    assert replay["auth"] == inv["auth"] and replay["targets"][0]["port"] == 8402
