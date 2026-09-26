@@ -41,29 +41,57 @@ flowchart LR
 
 ## Architecture: "Two instances. One boundary."
 
-```mermaid
-flowchart LR
-  U["browser"] -->|"HTTPS, NetBird reverse proxy<br/>(one credential per role)"| CP
-  subgraph CP["VX1 #1 control plane"]
-    E["Ontofill engine<br/>plans + dispatches"]
-    BA["browser-agent service<br/>holds the Vultr / Jev keys"]
-    APP["this app<br/>investigator · approver"]
-  end
-  CP <-->|"NetBird WireGuard<br/>peer to peer"| SB
-  subgraph SB["VX1 #2 sandbox host"]
-    POD["gVisor browser pods<br/>zero secrets · egress proxy"]
-  end
-  E --> INF["Vultr Serverless Inference"]
-  E --> LAKE[("Vultr Object Storage<br/>bronze · silver · gold")]
-  APP -->|"reads gold + live feed"| LAKE
+A control plane that plans on Vultr models and dispatches disposable sandboxes. The full, canonical description is
+[`docs/planning/03-technical-architecture.md`](docs/planning/03-technical-architecture.md).
+
+```
+                 Judges / users ──HTTPS──▶ NetBird reverse proxy (PIN: investigator · SSO: approver)
+                                                  │ WireGuard (zero open ports)
+ ┌──────────── VX1 #1 · CONTROL PLANE ────────────▼─────────────────────────────────┐
+ │ Proveedor Abierto app (reads gold export; dossier, run view, journal, approvals) │
+ │ Ontofill engine: P1 scope → P2 ontology → P3 fan-out → P4 local scoping → P5 exec│
+ │   ├─ decision interface ─▶ Inference gateway ─▶ Vultr Serverless Inference      │
+ │   │                          (only real key · per-session tokens · Jev + safety) │
+ │   ├─ Controller (MCP): sessions, cell pool, native loop / Skyvern backends       │
+ │   ├─ Refiner: silver → SHACL → gold · metrics · DoD                             │
+ │   └─ Postgres + Oxigraph (silver/gold graphs)                                    │
+ └──────────────────────────┬───────────────────────────────────────────────────────┘
+          CDP / cell API (control → sandbox only, NetBird + VPC)
+ ┌──────────── VX1 #2 · SANDBOX HOST (zero secrets) ▼───────────────────────────────┐
+ │ cell-1 [Skyvern brain? ─CDP─ gVisor Chromium hands ─ egress allowlist proxy]     │
+ │ cell-N  … caps: mem/cpu/pids/timeout · destroyed after every session             │
+ │ (optional: a throwaway VX1 per high-risk cell)                                   │
+ └──────────────────────────┬───────────────────────────────────────────────────────┘
+                            ▼
+              Vultr Object Storage = bronze (raw captures, content-addressed)
 ```
 
-- **Control plane (VX1 #1):** the engine plans each phase on Vultr models and dispatches jobs. The browser-agent
-  service holds the Vultr and Jev keys. This app reads the gold export and the live run feed. *(Deployment pending.)*
-- **Sandbox host (VX1 #2):** one gVisor pod per browser session, with an egress proxy limited to the source's
-  allowed domains. Pods get **zero** secrets. *(Pending; the local rehearsal runs runc.)*
-- **Lake:** bronze (raw captures), silver (observations) and gold (reconciled values) on Vultr Object Storage.
-  Git never holds captured data.
+- **Control plane (VX1 #1):** the engine plans each phase on Vultr models, this app reads the gold export and the
+  live run feed, and the browser layer runs as three parts:
+  - **Inference gateway:** an OpenAI-compatible proxy in front of Vultr Serverless Inference. It holds the **only
+    real key**, issues a per-session token (time limit, dollar budget, revoked at close), attributes every model call
+    to a session and step, and screens page content inside prompts with Jev and the Vultr content-safety model
+    before forwarding. A flagged page is quarantined (wrapped as untrusted data), never silently passed on.
+  - **Controller** (MCP): `session.open / act / observe / close`, a warm pool of cells, recycled after every session.
+    Two backends: the **native** loop (primary, concurrent) and **Skyvern** for hard navigation (one unmodified
+    Skyvern per cell, called over its API).
+  - Postgres + Oxigraph for silver and gold. *(Deployment pending.)*
+- **Sandbox host (VX1 #2), zero secrets:** each **cell** is gVisor Chromium "hands" behind an egress allowlist
+  proxy, with memory, CPU, process and time caps, plus an optional Skyvern "brain" that holds only a session token.
+  Each cell has its own network; it cannot reach the cloud metadata IP, the mesh or other cells. *(Pending; the local
+  rehearsal runs runc.)*
+- **Lake:** bronze (raw, content-addressed captures) on Vultr Object Storage; silver (observations with evidence,
+  conflicts kept) and gold (reconciled, SHACL-valid values). Git never holds captured data. An ontology or PRD change
+  re-refines gold from bronze without browsing again.
+
+**Execution modes per step,** chosen by the technical definition for each source and escalated only when a check fails:
+
+| Mode | What runs |
+|---|---|
+| D0 | download + parse (CSV, XLSX, PDF, API), no model |
+| D1 | a crystallized script; the model only maps, parses or repairs fields |
+| S1 | the native agent loop: observe → Jev gate → plan (Vultr tool call) → Jev action guard → act → Jev check → Vultr vision verify |
+| S2 | Skyvern in its own cell, through the gateway |
 
 **Two execution patterns, both visible in the app:**
 

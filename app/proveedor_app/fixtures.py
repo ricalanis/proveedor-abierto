@@ -251,6 +251,8 @@ def _render_run(
             # §12 Pattern A: the extractor is written, run in the sandbox against stored captures, repaired, retried
             code1 = bronze.put(b"def extract(page):\n    return page['rfc']\n", "text/x-python", f"https://{host}/",
                                captured_at=ts0.isoformat(), source_id="compras-example", step_id="code")
+            diff0 = bronze.put(b"+def extract(page):\n+    return page['rfc']\n", "text/x-diff", f"https://{host}/",
+                               captured_at=ts0.isoformat(), source_id="compras-example", step_id="code")
             diff = bronze.put(b"-    return page['rfc']\n+    return page.get('rfc') or page['tax_id']\n", "text/x-diff",
                               f"https://{host}/", captured_at=ts0.isoformat(), source_id="compras-example",
                               step_id="code")
@@ -260,13 +262,15 @@ def _render_run(
             a1 = step(5, tdd_steps["compras-example"]["step_id"], "15 stored captures from the agentic loop",
                       {"tool": "code.test", "attempt": 1}, {"exit_code": 1}, {"status": "failed", "attempt": 1},
                       source_id="compras-example", objective_id=objective, tdd_path=tdd_path, mode="D1",
-                      event="repair", repair={"attempt": 1, "max_attempts": 3, "code_key": code1, "result": "fail",
+                      event="repair", repair={"attempt": 1, "max_attempts": 3, "code_key": code1, "diff_key": diff0,
+                                              "result": "fail",
                                               "stderr_excerpt": "KeyError: 'rfc' (4 of 15 pages label it 'tax_id')",
                                               "test": {"pages": 15, "precision": 0.73, "coverage": 0.73}})
             a2 = step(5, a1["step_id"], "stderr from attempt 1", {"tool": "code.repair", "attempt": 2}, {"exit_code": 0},
                       {"status": "ok", "attempt": 2}, source_id="compras-example", objective_id=objective,
                       tdd_path=tdd_path, mode="D1", event="repair",
                       repair={"attempt": 2, "max_attempts": 3, "code_key": code2, "diff_key": diff, "result": "pass",
+                              "stderr_excerpt": "",
                               "test": {"pages": 15, "precision": 1.0, "coverage": 1.0}})
             mode_counts["D1"] += 2
             shared["macro"] = step(5, a2["step_id"],
@@ -322,7 +326,7 @@ def _render_run(
                                        else f"type the RFC into the search box on {host}"),
                             "risk_tier": "HIGH" if risky else "SAFE", "decided_by": "vultr" if risky else "code",
                             "outcome": "pending_approval" if risky else "allowed",
-                            **({"approval_path": "05-actions/req-0001/APPROVAL_PENDING.md"} if risky else {})}))
+                            "approval_path": "05-actions/req-0001/APPROVAL_PENDING.md" if risky else None}))
                     mode_counts["S1"] += 1
                 steps[source_id] = step(5, parent, f"page for {row['tax_id']} on {host}", "extract fields",
                                         "emit.observation", evaluated, source_id=source_id, objective_id=objective,
