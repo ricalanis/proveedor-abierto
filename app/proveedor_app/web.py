@@ -358,7 +358,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if not steps and status is None:
             raise HTTPException(404, f"no live feed for run {run_id}")
         jobs = settings.store.live_jobs(run_id)
-        backend = (status or {}).get("inference_backend") or backend_of((status or {}).get("metrics"), steps)
+        backend = backend_of((status or {}).get("metrics"), [*steps, status or {}])
         return {"run_id": run_id, "steps": steps, "new": steps[after:][::-1], "panel": live.summarize(steps, status),
                 "proof": live.proof(jobs), "backend": backend}
 

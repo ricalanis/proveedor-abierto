@@ -46,6 +46,8 @@ FIELD_SOURCE = {
 }
 PROCEDURES = ["licitacion_publica", "invitacion_tres", "adjudicacion_directa"]
 BUYERS = ["Dependencia Ejemplo A", "Dependencia Ejemplo B", "Dependencia Ejemplo C"]
+# Fixtures are not model output of any kind; they declare the recorded backend so nothing treats them as real.
+GEN = {"backend": "recorded", "model": "synthetic-fixture", "at": "2026-09-26T18:00:00+00:00"}
 
 
 def _sha(data: bytes) -> str:
@@ -185,6 +187,7 @@ def _render_run(
             "parent_step_id": parent,
             "value_ids": kw.get("value_ids", []),
             "ts": (ts0 + timedelta(seconds=len(trace) * 7)).isoformat(),
+            "generated_by": GEN,
         }
         trace.append(s)
         return s
@@ -270,7 +273,8 @@ def _render_run(
             vid = f"val:{run_id[-4:]}-{nn:03d}-{name}"
             missing = name != "legal_name" and rng.random() < degrade
             if missing:
-                fields[name] = {"value_id": vid, "value": None, "confidence": 0.0, "status": "missing", "evidence": []}
+                fields[name] = {"value_id": vid, "value": None, "confidence": 0.0, "status": "missing", "evidence": [],
+                                "generated_by": GEN}
                 continue
             value = row[name]
             path = f"/proveedor/{row['tax_id']}" if source_id != "lista-fiscal-example" else "/listado-completo.csv"
@@ -284,7 +288,8 @@ def _render_run(
             elif name == "founding_date" and row["i"] % 7 == 2:  # corroborated by the gazette
                 ev.append(_evidence(bronze, "gaceta-example", f"/edicion/{nn:03d}.pdf", "fecha de constitucion",
                                     value, captured, step_for("gaceta-example")))
-            fields[name] = {"value_id": vid, "value": value, "confidence": conf, "status": status, "evidence": ev}
+            fields[name] = {"value_id": vid, "value": value, "confidence": conf, "status": status, "evidence": ev,
+                            "generated_by": GEN}
             for e in ev:
                 st = steps[e["source_id"]]
                 if vid not in st["value_ids"]:
@@ -296,7 +301,7 @@ def _render_run(
             st["requested"] = f"extract {', '.join(fields_done)}"
             st["executed"] = f"emit.observation x{len(fields_done)}"
         suppliers.append({"id": row["id"], "classified_as": row["classified_as"], "fields": fields,
-                          "flags": [], "links": [],
+                          "flags": [], "links": [], "generated_by": GEN,
                           "contract_ids": [c["id"] for c in contracts if row["id"] in c["supplier_ids"]]})
 
     ids = {s["id"] for s in suppliers}
@@ -311,7 +316,7 @@ def _render_run(
         captured = (ts0 + timedelta(minutes=90 + k)).isoformat()
         ev = _evidence(bronze, "compras-example", f"/expediente/{c['id'].split(':', 1)[1]}", "importe",
                        f"{c['amount']:.2f} {c['currency']}", captured, st["step_id"])
-        run_contracts.append(dict(c, evidence=[ev]))
+        run_contracts.append(dict(c, evidence=[ev], generated_by=GEN))
     contracts = run_contracts
 
     _add_flags_and_links(suppliers, contracts)
@@ -320,6 +325,8 @@ def _render_run(
     level1 = {n.split("/")[1] for n in used}
     metrics.update(
         run_id=run_id,
+        generated_by=GEN,
+        inference_backend=GEN["backend"],
         level_ratio_coverage={
             "sector": [
                 round(len(level1) / len(TAXONOMY), 4),
@@ -458,7 +465,7 @@ def _write_live_record(lake: Path, run_id: str, suppliers: list[dict], trace: li
     (run_dir / "trace.live.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in live))
     (run_dir / "jobs.jsonl").write_text("".join(json.dumps(j, ensure_ascii=False) + "\n" for j in jobs))
     status = {"run_id": run_id, "state": "done", "phase": 5, "checkpoint_pending": None,
-              "updated_at": trace[-1]["ts"], "sources": [], "metrics": metrics}
+              "updated_at": trace[-1]["ts"], "sources": [], "metrics": metrics, "generated_by": GEN}
     (run_dir / "status.json").write_text(json.dumps(status, indent=2))
     (lake / "runs" / CASE_ID / "latest.json").write_text(json.dumps({"run_id": run_id}))
 
@@ -487,7 +494,7 @@ def generate(out: Path, n_suppliers: int = 60, seed: int = 7) -> Path:
     for rel, text in CASE_FILES.items():
         (case / rel).parent.mkdir(parents=True, exist_ok=True)
         (case / rel).write_text(text)
-    objectives = {"ontology_version": "v1", "prd_path": "01-scope/prd.md", "objectives": [
+    objectives = {"ontology_version": "v1", "prd_path": "01-scope/prd.md", "generated_by": GEN, "objectives": [
         {"id": objective, "source_id": source_id, "source_url": f"https://{host}/",
          "target_fields": sorted(f for f, s in FIELD_SOURCE.items() if s == source_id) or ["founding_date"],
          "priority": k + 1, "expected_contribution": round(0.9 - 0.1 * k, 2)}

@@ -192,13 +192,25 @@ class Replayer:
         return {
             "run_id": self.new_run_id, "state": state, "phase": phase, "checkpoint_pending": None,
             "updated_at": datetime.now(UTC).isoformat(timespec="seconds"),
-            "sources": [{"source_id": sid, "source_type": types.get(sid), "health": h} for sid, h in health.items()],
-            "metrics": self._partial_metrics(emitted),
-            **({"inference_backend": b} if (b := self.recorded_status.get("inference_backend")
-                                             or self.run.metrics.get("inference_backend")) else {}),
-            **({"live_view_url": self.recorded_status["live_view_url"]}
-               if self.recorded_status.get("live_view_url") else {}),
+            "sources": [{"source_id": sid, "source_type": types.get(sid) or "unknown", "health": h}
+                        for sid, h in health.items()],
+            "metrics": self._metrics_with_provenance(emitted),
+            "generated_by": self.generated_by,
         }
+
+    @property
+    def generated_by(self) -> dict:
+        """Provenance of the replayed run: the recording's own, never upgraded."""
+        gen = self.recorded_status.get("generated_by") or self.run.metrics.get("generated_by")
+        if gen:
+            return gen
+        return {"backend": self.run.inference_backend or "recorded", "model": "unknown",
+                "at": datetime.now(UTC).isoformat(timespec="seconds")}
+
+    def _metrics_with_provenance(self, emitted: set[str]) -> dict:
+        metrics = self._partial_metrics(emitted)
+        metrics["inference_backend"] = self.generated_by["backend"]
+        return metrics
 
     def stop(self) -> None:
         self._stop.set()

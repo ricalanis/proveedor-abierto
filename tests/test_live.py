@@ -80,7 +80,7 @@ def test_simulated_inference_banner_and_dod(lake, fixture_root):
     assert "Simulated inference." in page and "✓" not in page.split("dod__grid")[1].split("</dl>")[0]
     assert all(v is False for v in dod.dod_met(metrics, "recorded").values())
     status = json.loads((lake / "runs/fixture-case/run-fixture-0001/status.json").read_text())
-    status["inference_backend"] = "recorded"
+    status["generated_by"] = {"backend": "recorded", "model": "double", "at": "2026-09-26T18:00:00Z"}
     (lake / "runs/fixture-case/run-fixture-0001/status.json").write_text(json.dumps(status))
     assert "Simulated inference." in c.get("/run/run-fixture-0001").text
 
@@ -131,3 +131,13 @@ def test_browser_sees_live_updates(lake, fixture_root):
     finally:
         rep.stop()
         server.should_exit = True
+
+
+def test_replay_output_matches_engine_schemas(lake, validator_for):
+    live.Replayer(lake, "run-fixture-0001", duration=0.0, new_run_id="rehearsal-schema").play(sleep=lambda s: None)
+    run_dir = lake / "runs" / "fixture-case" / "rehearsal-schema"
+    errors = list(validator_for("run-status.schema.json").iter_errors(json.loads((run_dir / "status.json").read_text())))
+    assert not errors, [e.message for e in errors][:3]
+    step_validator = validator_for("trace-step.schema.json")
+    for line in (run_dir / "trace.live.jsonl").read_text().splitlines()[:50]:
+        assert not list(step_validator.iter_errors(json.loads(line)))
