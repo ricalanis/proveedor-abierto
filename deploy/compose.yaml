@@ -30,7 +30,9 @@ services:
       PA_ROLE: investigator
     volumes:
       - ${PA_LAKE_DIR:-../.lake}:/lake:ro
-      - ${PA_CASE_HOST_DIR:-../case}:/case:ro          # read-only: the investigator process cannot write anything
+      # read-only: the investigator process cannot write anything. PA_INVESTIGATOR_CASE_HOST_DIR (optional) keeps the
+      # investigator on the case that matches its gold (e.g. the synthetic fixture case) until real gold exists.
+      - ${PA_INVESTIGATOR_CASE_HOST_DIR:-${PA_CASE_HOST_DIR:-../case}}:/case:ro
       - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
     ports:
       - "${PA_BIND_IP:-127.0.0.1}:${PA_INVESTIGATOR_PORT:-8400}:8400"
