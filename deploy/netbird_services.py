@@ -17,9 +17,9 @@ Configuration comes from the environment (deploy/.env or the repo's .env, both g
     PA_APPROVER_GROUP           IdP distribution group for SSO on the approver URL (preferred), or PA_APPROVER_PIN
     PA_ALLOWED_COUNTRIES        optional, e.g. "US,MX": country allowlist on both services
 
-API reference: https://docs.netbird.io/api/resources/services (reverse proxy is in beta). Unverified against
-the live API until the control-plane peer exists: the `target_type` value for a peer ("peer") and whether a
-peer target can reach the peer's loopback (so the default target host is the peer's NetBird IP).
+API reference: https://docs.netbird.io/api/resources/services (reverse proxy is in beta). Per
+docs/reference/netbird.md the peer target type is `peer` and the proxy dials the peer's NetBird IP (not
+127.0.0.1), so the default target host is that IP and the containers bind to it (PA_BIND_IP).
 """
 
 from __future__ import annotations

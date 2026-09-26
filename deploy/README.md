@@ -73,9 +73,11 @@ NetBird-peers-only, IP and country rules, CrowdSec reputation. **Our choice:**
    free proxy domain (`proveedor.<domain>`, `proveedor-approver.<domain>`). The script refuses a peer that is not
    a Linux host, and never prints the token or credentials (`plan` redacts them).
    The proxy reaches a peer target over WireGuard, so the script targets the peer's NetBird IP by default.
-   Bind the containers there: `PA_BIND_IP=<the VM's 100.x NetBird IP>` in `deploy/.env`. That is not a public
-   interface, and `verify.sh local` checks listeners against `PA_BIND_IP`. **Unverified until the VM exists:**
-   the API's `target_type` value for a peer (`peer`) and whether loopback targets work at all.
+   **Confirmed** (docs/reference/netbird.md): the proxy reaches the VM's NetBird IP, not 127.0.0.1, and the
+   target type for a peer is `peer`. On the VM, bind the containers there:
+   `PA_BIND_IP=$(netbird status --ipv4)` in `deploy/.env`. That is not a public interface, and `verify.sh local`
+   checks listeners against `PA_BIND_IP`. SSO sessions carry `X-NetBird-User` / `X-NetBird-Groups`, which are
+   used for audit only (they prefill the approver name).
 2. **Fallback: `netbird expose`** (`netbird-expose.sh`): `--with-password`/`--with-pin` for the investigator,
    `--with-user-groups approvers` for the approver. URLs live only while the command runs ("gone on Ctrl+C"),
    up to 10 sessions per peer. **Prerequisite for both:** an account admin enables **Peer Expose** in the Cloud

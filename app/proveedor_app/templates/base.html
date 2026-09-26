@@ -29,6 +29,7 @@
       <a href="/completeness" {% if nav == "completeness" %}aria-current="page"{% endif %}>Completeness</a>
       <a href="/engine" {% if nav == "engine" %}aria-current="page"{% endif %}>Engine report</a>
       <a href="/watchlist" {% if nav == "watchlist" %}aria-current="page"{% endif %}>Watchlist</a>
+      {% if role == "approver" %}<a href="/spend" {% if nav == "spend" %}aria-current="page"{% endif %}>Spend</a>{% endif %}
       {% if role == "approver" %}<a href="/approvals" {% if nav == "approvals" %}aria-current="page"{% endif %}>Approvals</a>{% endif %}
     </nav>
     <span class="role role--{{ role }}" title="Access role for this URL">{{ "Approver" if role == "approver" else "Investigator · read-only" }}</span>

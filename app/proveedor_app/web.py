@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlsplit
 
@@ -351,6 +352,44 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     def identity(request: Request) -> str:
         return request.headers.get(settings.identity_header, "") if settings.identity_header else ""
+
+    @app.get("/spend", response_class=HTMLResponse)
+    def spend(request: Request):
+        """Operator billing view: reads the spend tracker's history file only; never calls billing APIs."""
+        require_approver(request)
+        path = Path(os.environ.get("PA_SPEND_HISTORY", REPO_ROOT.parent / ".cache" / "spend" / "history.jsonl"))
+        history = []
+        if path.is_file():
+            for raw in path.read_text().splitlines():
+                try:
+                    history.append(json.loads(raw))
+                except ValueError:
+                    continue
+        latest = history[-1] if history else None
+        try:
+            r = settings.store.run(None)
+        except LookupError:
+            r = None
+        per_supplier = None
+        eng = (latest or {}).get("engine") or {}
+        if r and eng.get("reported") and r.run_id in (eng.get("runs") or {}):
+            complete = sum(dod.core_ratio(s) >= 0.8 for s in r.suppliers)
+            gold_values = sum(1 for v in r.values.values() if dod.is_filled(v.data))
+            usd = eng["runs"][r.run_id]
+            per_supplier = {"run_id": r.run_id, "usd": usd, "per_complete_supplier": usd / complete if complete else None,
+                            "per_gold_value": usd / gold_values if gold_values else None}
+        rows, prev = [], None
+        for s in history[-48:]:
+            dt = (datetime.fromisoformat(s["ts"]) - datetime.fromisoformat(prev["ts"])).total_seconds() / 3600 if prev else 0
+            rate = (s["credit_used"] - prev["credit_used"]) / dt if prev and dt > 0 else None
+            rows.append({"ts": s["ts"], "used": s["credit_used"], "left": s["credit_remaining"], "rate": rate})
+            prev = s
+        deadline = datetime(2026, 9, 27, 12, 0, tzinfo=timezone(timedelta(hours=-7)))
+        hours_left = max(0.0, (deadline - datetime.fromisoformat(latest["ts"])).total_seconds() / 3600) if latest else 0
+        rates = [x["rate"] for x in rows[-1:] if x["rate"] is not None] + [(latest or {}).get("resource_rate_usd_per_hour") or 0]
+        projected = (latest["credit_used"] + max(rates) * hours_left) if latest else None
+        return render(request, "spend.html", nav="spend", run=None, latest=latest, rows=rows[::-1],
+                      projected=projected, hours_left=hours_left, per_supplier=per_supplier, history_path=str(path))
 
     @app.get("/approvals", response_class=HTMLResponse)
     def approvals(request: Request, done: str = "", error: str = ""):

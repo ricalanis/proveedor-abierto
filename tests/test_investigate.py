@@ -215,3 +215,23 @@ def test_discovered_by_shown_where_sources_appear(case_copy, store, fixture_root
                and v.data["evidence"][0]["source_id"] == doc["objectives"][0]["source_id"])
     assert "How this source was found" in c.get(f"/journal/{ref.value_id}").text
     assert "Found by" in c.get("/run/run-fixture-0001").text
+
+
+def test_spend_page_is_approver_only_and_reads_history(make_client, case_copy, tmp_path, monkeypatch):
+    snap = {"ts": "2026-09-26T22:00:00+00:00", "credit_total": 200.0, "credit_used": 12.34, "credit_remaining": 187.66,
+            "resource_rate_usd_per_hour": 0.24,
+            "by_category": {"compute": 0.6, "storage": 0.25, "inference": 11.49, "bandwidth": 0.0, "other": 0.0},
+            "inference": [{"label": "sub", "models": [{"model": "glm-5.3", "input_tokens": 2000000,
+                                                       "output_tokens": 1000000, "est_usd": 4.5}]}],
+            "engine": {"reported": True, "runs": {"run-fixture-0001": 1.2}, "by_mode": {"D0": 0.0, "S1": 1.2},
+                       "by_backend": {"vultr": 1.1, "jev": 0.1}}}
+    hist = tmp_path / "history.jsonl"
+    hist.write_text(json.dumps({**snap, "ts": "2026-09-26T21:00:00+00:00", "credit_used": 10.0}) + "\n" + json.dumps(snap) + "\n")
+    monkeypatch.setenv("PA_SPEND_HISTORY", str(hist))
+    assert make_client(case_dir=case_copy).get("/spend").status_code == 403
+    page = make_client(role="approver", case_dir=case_copy).get("/spend")
+    assert page.status_code == 200
+    for needle in ("$12.34", "$187.66", "glm-5.3", "2,000,000", "Within the credit", "per supplier at", "2.34"):
+        assert needle in page.text, needle
+    monkeypatch.setenv("PA_SPEND_HISTORY", str(tmp_path / "missing.jsonl"))
+    assert "No spend snapshot yet" in make_client(role="approver", case_dir=case_copy).get("/spend").text
