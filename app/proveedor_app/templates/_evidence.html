@@ -5,7 +5,7 @@
   </p>
   <p class="ev__meta">
     <span class="status status--{{ selected.data.status }}">{{ selected.data.status }}</span>
-    <span class="mono">confidence {{ "%.2f"|format(selected.data.confidence or 0) }}</span>
+    <span class="mono">confidence {{ "%.2f"|format(selected.data.confidence if selected.data.confidence is number else 0) }}</span>
     <a href="/journal/{{ selected.value_id|urlencode }}">Trace this value to the brief</a>
   </p>
   {% if selected.data.status == "conflict" %}
