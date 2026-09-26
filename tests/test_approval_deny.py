@@ -125,7 +125,7 @@ def test_review_shows_revisions_basis_and_archived_draft(make_client, case_copy)
     for needle in ("Earlier drafts", "DoD must follow the case definition", "Fixture Approver", "2026-09-26",
                    "basis--human", "basis--proposed", "basis--brief",
                    "Why this number: Four independent publisher kinds",
-                   "Feasibility: About 1.20 USD", 'value="deny"', "Deny with reason", 'name="reason"',
+                   "Feasibility: About 1.20 USD", "Every claim must link to the public source it came from.", 'value="deny"', "Deny with reason", 'name="reason"',
                    "/case-file?path=01-scope/revisions/1/prd.json"):
         assert needle in page, needle
     draft = c.get("/case-file", params={"path": "01-scope/revisions/1/prd.json"})

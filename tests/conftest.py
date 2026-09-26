@@ -96,7 +96,7 @@ def s12_compat(doc: dict, schema: dict, kind: str) -> dict:
 
 def v095_compat(doc: dict, schema: dict) -> dict:
     """CONTRACT v0.9.5 fields the fixture PRD emits ahead of the engine schema (`revisions`, and `basis` /
-    `rationale` / `feasibility` per DoD criterion): stripped only while the schema lacks them."""
+    `basis_quote` / `rationale` / `feasibility` per DoD criterion): stripped only while the schema lacks them."""
     import copy
 
     doc = copy.deepcopy(doc)
@@ -105,7 +105,7 @@ def v095_compat(doc: dict, schema: dict) -> dict:
     crit = ((schema.get("$defs") or {}).get("criterion") or {}).get("properties")
     if crit is not None and isinstance(doc.get("definition_of_done"), list):
         for c in doc["definition_of_done"]:
-            for key in ("basis", "rationale", "feasibility"):
+            for key in ("basis", "basis_quote", "rationale", "feasibility"):
                 if key not in crit:
                     c.pop(key, None)
     return doc

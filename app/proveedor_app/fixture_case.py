@@ -40,13 +40,16 @@ PRD = {
     ],
     "constraints": ["Public sources only; no logins, no captcha bypass", "Polite crawl rates; budget capped in the run"],
     "non_goals": ["Accusing anyone or scoring corruption probability", "Profiling private individuals"],
-    # CONTRACT v0.9.5: where each number comes from (brief | human | proposed); proposed ones explain themselves
+    # CONTRACT v0.9.5: where each number comes from (brief | human | proposed). brief/human criteria quote the exact
+    # words the number is grounded in (`basis_quote`); proposed ones explain themselves
     "definition_of_done": [
-        {"id": "dod_suppliers", "metric": "suppliers_at_80pct_core", "operator": ">=", "target": 50, "basis": "human"},
+        {"id": "dod_suppliers", "metric": "suppliers_at_80pct_core", "operator": ">=", "target": 50, "basis": "human",
+         "basis_quote": "DoD must follow the case definition"},
         {"id": "dod_sources", "metric": "distinct_source_types", "operator": ">=", "target": 4, "basis": "proposed",
          "rationale": "Four independent publisher kinds let every core field be cross-checked at least once",
          "feasibility": "About 1.20 USD and 40 minutes of the 2.00 USD run budget at the fixture's crawl rate"},
-        {"id": "dod_evidence", "metric": "gold_values_without_evidence", "operator": "=", "target": 0, "basis": "brief"},
+        {"id": "dod_evidence", "metric": "gold_values_without_evidence", "operator": "=", "target": 0, "basis": "brief",
+         "basis_quote": "Every claim must link to the public source it came from."},
     ],
     "revisions": [
         {"n": 1, "decision": "deny", "reason": "DoD must follow the case definition", "approver": "Fixture Approver",

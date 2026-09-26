@@ -8,7 +8,8 @@
   <table class="ledger dod-criteria">
     <thead><tr><th scope="col">Criterion</th><th scope="col">Metric</th><th scope="col" class="num">Target</th><th scope="col">Basis</th></tr></thead>
     <tbody>{% for c in prd.definition_of_done %}
-      <tr><th scope="row" class="mono">{{ c.id }}</th><td class="mono">{{ c.metric }}{% if c.basis == "proposed" %}
+      <tr><th scope="row" class="mono">{{ c.id }}</th><td class="mono">{{ c.metric }}{% if c.basis in ("brief", "human") %}
+          {% if c.basis_quote %}<q class="sub basis-quote">{{ c.basis_quote }}</q>{% else %}<span class="sub muted">No quote given for this number.</span>{% endif %}{% endif %}{% if c.basis == "proposed" %}
           {% set why = c.rationale or c.basis_rationale %}{% set feas = c.feasibility or c.feasibility_note %}
           {% if why %}<span class="sub">Why this number: {{ why }}</span>{% endif %}
           {% if feas %}<span class="sub">Feasibility: {{ feas }}</span>{% endif %}

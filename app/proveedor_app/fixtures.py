@@ -569,7 +569,7 @@ def _add_flags_and_links(suppliers: list[dict], contracts: list[dict]) -> None:
 
 CASE_FILES = {
     "brief.md": "# Brief (synthetic fixture)\n\nWho receives public money through government contracts, and are "
-                "they legitimate companies?\n",
+                "they legitimate companies? Every claim must link to the public source it came from.\n",
     "01-scope/prd.md": "# Global PRD (synthetic fixture)\n\n## Personas\n- Investigative journalist\n"
                        "- Civil-society watchdog\n\n## Definition of done\n- >= 50 suppliers at >= 80% of core "
                        "fields in gold\n- >= 4 distinct source types\n- every gold value has evidence\n",
