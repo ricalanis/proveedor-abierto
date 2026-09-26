@@ -1,0 +1,328 @@
+"""Investigation logic behind the screens: signals, relationships, run diffs, the case journal, approvals."""
+
+from __future__ import annotations
+
+import json
+import math
+import re
+from dataclasses import dataclass, field
+from datetime import UTC, date, datetime
+from pathlib import Path
+
+import yaml
+
+from .gold import Run
+
+# Plain-language rule descriptions for rule ids we know. Unknown rule ids fall back to the flag's own label.
+RULES = {
+    "tax_list_listed": {
+        "checks": "Whether the supplier's RFC appears on the tax authority's published list of companies presumed "
+                  "or confirmed to issue invoices for simulated operations.",
+        "verify": ["Open the list capture and confirm the RFC matches exactly (not a similar name).",
+                   "Check the listing stage: 'presunto' can still be rebutted; 'definitivo' is a final finding.",
+                   "Compare the listing date with the contract dates."],
+    },
+    "sanctioned_supplier": {
+        "checks": "Whether the supplier appears in the registry of sanctioned suppliers.",
+        "verify": ["Confirm the registry entry refers to this legal entity (RFC, not only the name).",
+                   "Check the sanction's start and end dates and whether it covers the contracting agency.",
+                   "Look for a later court decision that suspends the sanction."],
+    },
+    "founded_shortly_before_award": {
+        "checks": "Whether the company was founded within a year before its first recorded public contract.",
+        "verify": ["Confirm the founding date in the company registry or official gazette capture.",
+                   "Check the procedure's experience requirements and whether the company met them.",
+                   "Look for a predecessor company with the same partners or address."],
+    },
+    "shared_address_bidders": {
+        "checks": "Whether two participants in the same procedure declare the same address.",
+        "verify": ["Compare both address captures character by character.",
+                   "Check whether the address is a large office building or a business centre.",
+                   "Look for shared representatives, partners or phone numbers between the two companies."],
+    },
+}
+
+LINK_TYPES = ("shared_address", "shared_representative", "same_procedure")
+
+
+def rule_info(rule_id: str, label: str = "") -> dict:
+    return RULES.get(rule_id, {"checks": label or rule_id, "verify": []})
+
+
+def signals_by_rule(run: Run) -> list[dict]:
+    """[{rule_id, label, info, hits: [(supplier, index, flag)]}] sorted by number of hits."""
+    groups: dict[str, dict] = {}
+    for s in run.suppliers:
+        for i, f in enumerate(s.get("flags") or []):
+            g = groups.setdefault(f["rule_id"], {"rule_id": f["rule_id"], "label": f["label"], "hits": []})
+            g["hits"].append((s, i, f))
+    out = sorted(groups.values(), key=lambda g: (-len(g["hits"]), g["rule_id"]))
+    for g in out:
+        g["info"] = rule_info(g["rule_id"], g["label"])
+    return out
+
+
+def dispute_record(run: Run, supplier: dict, flag: dict) -> dict:
+    """What a company would send to contest a signal: the rule, the values and the captures behind them."""
+    values = []
+    for vid in flag.get("evidence_value_ids") or []:
+        ref = run.values.get(vid)
+        if ref:
+            values.append({"value_id": vid, "supplier_id": ref.supplier_id, "field": ref.field,
+                           "value": ref.data.get("value"),
+                           "evidence": [{"url": e.get("url"), "bronze_key": e.get("bronze_key"),
+                                         "captured_at": e.get("captured_at")} for e in ref.data.get("evidence") or []]})
+    return {"case_id": run.case_id, "run_id": run.run_id, "supplier_id": supplier["id"], "rule_id": flag["rule_id"],
+            "signal": flag["label"], "values": values,
+            "correction": "<what is wrong, and the official document that shows the correct value>"}
+
+
+# Relationships -------------------------------------------------------------------------------------------------
+
+@dataclass
+class Cluster:
+    members: list[str]
+    edges: list[dict] = field(default_factory=list)  # {a, b, type, via_value_id}
+
+    def layout(self, size: int = 280) -> dict[str, tuple[float, float]]:
+        """Deterministic circle layout for a small SVG."""
+        n = len(self.members)
+        r = 0 if n == 1 else size * 0.36
+        c = size / 2
+        return {m: (c + r * math.cos(2 * math.pi * i / n - math.pi / 2), c + r * math.sin(2 * math.pi * i / n - math.pi / 2))
+                for i, m in enumerate(self.members)}
+
+
+def cluster_summary(run: Run, cluster: Cluster) -> list[dict]:
+    """What connects a group, one line per shared value: {type, value, value_id, supplier_id, members: [1-based]}."""
+    index = {m: i + 1 for i, m in enumerate(cluster.members)}
+    lines: dict[tuple, dict] = {}
+    for e in cluster.edges:
+        ref = run.values.get(e.get("via_value_id") or "")
+        shared = None if e["type"] == "same_procedure" or not ref else ref.data.get("value")
+        line = lines.setdefault((e["type"], shared), {
+            "type": e["type"], "value": shared, "value_id": ref.value_id if ref and shared else None,
+            "supplier_id": ref.supplier_id if ref and shared else None, "members": set(), "pairs": [],
+        })
+        line["members"].update((index[e["a"]], index[e["b"]]))
+        line["pairs"].append((index[e["a"]], index[e["b"]]))
+    out = []
+    for line in lines.values():
+        line["members"] = sorted(line["members"])
+        line["pairs"].sort()
+        out.append(line)
+    order = {t: i for i, t in enumerate(LINK_TYPES)}
+    return sorted(out, key=lambda x: (order.get(x["type"], 9), x["members"]))
+
+
+def clusters(run: Run, types: tuple[str, ...]) -> list[Cluster]:
+    """Connected components over the chosen link types, largest first. Edges are deduplicated (a-b == b-a)."""
+    parent: dict[str, str] = {}
+
+    def find(x: str) -> str:
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    edges: dict[tuple, dict] = {}
+    for s in run.suppliers:
+        for link in s.get("links") or []:
+            if link["type"] not in types or link["target"] not in run.suppliers_by_id:
+                continue
+            a, b = sorted((s["id"], link["target"]))
+            key = (a, b, link["type"])
+            if key not in edges:
+                edges[key] = {"a": a, "b": b, "type": link["type"], "via_value_id": link.get("via_value_id")}
+            parent[find(a)] = find(b)
+    groups: dict[str, Cluster] = {}
+    for e in edges.values():
+        root = find(e["a"])
+        cl = groups.setdefault(root, Cluster(members=[]))
+        cl.edges.append(e)
+        for m in (e["a"], e["b"]):
+            if m not in cl.members:
+                cl.members.append(m)
+    for cl in groups.values():
+        cl.members.sort()
+    return sorted(groups.values(), key=lambda c: (-len(c.members), c.members[0]))
+
+
+# Watchlist: what changed between two runs ------------------------------------------------------------------------
+
+def diff_supplier(old: dict | None, new: dict | None) -> list[dict]:
+    """Human-readable changes for one supplier between two runs."""
+    if new is None:
+        return [{"kind": "gone", "text": "No longer in the latest run"}]
+    if old is None:
+        return [{"kind": "new", "text": "First appears in this run"}]
+    changes = []
+    of, nf = old.get("fields") or {}, new.get("fields") or {}
+    for name in sorted(set(of) | set(nf)):
+        a, b = of.get(name) or {}, nf.get(name) or {}
+        if a.get("value") != b.get("value") or a.get("status") != b.get("status"):
+            changes.append({"kind": "field", "field": name, "before": a.get("value"), "after": b.get("value"),
+                            "status_before": a.get("status"), "status_after": b.get("status"),
+                            "value_id": b.get("value_id")})
+    old_rules = {f["rule_id"] for f in old.get("flags") or []}
+    for f in new.get("flags") or []:
+        if f["rule_id"] not in old_rules:
+            changes.append({"kind": "signal", "text": f["label"]})
+    new_rules = {f["rule_id"] for f in new.get("flags") or []}
+    for f in old.get("flags") or []:
+        if f["rule_id"] not in new_rules:
+            changes.append({"kind": "signal_cleared", "text": f["label"]})
+    added = set(new.get("contract_ids") or []) - set(old.get("contract_ids") or [])
+    if added:
+        changes.append({"kind": "contracts", "text": f"{len(added)} new contract{'s' if len(added) > 1 else ''}"})
+    return changes
+
+
+# Case journal ----------------------------------------------------------------------------------------------------
+
+PHASE_NAMES = {1: "Scope", 2: "Ontology", 3: "Fan out", 4: "Local scoping", 5: "Execute"}
+
+
+class CaseDir:
+    """Read-only, path-safe access to a case package directory."""
+
+    def __init__(self, root: Path):
+        self.root = Path(root).resolve()
+
+    def path(self, rel: str) -> Path | None:
+        p = (self.root / rel).resolve()
+        return p if p.is_relative_to(self.root) else None
+
+    def read(self, rel: str | None, limit: int = 6000) -> str | None:
+        p = self.path(rel) if rel else None
+        if not p or not p.is_file():
+            return None
+        text = p.read_text(errors="replace")
+        return text if len(text) <= limit else text[:limit] + "\n…"
+
+    def exists(self, rel: str) -> bool:
+        p = self.path(rel)
+        return bool(p and p.exists())
+
+    def latest(self, pattern: str) -> str | None:
+        found = sorted(self.root.glob(pattern))
+        return str(found[-1].relative_to(self.root)) if found else None
+
+    def objective(self, objective_id: str | None, source_id: str | None = None) -> dict | None:
+        text = self.read("03-fanout/objectives.yaml", limit=10**6)
+        if not text or not objective_id:
+            return None
+        try:
+            data = yaml.safe_load(text)
+        except yaml.YAMLError:
+            return None
+        items = data.get("objectives", []) if isinstance(data, dict) else data or []
+        matches = [o for o in items if isinstance(o, dict) and o.get("id") == objective_id]
+        return next((o for o in matches if o.get("source_id") == source_id), matches[0] if matches else None)
+
+    def anchors(self) -> list[dict]:
+        """The documents every value ultimately rests on, newest version where versioned."""
+        docs = [("Brief", "brief.md"), ("Global PRD", "01-scope/prd.md")]
+        onto = self.latest("02-ontology/versions/*")
+        if onto:
+            docs.append(("Ontology", onto))
+        docs.append(("Objectives", "03-fanout/objectives.yaml"))
+        return [{"label": label, "path": rel, "exists": self.exists(rel)} for label, rel in docs]
+
+
+def journal_chain(run: Run, case: CaseDir, value_id: str) -> list[dict]:
+    """One replay per producing step: value -> steps (phase 5 .. 1) with their TDD / objective documents."""
+    replays = []
+    for chain in run.lineage(value_id):
+        stops = []
+        for step in chain:
+            stop = {"step": step, "phase_name": PHASE_NAMES.get(step.get("phase"), "?"), "docs": []}
+            if step.get("tdd_path") and step.get("phase") == 4:
+                stop["docs"].append({"label": "Technical definition document", "path": step["tdd_path"],
+                                     "text": case.read(step["tdd_path"], limit=1800)})
+            if step.get("phase") == 3 and step.get("objective_id"):
+                stop["objective"] = case.objective(step["objective_id"], step.get("source_id"))
+            stops.append(stop)
+        replays.append(stops)
+    return replays
+
+
+# Approvals -------------------------------------------------------------------------------------------------------
+
+CHECKPOINTS = ("prd", "factors", "ontology")
+_JSON_BLOCK = re.compile(r"```json\s*(\{.*?\})\s*```", re.DOTALL)
+
+
+@dataclass
+class Approval:
+    phase_dir: str  # relative to the case dir, e.g. "01-scope"
+    pending_text: str
+    meta: dict
+    approved: dict | None
+
+    @property
+    def checkpoint(self) -> str | None:
+        cp = self.meta.get("checkpoint")
+        if cp in CHECKPOINTS:
+            return cp
+        return {"01-scope": "prd", "02-ontology": "ontology"}.get(self.phase_dir)
+
+
+def _front_matter(text: str) -> dict:
+    """Structured metadata inside APPROVAL_PENDING.md: YAML front matter or a ```json block."""
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        if end > 0:
+            try:
+                data = yaml.safe_load(text[3:end])
+                if isinstance(data, dict):
+                    return data
+            except yaml.YAMLError:
+                pass
+    m = _JSON_BLOCK.search(text)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except ValueError:
+            pass
+    return {}
+
+
+def approvals(case: CaseDir) -> list[Approval]:
+    out = []
+    if not case.root.is_dir():
+        return out
+    for pending in sorted(case.root.glob("*/APPROVAL_PENDING.md")) + sorted(case.root.glob("*/*/APPROVAL_PENDING.md")):
+        rel_dir = str(pending.parent.relative_to(case.root))
+        text = pending.read_text(errors="replace")
+        approved_path = pending.parent / "APPROVED"
+        approved = None
+        if approved_path.is_file():
+            try:
+                approved = json.loads(approved_path.read_text())
+            except ValueError:
+                approved = {"approver": approved_path.read_text().strip()[:200], "date": None}
+        out.append(Approval(rel_dir, text, _front_matter(text), approved))
+    return out
+
+
+def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = None) -> dict:
+    """Write the APPROVED marker next to a pending checkpoint. Raises ValueError when the request is invalid."""
+    approver = " ".join(approver.split())[:120]
+    if not approver:
+        raise ValueError("approver name is required")
+    target = case.path(phase_dir)
+    if not target or target == case.root or not (target / "APPROVAL_PENDING.md").is_file():
+        raise ValueError(f"no pending approval in {phase_dir!r}")
+    marker = target / "APPROVED"
+    if marker.exists():
+        raise ValueError(f"{phase_dir} is already approved")
+    item = next(a for a in approvals(case) if a.phase_dir == phase_dir)
+    record = {"approver": approver, "date": (today or datetime.now(UTC).date()).isoformat()}
+    if item.checkpoint:
+        record["checkpoint"] = item.checkpoint
+    with marker.open("x") as fh:  # never overwrite a concurrent approval
+        json.dump(record, fh)
+        fh.write("\n")
+    return record

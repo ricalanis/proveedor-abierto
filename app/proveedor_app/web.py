@@ -2,18 +2,19 @@
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, Response
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from . import CORE_FIELDS, dod
-from .gold import GoldStore, Run, load_store, sniff_media_type
+from . import CORE_FIELDS, dod, investigate
+from .gold import GoldStore, Run, UnavailableStore, load_store, sniff_media_type
 
 HERE = Path(__file__).parent
 REPO_ROOT = HERE.parent.parent
@@ -44,9 +45,10 @@ LINK_LABELS = {
 
 @dataclass
 class Settings:
-    store: GoldStore
+    store: GoldStore | UnavailableStore
     case_dir: Path
     role: str = "investigator"
+    identity_header: str | None = None  # header the NetBird proxy sets with the signed-in user, if any
 
     def __post_init__(self) -> None:
         if self.role not in ROLES:
@@ -54,11 +56,20 @@ class Settings:
 
 
 def settings_from_env() -> Settings:
+    try:
+        store = load_store(REPO_ROOT)
+    except (FileNotFoundError, ValueError) as exc:
+        store = UnavailableStore(str(exc))
     return Settings(
-        store=load_store(REPO_ROOT),
+        store=store,
         case_dir=Path(os.environ.get("PA_CASE_DIR", REPO_ROOT / "case")),
         role=os.environ.get("PA_ROLE", "investigator"),
+        identity_header=os.environ.get("PA_IDENTITY_HEADER") or None,
     )
+
+
+class NoGold(Exception):
+    """No gold export can be read yet."""
 
 
 def supplier_name(supplier: dict | None) -> str:
@@ -102,15 +113,25 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         try:
             return settings.store.run(request.query_params.get("run"))
         except LookupError as exc:
-            raise HTTPException(503, str(exc)) from exc
+            raise NoGold(str(exc)) from exc
 
     def render(request: Request, name: str, **ctx) -> HTMLResponse:
         ctx.setdefault("nav", "")
         return templates.TemplateResponse(request, name, ctx)
 
+    @app.exception_handler(NoGold)
+    def no_gold(request: Request, exc: NoGold) -> HTMLResponse:
+        response = render(request, "no_gold.html", run=None, reason=str(exc))
+        response.status_code = 503
+        return response
+
     @app.get("/healthz")
     def healthz() -> dict:
-        return {"ok": True, "role": settings.role, "case_id": settings.store.case_id}
+        try:
+            run_id = settings.store.latest_run_id() if isinstance(settings.store, GoldStore) else None
+        except LookupError:
+            run_id = None
+        return {"ok": True, "role": settings.role, "run_id": run_id}
 
     @app.get("/", response_class=HTMLResponse)
     def index(request: Request, q: str = "", show: str = "all"):
@@ -192,6 +213,140 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def completeness_api(request: Request) -> dict:
         settings.store.refresh()  # pick up a new latest.json while a run is in progress
         return completeness_model(run(request))
+
+    case = investigate.CaseDir(settings.case_dir)
+
+    def selected_ids(r: Run, ids: str) -> list[str]:
+        return [i for i in dict.fromkeys(x.strip() for x in ids.split(",")) if i in r.suppliers_by_id]
+
+    @app.get("/signals", response_class=HTMLResponse)
+    def signals(request: Request):
+        r = run(request)
+        return render(request, "signals.html", nav="signals", run=r, groups=investigate.signals_by_rule(r))
+
+    @app.get("/signals/{supplier_id}/{index}", response_class=HTMLResponse)
+    def signal_detail(request: Request, supplier_id: str, index: int):
+        r = run(request)
+        s = r.suppliers_by_id.get(supplier_id)
+        flags = (s or {}).get("flags") or []
+        if not s or not 0 <= index < len(flags):
+            raise HTTPException(404, "no such signal")
+        flag = flags[index]
+        refs = [r.values[v] for v in flag.get("evidence_value_ids") or [] if v in r.values]
+        dispute = json.dumps(investigate.dispute_record(r, s, flag), indent=2, ensure_ascii=False)
+        return render(request, "signal.html", nav="signals", run=r, s=s, flag=flag, refs=refs,
+                      info=investigate.rule_info(flag["rule_id"], flag["label"]), dispute=dispute)
+
+    @app.get("/relationships", response_class=HTMLResponse)
+    def relationships(request: Request, focus: str = "", types: str = "shared_address,shared_representative"):
+        r = run(request)
+        wanted = request.query_params.getlist("t") or types.split(",")
+        chosen = tuple(t for t in investigate.LINK_TYPES if t in wanted) or ("shared_address",)
+        found = investigate.clusters(r, chosen)
+        if focus:
+            found.sort(key=lambda c: focus not in c.members)
+        return render(request, "relationships.html", nav="relationships", run=r, clusters=found, focus=focus,
+                      chosen=chosen, LINK_TYPES=investigate.LINK_TYPES,
+                      summarize=lambda c: investigate.cluster_summary(r, c))
+
+    @app.get("/journal", response_class=HTMLResponse)
+    def journal_index(request: Request):
+        r = run(request)
+        by_phase: dict[int, int] = {}
+        for step in r.trace:
+            by_phase[step.get("phase")] = by_phase.get(step.get("phase"), 0) + 1
+        tdds = sorted({s["tdd_path"] for s in r.trace if s.get("tdd_path")})
+        sample = next((v for v in r.values.values() if r.steps_by_value.get(v.value_id)), None)
+        return render(request, "journal_index.html", nav="journal", run=r, by_phase=by_phase, anchors=case.anchors(),
+                      tdds=[{"path": p, "exists": case.exists(p)} for p in tdds], sample=sample,
+                      PHASE_NAMES=investigate.PHASE_NAMES)
+
+    @app.get("/journal/{value_id}", response_class=HTMLResponse)
+    def journal(request: Request, value_id: str):
+        r = run(request)
+        ref = r.values.get(value_id)
+        if not ref:
+            raise HTTPException(404, f"no value {value_id}")
+        anchors = case.anchors()
+        for a in anchors:
+            a["text"] = case.read(a["path"], limit=1500) if a["exists"] else None
+        return render(request, "journal.html", nav="journal", run=r, ref=ref,
+                      s=r.suppliers_by_id.get(ref.supplier_id), replays=investigate.journal_chain(r, case, value_id),
+                      anchors=anchors)
+
+    @app.get("/case-file", response_class=HTMLResponse)
+    def case_file(request: Request, path: str):
+        text = case.read(path, limit=200_000)
+        if text is None:
+            raise HTTPException(404, "not in the case package")
+        return render(request, "case_file.html", nav="journal", run=None, path=path, text=text)
+
+    @app.get("/watchlist", response_class=HTMLResponse)
+    def watchlist(request: Request, ids: str = ""):
+        r = run(request)
+        chosen = selected_ids(r, ids)
+        runs = settings.store.run_ids()
+        prev_id = runs[runs.index(r.run_id) - 1] if r.run_id in runs and runs.index(r.run_id) > 0 else None
+        prev = settings.store.run(prev_id) if prev_id else None
+        items = [{"s": r.suppliers_by_id[i],
+                  "changes": investigate.diff_supplier(prev.suppliers_by_id.get(i), r.suppliers_by_id[i]) if prev else []}
+                 for i in chosen]
+        return render(request, "watchlist.html", nav="watchlist", run=r, items=items, ids=",".join(chosen),
+                      prev_id=prev_id)
+
+    @app.get("/export/{name}")
+    def export(request: Request, name: str, ids: str = ""):
+        from . import export as ex
+
+        r = run(request)
+        subset = selected_ids(r, ids) if ids else None
+        stem = f"{r.case_id}-{r.run_id}" + ("-watchlist" if subset else "")
+        if name == "suppliers.csv":
+            body, media = ex.to_csv(r, subset), "text/csv; charset=utf-8"
+        elif name == "ocds.json":
+            body, media = json.dumps(ex.to_ocds(r, subset), ensure_ascii=False, indent=2), "application/json"
+        elif name == "gold.ttl":
+            body, media = ex.to_turtle(r, subset), "text/turtle; charset=utf-8"
+        else:
+            raise HTTPException(404, "unknown export")
+        ext = name.rsplit(".", 1)[1]
+        return Response(body, media_type=media,
+                        headers={"Content-Disposition": f'attachment; filename="{stem}.{ext}"'})
+
+    def require_approver(request: Request) -> None:
+        if settings.role != "approver":
+            raise HTTPException(403, "approvals are only available on the approver URL")
+
+    def identity(request: Request) -> str:
+        return request.headers.get(settings.identity_header, "") if settings.identity_header else ""
+
+    @app.get("/approvals", response_class=HTMLResponse)
+    def approvals(request: Request, done: str = "", error: str = ""):
+        require_approver(request)
+        items = investigate.approvals(case)
+        for a in items:
+            paths = a.meta.get("artifact_paths") or {"prd": ["01-scope/prd.md"]}.get(a.checkpoint or "", [])
+            a.artifacts = [{"path": p, "exists": case.exists(p)} for p in paths]
+        try:
+            r = settings.store.run(None)
+        except LookupError:
+            r = None
+        return render(request, "approvals.html", nav="approvals", run=r, items=items, who=identity(request),
+                      done=done, error=error)
+
+    @app.post("/approvals")
+    async def approve(request: Request):
+        require_approver(request)
+        origin = request.headers.get("origin")
+        if origin and urlsplit(origin).netloc != request.headers.get("host"):
+            raise HTTPException(403, "cross-origin approval refused")
+        form = {k: v[0] for k, v in parse_qs((await request.body()).decode()).items()}
+        who = identity(request) or form.get("approver", "")
+        try:
+            investigate.approve(case, form.get("phase_dir", ""), who)
+        except ValueError as exc:
+            return RedirectResponse(f"/approvals?error={exc}", status_code=303)
+        return RedirectResponse(f"/approvals?done={form.get('phase_dir', '')}", status_code=303)
 
     @app.get("/bronze/{key}")
     def bronze(key: str):

@@ -17,7 +17,7 @@
     <div class="masthead__id">
       <a class="wordmark" href="/">Proveedor Abierto</a>
       <span class="runline mono" title="Gold export being read">
-        {{ run.case_id if run else "" }} · {{ run.run_id if run else "no run" }}
+        {% if run %}{{ run.case_id }} · {{ run.run_id }}{% else %}no gold export yet{% endif %}
       </span>
     </div>
     <nav class="tabs" aria-label="Sections">

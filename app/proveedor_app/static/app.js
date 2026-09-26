@@ -76,3 +76,60 @@
   }
   setInterval(tick, 5000);
 })();
+
+// Watchlist: kept in this browser only (the investigator URL is read-only on the server).
+(() => {
+  const KEY = "pa.watchlist";
+  const read = () => {
+    try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
+  };
+  const write = (ids) => {
+    try { localStorage.setItem(KEY, JSON.stringify(ids)); } catch { /* private mode: nothing to keep */ }
+  };
+
+  for (const btn of document.querySelectorAll("[data-watch]")) {
+    const id = btn.dataset.watch;
+    const sync = () => {
+      const on = read().includes(id);
+      btn.setAttribute("aria-pressed", String(on));
+      btn.textContent = on ? "Watching" : "Watch this supplier";
+    };
+    sync();
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      const ids = read();
+      write(ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]);
+      sync();
+    });
+  }
+
+  const list = document.getElementById("watchlist");
+  if (list) {
+    const ids = read();
+    const shown = list.dataset.ids ? list.dataset.ids.split(",") : [];
+    if (!new URLSearchParams(location.search).has("ids") && ids.length) {
+      location.replace(`/watchlist?ids=${encodeURIComponent(ids.join(","))}`);
+    } else if (shown.length && !ids.length) {
+      write(shown); // arrived through a shared link: adopt it
+    }
+    list.addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-unwatch]");
+      if (!btn) return;
+      const next = read().filter((x) => x !== btn.dataset.unwatch);
+      write(next);
+      location.replace(`/watchlist?ids=${encodeURIComponent(next.join(","))}`);
+    });
+  }
+
+  document.addEventListener("click", async (event) => {
+    const btn = event.target.closest("[data-copy]");
+    if (!btn) return;
+    const text = document.querySelector(btn.dataset.copy)?.textContent || "";
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = "Copied";
+    } catch {
+      btn.textContent = "Select the text to copy";
+    }
+  });
+})();

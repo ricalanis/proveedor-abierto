@@ -13,7 +13,8 @@
         {% if s.classified_as %}<div><dt>Classified as</dt><dd>{% for c in s.classified_as %}<span class="tag mono">{{ c }}</span>{% endfor %}</dd></div>{% endif %}
       </dl>
       <div class="head-actions">
-        <a class="btn btn--quiet" href="/watchlist/add?supplier={{ s.id|urlencode }}" data-watch="{{ s.id }}">Watch this supplier</a>
+        <a class="btn btn--quiet" href="/watchlist?ids={{ s.id|urlencode }}" data-watch="{{ s.id }}" role="button" aria-pressed="false">Watch this supplier</a>
+        <a class="btn btn--quiet" href="/relationships?focus={{ s.id|urlencode }}&t=shared_address&t=shared_representative&t=same_procedure">Show connections</a>
       </div>
     </header>
 

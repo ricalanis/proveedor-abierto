@@ -66,6 +66,12 @@ def test_multiple_cases_need_case_id(tmp_path):
     for case in ("a", "b"):
         (tmp_path / "gold" / case).mkdir(parents=True)
     with pytest.raises(LookupError, match="PA_CASE_ID"):
-        GoldStore(LocalSource(tmp_path))
+        GoldStore(LocalSource(tmp_path)).run()
     (tmp_path / "gold" / "a" / "latest.json").write_text(json.dumps({"run_id": "r1"}))
     assert GoldStore(LocalSource(tmp_path), case_id="a").latest_run_id() == "r1"
+
+
+def test_empty_bucket_is_lazy(tmp_path):
+    store = GoldStore(LocalSource(tmp_path))  # no gold/ yet: constructing must not fail
+    with pytest.raises(LookupError):
+        store.run()

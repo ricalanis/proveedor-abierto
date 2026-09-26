@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Case journal{% endblock %}
+{% block main %}
+<section class="page-head">
+  <h1>Case journal</h1>
+  <p class="lede">Every value in this app can be traced back to the brief. Pick any value's captures in a dossier and choose "Trace this value to the brief", or start from the documents below.</p>
+  {% if sample %}<p><a class="btn" href="/journal/{{ sample.value_id|urlencode }}">Replay an example value</a></p>{% endif %}
+</section>
+
+<section class="block" aria-labelledby="docs-h">
+  <h2 id="docs-h">The case package</h2>
+  <table class="ledger">
+    <thead><tr><th scope="col">Document</th><th scope="col">Path</th><th scope="col">State</th></tr></thead>
+    <tbody>
+    {% for a in anchors %}
+      <tr><th scope="row">{{ a.label }}</th><td class="mono">{% if a.exists %}<a href="/case-file?path={{ a.path|urlencode }}">{{ a.path }}</a>{% else %}{{ a.path }}{% endif %}</td><td>{{ "present" if a.exists else "not produced yet" }}</td></tr>
+    {% endfor %}
+    {% for t in tdds %}
+      <tr><th scope="row">Technical definition</th><td class="mono">{% if t.exists %}<a href="/case-file?path={{ t.path|urlencode }}">{{ t.path }}</a>{% else %}{{ t.path }}{% endif %}</td><td>{{ "present" if t.exists else "not in this copy" }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="block" aria-labelledby="steps-h">
+  <h2 id="steps-h">Steps in run <span class="mono">{{ run.run_id }}</span></h2>
+  <table class="ledger">
+    <thead><tr><th scope="col">Phase</th><th scope="col" class="num">Steps</th></tr></thead>
+    <tbody>
+    {% for phase, name in PHASE_NAMES.items() %}
+      <tr><th scope="row">{{ phase }} · {{ name }}</th><td class="num mono">{{ by_phase.get(phase, 0) }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

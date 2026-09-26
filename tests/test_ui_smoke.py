@@ -98,7 +98,30 @@ def test_completeness_view(page, base_url, store):
 def test_no_horizontal_scroll(browser, base_url, width):
     ctx = browser.new_context(viewport={"width": width, "height": 800})
     pg = ctx.new_page()
-    for path in ("/", "/suppliers/sup:fixture-007", "/completeness"):
+    for path in ("/", "/suppliers/sup:fixture-007", "/completeness", "/signals", "/signals/sup:fixture-005/0",
+                 "/relationships", "/journal/val:0001-008-founding_date", "/watchlist?ids=sup:fixture-005"):
         pg.goto(base_url + path)
         assert pg.evaluate("document.documentElement.scrollWidth") <= width, path
     ctx.close()
+
+
+def test_evidence_to_journal_to_brief(page, base_url):
+    page.goto(base_url + "/suppliers/sup:fixture-008")
+    page.locator("a.ev-link[data-evidence$='founding_date']").click()
+    page.locator("#evidence-panel a", has_text="Trace this value to the brief").click()
+    page.wait_for_url("**/journal/**")
+    assert page.locator(".stop__phase", has_text="Phase 1").count() >= 1
+    assert "Who receives public money" in page.locator(".stop--anchor").last.inner_text()
+
+
+def test_watch_toggle_feeds_watchlist(page, base_url):
+    page.goto(base_url + "/suppliers/sup:fixture-003")
+    btn = page.locator("[data-watch]")
+    btn.click()
+    assert btn.get_attribute("aria-pressed") == "true"
+    page.goto(base_url + "/watchlist")
+    page.wait_for_url("**/watchlist?ids=*")
+    assert page.locator(".watch__item a.entity").inner_text() == "Proveedor Ejemplo 03 S.A. de C.V."
+    page.locator("[data-unwatch]").click()
+    page.wait_for_url("**/watchlist?ids=")
+    assert page.locator(".watch__item").count() == 0

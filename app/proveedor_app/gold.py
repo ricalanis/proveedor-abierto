@@ -143,6 +143,8 @@ class Run:
 
 
 class GoldStore:
+    """Gold export for one case. Lookups that cannot be answered yet raise LookupError."""
+
     def __init__(
         self,
         source: Source,
@@ -151,8 +153,14 @@ class GoldStore:
     ):
         self.source = source
         self.bronze_key_template = bronze_key_template
-        self.case_id = case_id or self._detect_case_id()
+        self._case_id = case_id
         self._cache: dict[str, Run] = {}
+
+    @property
+    def case_id(self) -> str:
+        if not self._case_id:  # resolved lazily: the bucket may hold no gold yet when the app starts
+            self._case_id = self._detect_case_id()
+        return self._case_id
 
     def _detect_case_id(self) -> str:
         cases = self.source.list_dirs("gold")
@@ -258,3 +266,26 @@ def load_store(repo_root: Path, env: dict[str, str] | None = None) -> GoldStore:
 
 def iter_evidence(field_data: dict) -> Iterable[dict]:
     return field_data.get("evidence") or []
+
+
+class UnavailableStore:
+    """Stands in when no gold source is configured yet (the approver URL must work before any gold exists)."""
+
+    def __init__(self, reason: str):
+        self.reason = reason
+        self.case_id = "no-case"
+
+    def run(self, run_id: str | None = None) -> Run:
+        raise LookupError(self.reason)
+
+    def run_ids(self) -> list[str]:
+        return []
+
+    def refresh(self) -> None:
+        pass
+
+    def bronze(self, key: str) -> bytes | None:
+        return None
+
+    def bronze_meta(self, key: str) -> dict:
+        return {}

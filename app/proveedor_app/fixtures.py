@@ -15,6 +15,8 @@ import random
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
+import yaml
+
 from . import CORE_FIELDS, dod
 
 CASE_ID = "fixture-case"
@@ -54,16 +56,17 @@ class _Bronze:
     def __init__(self, lake: Path):
         self.lake = lake
 
-    def put(self, data: bytes, content_type: str, url: str) -> str:
+    def put(self, data: bytes, content_type: str, url: str, captured_at: str, source_id: str, step_id: str) -> str:
         key = _sha(data)
         path = self.lake / "bronze" / "sha256" / key.split(":", 1)[1]
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
-        meta = {"content_type": content_type, "url": url, "captured_at": None, "source_id": None, "step_id": None}
+        meta = {"content_type": content_type, "url": url, "captured_at": captured_at, "source_id": source_id,
+                "step_id": step_id}
         path.with_name(path.name + ".meta.json").write_text(json.dumps(meta))
         return key
 
-    def screenshot(self, host: str, label: str, value: str) -> str:
+    def screenshot(self, host: str, label: str, value: str, **meta) -> str:
         esc = lambda s: str(s).replace("&", "&amp;").replace("<", "&lt;")
         svg = (
             '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">'
@@ -77,20 +80,22 @@ class _Bronze:
             f'<text x="20" y="181" font-family="sans-serif" font-size="20" fill="#111">{esc(value)}</text>'
             "</svg>"
         )
-        return self.put(svg.encode(), "image/svg+xml", f"https://{host}")
+        return self.put(svg.encode(), "image/svg+xml", f"https://{host}", **meta)
 
-    def page(self, host: str, path: str, label: str, value: str) -> str:
+    def page(self, host: str, path: str, label: str, value: str, **meta) -> str:
         html = f"<!-- synthetic fixture --><html><body><h1>{host}{path}</h1><dl><dt>{label}</dt><dd>{value}</dd></dl>"
-        return self.put(html.encode(), "text/html", f"https://{host}{path}")
+        return self.put(html.encode(), "text/html", f"https://{host}{path}", **meta)
 
 
-def _evidence(bronze: _Bronze, source_id: str, path: str, label: str, value: str, captured_at: str) -> dict:
+def _evidence(bronze: _Bronze, source_id: str, path: str, label: str, value: str, captured_at: str,
+              step_id: str) -> dict:
     host, source_type, _, _ = SOURCES[source_id]
+    meta = {"captured_at": captured_at, "source_id": source_id, "step_id": step_id}
     return {
         "url": f"https://{host}{path}",
-        "bronze_key": bronze.page(host, path, label, value),
+        "bronze_key": bronze.page(host, path, label, value, **meta),
         "selector": f"dl > dt:has-text('{label}') + dd",
-        "screenshot_key": bronze.screenshot(host, label, value),
+        "screenshot_key": bronze.screenshot(host, label, value, **meta),
         "captured_at": captured_at,
         "source_id": source_id,
         "source_type": source_type,
@@ -159,7 +164,7 @@ def _render_run(
     bronze: _Bronze,
     rng: random.Random,
     degrade: float,
-) -> tuple[list[dict], list[dict], dict]:
+) -> tuple[list[dict], list[dict], list[dict], dict]:
     """Build suppliers.jsonl rows, trace rows and metrics for one run. `degrade` = share of values left missing."""
     ts0 = datetime(2026, 9, 26, 18, 0, tzinfo=UTC)
     trace: list[dict] = []
@@ -206,7 +211,19 @@ def _render_run(
         nn = row["i"] + 1
         captured = (ts0 + timedelta(minutes=5 + row["i"])).isoformat()
         fields: dict[str, dict] = {}
-        by_source: dict[str, list[str]] = {}
+        steps: dict[str, dict] = {}
+
+        def step_for(source_id: str, steps: dict = steps, row: dict = row) -> str:
+            """The phase-5 step that captures this supplier on one source (created on first use)."""
+            if source_id not in steps:
+                host, _st, objective, mode = SOURCES[source_id]
+                steps[source_id] = step(5, tdd_steps[source_id]["step_id"], f"page for {row['tax_id']} on {host}",
+                                        "extract fields", "emit.observation", "passed SHACL, promoted to gold",
+                                        source_id=source_id, objective_id=objective,
+                                        tdd_path=tdd_steps[source_id]["tdd_path"], mode=mode, value_ids=[])
+                mode_counts[mode] += 1
+            return steps[source_id]["step_id"]
+
         for name, source_id in FIELD_SOURCE.items():
             vid = f"val:{run_id[-4:]}-{nn:03d}-{name}"
             missing = name != "legal_name" and rng.random() < degrade
@@ -215,30 +232,43 @@ def _render_run(
                 continue
             value = row[name]
             path = f"/proveedor/{row['tax_id']}" if source_id != "lista-fiscal-example" else "/listado-completo.csv"
-            ev = [_evidence(bronze, source_id, path, name.replace("_", " "), value, captured)]
+            ev = [_evidence(bronze, source_id, path, name.replace("_", " "), value, captured, step_for(source_id))]
             status, conf = "gold", round(rng.uniform(0.86, 0.99), 2)
             if name == "founding_date" and row["i"] % 13 == 6:  # the gazette disagrees with the registry
                 other = (date.fromisoformat(value) + timedelta(days=365)).isoformat()
                 ev.append(_evidence(bronze, "gaceta-example", f"/edicion/{nn:03d}.pdf", "fecha de constitucion",
-                                    other, captured))
+                                    other, captured, step_for("gaceta-example")))
                 status, conf = "conflict", 0.55
             elif name == "founding_date" and row["i"] % 7 == 2:  # corroborated by the gazette
                 ev.append(_evidence(bronze, "gaceta-example", f"/edicion/{nn:03d}.pdf", "fecha de constitucion",
-                                    value, captured))
+                                    value, captured, step_for("gaceta-example")))
             fields[name] = {"value_id": vid, "value": value, "confidence": conf, "status": status, "evidence": ev}
             for e in ev:
-                by_source.setdefault(e["source_id"], []).append(vid)
-        for source_id, vids in by_source.items():
-            host, _st, objective, mode = SOURCES[source_id]
-            step(5, tdd_steps[source_id]["step_id"], f"page for {row['tax_id']} on {host}",
-                 f"extract {', '.join(sorted({v.rsplit('-', 1)[-1] for v in vids}))}",
-                 f"emit.observation x{len(vids)}", "passed SHACL, promoted to gold",
-                 source_id=source_id, objective_id=objective,
-                 tdd_path=tdd_steps[source_id]["tdd_path"], mode=mode, value_ids=vids)
-            mode_counts[mode] += 1
+                st = steps[e["source_id"]]
+                if vid not in st["value_ids"]:
+                    st["value_ids"].append(vid)
+        for st in steps.values():
+            fields_done = sorted(v.split("-", 2)[-1] for v in st["value_ids"])
+            st["requested"] = f"extract {', '.join(fields_done)}"
+            st["executed"] = f"emit.observation x{len(fields_done)}"
         suppliers.append({"id": row["id"], "classified_as": row["classified_as"], "fields": fields,
                           "flags": [], "links": [],
                           "contract_ids": [c["id"] for c in contracts if row["id"] in c["supplier_ids"]]})
+
+    ids = {s["id"] for s in suppliers}
+    run_contracts = []
+    for k, c in enumerate(x for x in contracts if ids & set(x["supplier_ids"])):
+        host, _st, objective, mode = SOURCES["compras-example"]
+        st = step(5, tdd_steps["compras-example"]["step_id"], f"procedure page for {c['id']} on {host}",
+                  "extract contract", "emit.observation x1", "passed SHACL, promoted to gold",
+                  source_id="compras-example", objective_id=objective,
+                  tdd_path=tdd_steps["compras-example"]["tdd_path"], mode=mode)
+        mode_counts[mode] += 1
+        captured = (ts0 + timedelta(minutes=90 + k)).isoformat()
+        ev = _evidence(bronze, "compras-example", f"/expediente/{c['id'].split(':', 1)[1]}", "importe",
+                       f"{c['amount']:.2f} {c['currency']}", captured, st["step_id"])
+        run_contracts.append(dict(c, evidence=[ev]))
+    contracts = run_contracts
 
     _add_flags_and_links(suppliers, contracts)
     metrics = dod.compute(suppliers)
@@ -255,7 +285,7 @@ def _render_run(
         mode_counts=mode_counts,
         jobs={"ok": sum(1 for s in trace if s["phase"] == 5), "failed_by_reason": {"timeout": 3, "captcha_stop": 1}},
     )
-    return suppliers, trace, metrics
+    return suppliers, contracts, trace, metrics
 
 
 def _add_flags_and_links(suppliers: list[dict], contracts: list[dict]) -> None:
@@ -351,9 +381,8 @@ def generate(out: Path, n_suppliers: int = 60, seed: int = 7) -> Path:
     base = _suppliers(rng, n_suppliers)
     contracts = _contracts(rng, base)
     for run_id, count, degrade in ((RUNS[0], n_suppliers - 6, 0.12), (RUNS[1], n_suppliers, 0.03)):
-        suppliers, trace, metrics = _render_run(run_id, base[:count], contracts, bronze, random.Random(seed + count),
-                                                degrade)
-        run_contracts = [c for c in contracts if any(sid in {s["id"] for s in suppliers} for sid in c["supplier_ids"])]
+        suppliers, run_contracts, trace, metrics = _render_run(run_id, base[:count], contracts, bronze,
+                                                               random.Random(seed + count), degrade)
         run_dir = lake / "gold" / CASE_ID / run_id
         run_dir.mkdir(parents=True, exist_ok=True)
         for name, rows in (("suppliers", suppliers), ("contracts", run_contracts), ("trace", trace)):
@@ -366,6 +395,13 @@ def generate(out: Path, n_suppliers: int = 60, seed: int = 7) -> Path:
     for rel, text in CASE_FILES.items():
         (case / rel).parent.mkdir(parents=True, exist_ok=True)
         (case / rel).write_text(text)
+    objectives = {"ontology_version": "v1", "prd_path": "01-scope/prd.md", "objectives": [
+        {"id": objective, "source_id": source_id, "source_url": f"https://{host}/",
+         "target_fields": sorted(f for f, s in FIELD_SOURCE.items() if s == source_id) or ["founding_date"],
+         "priority": k + 1, "expected_contribution": round(0.9 - 0.1 * k, 2)}
+        for k, (source_id, (host, _st, objective, _m)) in enumerate(SOURCES.items())]}
+    (case / "03-fanout" / "objectives.yaml").parent.mkdir(parents=True, exist_ok=True)
+    (case / "03-fanout" / "objectives.yaml").write_text(yaml.safe_dump(objectives, sort_keys=False))
     for source_id, (host, stype, objective, mode) in SOURCES.items():
         tdd = case / "04-local" / f"{source_id}__{objective}" / "tdd.md"
         tdd.parent.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}No gold yet{% endblock %}
+{% block main %}
+<section class="page-head">
+  <h1>No gold export to read yet</h1>
+  <p class="lede">The engine has not exported a run for this case, or this instance is not pointed at one. {% if role == "approver" %}Checkpoints waiting for sign-off are under <a href="/approvals">Approvals</a>.{% endif %}</p>
+  <pre class="record">{{ reason }}</pre>
+</section>
+{% endblock %}
