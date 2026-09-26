@@ -32,8 +32,8 @@ the audience sees can be clicked back to its capture and to the brief. Show thin
 
 ## If something breaks
 
-- **The run stalls:** switch `/completeness` to the cached run (`?run=<cached run id>`) and keep narrating the
-  same beats. Every screen works on any run.
+- **The run stalls:** start the snapshot replay (see Setup) on a spare port and keep narrating the same beats on
+  `/run`. When the replay finishes, it publishes its gold, so the dossier and journal beats work on it too.
 - **The approval does not resume:** the `APPROVED` file is in `case/<phase>/`. Show it with `cat`. The engine
   resumes on the next `ontofill run`.
 - **A screenshot fails to load:** the evidence panel still shows the source URL and the bronze key. Click the
