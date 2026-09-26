@@ -1,7 +1,9 @@
 # Deploying the app behind NetBird
 
 The app runs on the control-plane VM next to the engine as **two processes, one per role**, published through
-NetBird's reverse proxy as **two URLs with different credentials**. The VM opens no inbound port for the app.
+NetBird's reverse proxy as **two URLs with different credentials**. Management is **NetBird Cloud**
+(`app.netbird.io`): peers enroll there, and the two role URLs and their access policies are configured in the
+Cloud dashboard. The VMs allow **zero public inbound ports, SSH included**; administration goes over NetBird.
 
 ```
  browser ──HTTPS──> NetBird reverse proxy ──WireGuard──> control-plane VM
@@ -57,7 +59,8 @@ IP, and the investigator container cannot write the case or its root filesystem.
    a connected client, and the Peer Expose feature enabled by the account admin.
    Limitation: the credential is passed as a flag and is visible in the VM's process list. Prefer SSO groups for
    the approver.
-2. **Dashboard reverse-proxy services (persistent, custom domain).** Configured in the dashboard with per-service
+2. **Cloud dashboard reverse-proxy services (persistent, custom domain; preferred for the demo).** Configured in
+   the NetBird Cloud dashboard (`app.netbird.io` → Reverse Proxy) with per-service
    Authentication (SSO with distribution groups, password, PIN, header) and Access Control (CIDR/country).
    The proxy tunnels to the target peer's NetBird address. **Unverified:** whether a dashboard service can reach a
    port bound to the peer's loopback. If it cannot, set `PA_BIND_IP` to the VM's NetBird IP (`100.x.y.z`). That is
@@ -74,8 +77,14 @@ Sources (NetBird docs, reverse proxy in beta at the time of writing):
 
 ## Evidence to capture for the judges (no credentials on screen)
 
+Before any screenshot goes into the README, check every peer, group and service name visible on screen.
+Names must be neutral (for example `pa-control-plane`, `pa-sandbox`). Never capture a peer whose hostname
+contains an employer's or client's name; rename the peer in the dashboard first, or leave it out of the capture.
+Also keep account emails, setup keys, and the PIN or password fields out of frame.
+
 - [ ] `./verify.sh remote ...` output (VM ports closed, unauthenticated URLs refused)
 - [ ] `./verify.sh local` output on the VM
 - [ ] NetBird dashboard: the two services (or the expose sessions) with their authentication settings
 - [ ] Access policy / groups: investigators vs approvers
-- [ ] Peers list: control-plane VM and sandbox VM connected peer to peer (Codex's side, approach 3)
+- [ ] Peers list: control-plane VM and sandbox VM connected peer to peer (Codex's side, approach 3), with names checked
+- [ ] `./verify.sh remote` shows port 22 closed as well (admin over NetBird only)

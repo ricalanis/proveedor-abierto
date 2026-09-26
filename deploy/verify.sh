@@ -7,7 +7,7 @@
 #       and cannot write the case, the approver process can reach them.
 #
 #   deploy/verify.sh remote <vm-public-ip> <investigator-url> <approver-url>
-#       From outside: the VM exposes no app port (nor common web ports), and both NetBird URLs refuse
+#       From outside: the VM exposes no inbound port at all (SSH included), and both NetBird URLs refuse
 #       unauthenticated requests (no app page is served without the role's credential).
 #       Optional: PA_INVESTIGATOR_COOKIE="name=value" (a session cookie after logging in to the investigator URL)
 #       also checks that the investigator URL cannot reach approver routes.
@@ -102,7 +102,8 @@ remote_mode() {
   for port in 80 443 3000 5000 5432 7878 8000 8080 8400 8401 8443 9000; do
     if nc -z -w 3 "$vm" "$port" 2>/dev/null; then fail "VM port $port is open"; else pass "VM port $port closed"; fi
   done
-  if nc -z -w 3 "$vm" 22 2>/dev/null; then warn "VM port 22 (ssh) is open; close it and use NetBird SSH for zero inbound ports"
+  # Zero public inbound ports, SSH included: administration goes over NetBird.
+  if nc -z -w 3 "$vm" 22 2>/dev/null; then fail "VM port 22 (ssh) is open publicly; admin must go over NetBird"
   else pass "VM port 22 closed"; fi
 
   for url in "$inv" "$inv/approvals" "$app" "$app/approvals" "$app/api/run/x"; do

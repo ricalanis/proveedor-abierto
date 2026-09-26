@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Publish the two role URLs through NetBird's reverse proxy (`netbird expose`, NetBird >= v0.66).
+# Management is NetBird Cloud (app.netbird.io): the VM's peer must be enrolled there, and an account admin must
+# enable Peer Expose. For persistent URLs, configure the two services in the Cloud dashboard instead (deploy/README).
 # Each URL gets its own credential, so access matches the role:
 #   investigator (read-only app)  -> shared password or PIN
 #   approver (phase sign-off)     -> SSO restricted to an IdP group (preferred) or a different PIN

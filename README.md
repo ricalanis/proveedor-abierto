@@ -79,13 +79,15 @@ The proxy's `X-NetBird-User` header only prefills the approver's name; `APPROVED
 
 ### NetBird evidence
 
-How it is deployed and gated: [`deploy/README.md`](deploy/README.md). The two containers bind to loopback only;
+How it is deployed and gated: [`deploy/README.md`](deploy/README.md). Management is NetBird Cloud; the VMs
+allow zero public inbound ports, SSH included. The two containers bind to loopback only;
 `netbird expose` publishes one URL per role with its own credential (password or PIN for investigators, SSO
 restricted to an approvers group for approvers). `deploy/verify.sh` proves the gate.
 
 - [x] `deploy/verify.sh local` passes on a local rehearsal: loopback-only listeners, investigator 403 on approval
   routes, cross-origin approval refused, investigator container read-only. Binding to `0.0.0.0` makes it fail.
-- [ ] `deploy/verify.sh remote` from outside the mesh: VM app ports closed, unauthenticated URLs refused *(pending VM)*
+- [ ] `deploy/verify.sh remote` from outside the mesh: every probed VM port closed (SSH included), unauthenticated
+  URLs refused *(pending VM)*
 - [ ] Reverse-proxy services and their authentication settings (screenshot) *(pending VM)*
 - [ ] Access groups: investigators vs approvers (screenshot) *(pending VM)*
 - [ ] Peer list: control-plane and sandbox VMs connected peer to peer (screenshot, engine side) *(pending VM)*
