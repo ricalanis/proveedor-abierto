@@ -30,7 +30,8 @@ inside the VM at `169.254.169.254`. Provision them after boot over NetBird into 
 | `Dockerfile` | App image (Python 3.13, uv, non-root user, healthcheck) |
 | `compose.yaml` | The two role containers; host ports bound to `PA_BIND_IP` (default `127.0.0.1`); `cap_drop: ALL`, `no-new-privileges`, read-only root |
 | `.env.example` | Local rehearsal defaults (synthetic fixtures). Copy to `.env`; secrets never go in the file |
-| `netbird-expose.sh` | Publishes both URLs with `netbird expose`, one credential per role |
+| `netbird_services.py` | Creates or updates the two NetBird Cloud reverse-proxy services via the API (primary) |
+| `netbird-expose.sh` | Publishes both URLs with `netbird expose`, one credential per role (fallback) |
 | `systemd/proveedor-expose.service` | Keeps the two expose sessions alive on the VM |
 | `verify.sh` | Proves the gate: `local` on the VM, `remote` from outside |
 
@@ -66,12 +67,15 @@ NetBird-peers-only, IP and country rules, CrowdSec reputation. **Our choice:**
 | investigator | password (or 6-digit PIN) + optional country rule | read-only, shareable with the judges on the day |
 | approver | SSO/OIDC restricted to the `approvers` group | signs off phases; tied to a named person in the IdP |
 
-1. **Primary: two reverse-proxy services in the Cloud dashboard** (`app.netbird.io` → Reverse Proxy), each
-   targeting the control-plane peer on its port (8400 / 8401), with the protection above. Persistent URLs,
-   optional custom domain via CNAME.
-   **Unverified:** whether a proxy service can reach a port bound to the peer's loopback. If it cannot, set
-   `PA_BIND_IP` to the VM's NetBird IP (`100.x.y.z`), which is still not a public interface; `verify.sh local`
-   checks listeners against `PA_BIND_IP`.
+1. **Primary: two reverse-proxy services in NetBird Cloud**, scripted against the Services API with
+   `deploy/netbird_services.py` (`plan` → `apply`, idempotent; `status`, `delete` touch only our two services).
+   Each targets the control-plane peer on its port (8400 / 8401) with the protection above, under the account's
+   free proxy domain (`proveedor.<domain>`, `proveedor-approver.<domain>`). The script refuses a peer that is not
+   a Linux host, and never prints the token or credentials (`plan` redacts them).
+   The proxy reaches a peer target over WireGuard, so the script targets the peer's NetBird IP by default.
+   Bind the containers there: `PA_BIND_IP=<the VM's 100.x NetBird IP>` in `deploy/.env`. That is not a public
+   interface, and `verify.sh local` checks listeners against `PA_BIND_IP`. **Unverified until the VM exists:**
+   the API's `target_type` value for a peer (`peer`) and whether loopback targets work at all.
 2. **Fallback: `netbird expose`** (`netbird-expose.sh`): `--with-password`/`--with-pin` for the investigator,
    `--with-user-groups approvers` for the approver. URLs live only while the command runs ("gone on Ctrl+C"),
    up to 10 sessions per peer. **Prerequisite for both:** an account admin enables **Peer Expose** in the Cloud
