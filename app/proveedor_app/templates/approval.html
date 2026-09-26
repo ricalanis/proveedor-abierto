@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set CP_NAMES = {"prd": "Global PRD", "factors": "Factors of variation", "ontology": "Ontology"} %}
+{% set CP_NAMES = {"prd": "Global PRD", "factors": "Factors of variation", "ontology": "Ontology", "action": "Action before submit"} %}
 {% block title %}Review {{ CP_NAMES.get(a.checkpoint, "checkpoint") }}{% endblock %}
 {% block main %}
 <nav class="crumbs" aria-label="Breadcrumb"><a href="/approvals">Approvals</a> <span aria-hidden="true">/</span> <span class="mono">{{ a.phase_dir }}</span></nav>
@@ -10,18 +10,20 @@
     · files: {% for f in paths %}{% if f.exists %}<a class="mono" href="/case-file?path={{ f.path|urlencode }}" target="_blank" rel="noopener">{{ f.path }}</a>{% else %}<span class="mono muted">{{ f.path }} (missing)</span>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}</p>
 </section>
 {% if error %}<p class="notice notice--error" role="alert">{{ error }}</p>{% endif %}
-{% if a.approved %}<p class="notice" role="status">Approved by {{ a.approved.approver }}{% if a.approved.date %} on <span class="mono">{{ a.approved.date }}</span>{% endif %}.{% if a.approved.decisions %} Factor decisions: {% for k, v in a.approved.decisions.items() %}<span class="mono">{{ k }}</span> {{ v }}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>{% endif %}
+{% if a.approved and a.decision == "deny" %}<p class="notice notice--error" role="status">Denied by {{ a.approved.approver }}{% if a.approved.date %} on <span class="mono">{{ a.approved.date }}</span>{% endif %}{% if a.approved.reason %}: {{ a.approved.reason }}{% endif %}.</p>
+{% elif a.approved %}<p class="notice" role="status">Approved by {{ a.approved.approver }}{% if a.approved.date %} on <span class="mono">{{ a.approved.date }}</span>{% endif %}.{% if a.approved.decisions %} Factor decisions: {% for k, v in a.approved.decisions.items() %}<span class="mono">{{ k }}</span> {{ v }}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>{% endif %}
 
 <form method="post" action="/approvals" class="review">
   <input type="hidden" name="phase_dir" value="{{ a.phase_dir }}">
+  {% if a.checkpoint == "action" %}{% include "_review_action.html" %}{% endif %}
   {% if docs.prd %}{% include "_review_prd.html" %}{% endif %}
   {% if docs.factors %}{% include "_review_factors.html" %}{% endif %}
   {% if docs.ontology %}{% include "_review_ontology.html" %}{% endif %}
-  {% if not docs %}
+  {% if not docs and a.checkpoint != "action" %}
   <section class="block"><h2>What the engine is asking</h2><pre class="record">{{ a.pending_text }}</pre></section>
   {% endif %}
 
-  {% if not a.approved %}
+  {% if not a.approved and a.checkpoint != "action" %}
   <section class="signoff" aria-labelledby="signoff-h">
     <h2 id="signoff-h">Sign off</h2>
     {% if backend == "recorded" %}<p class="note">This artifact came from recorded (simulated) inference. You can approve it to test the flow, but it will not satisfy the checkpoint on a live run: the engine regenerates it with Vultr inference first.</p>{% endif %}

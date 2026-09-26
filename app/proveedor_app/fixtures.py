@@ -190,8 +190,25 @@ def _render_run(
             "value_ids": kw.get("value_ids", []),
             "ts": (ts0 + timedelta(seconds=len(trace) * 7)).isoformat(),
             "generated_by": GEN,
+            **{k: kw[k] for k in ("event", "verify", "repair", "gate", "screenshot_key") if k in kw},
         }
         trace.append(s)
+        return s
+
+    def verify(action: dict, goal: str, verdict: str = "achieved", backend: str = "vultr",
+               confidence: float = 0.93) -> dict:
+        """§12 Pattern B: a vision check of the page after a browser action."""
+        host = SOURCES[action["source_id"]][0]
+        shot = bronze.screenshot(host, "after: " + goal[:40], verdict, captured_at=action["ts"],
+                                 source_id=action["source_id"], step_id=action["step_id"])
+        model = "qwen3.8-27b" if backend == "vultr" else "jev-typed-check"
+        s = step(5, action["step_id"], {"screenshot_key": shot}, {"tool": "vision.verify", "goal": goal},
+                 {"model": model}, {"status": "ok" if verdict == "achieved" else verdict},
+                 source_id=action["source_id"], objective_id=action["objective_id"], tdd_path=action["tdd_path"],
+                 mode=action["mode"], event="verify", screenshot_key=shot,
+                 verify={"goal": goal, "verdict": verdict, "confidence": confidence, "backend": backend,
+                         "model": model, "screenshot_key": shot})
+        mode_counts[action["mode"]] += 1
         return s
 
     p1 = step(1, None, "case/brief.md", "draft personas, jobs and a global PRD with a DoD", "wrote 01-scope/prd.md",
@@ -230,7 +247,29 @@ def _render_run(
     def macro_step() -> dict:
         if "macro" not in shared:
             host, _st, objective, _m = SOURCES["compras-example"]
-            shared["macro"] = step(5, tdd_steps["compras-example"]["step_id"],
+            tdd_path = tdd_steps["compras-example"]["tdd_path"]
+            # §12 Pattern A: the extractor is written, run in the sandbox against stored captures, repaired, retried
+            code1 = bronze.put(b"def extract(page):\n    return page['rfc']\n", "text/x-python", f"https://{host}/",
+                               captured_at=ts0.isoformat(), source_id="compras-example", step_id="code")
+            diff = bronze.put(b"-    return page['rfc']\n+    return page.get('rfc') or page['tax_id']\n", "text/x-diff",
+                              f"https://{host}/", captured_at=ts0.isoformat(), source_id="compras-example",
+                              step_id="code")
+            code2 = bronze.put(b"def extract(page):\n    return page.get('rfc') or page['tax_id']\n", "text/x-python",
+                               f"https://{host}/", captured_at=ts0.isoformat(), source_id="compras-example",
+                               step_id="code")
+            a1 = step(5, tdd_steps["compras-example"]["step_id"], "15 stored captures from the agentic loop",
+                      {"tool": "code.test", "attempt": 1}, {"exit_code": 1}, {"status": "failed", "attempt": 1},
+                      source_id="compras-example", objective_id=objective, tdd_path=tdd_path, mode="D1",
+                      event="repair", repair={"attempt": 1, "max_attempts": 3, "code_key": code1, "result": "fail",
+                                              "stderr_excerpt": "KeyError: 'rfc' (4 of 15 pages label it 'tax_id')",
+                                              "test": {"pages": 15, "precision": 0.73, "coverage": 0.73}})
+            a2 = step(5, a1["step_id"], "stderr from attempt 1", {"tool": "code.repair", "attempt": 2}, {"exit_code": 0},
+                      {"status": "ok", "attempt": 2}, source_id="compras-example", objective_id=objective,
+                      tdd_path=tdd_path, mode="D1", event="repair",
+                      repair={"attempt": 2, "max_attempts": 3, "code_key": code2, "diff_key": diff, "result": "pass",
+                              "test": {"pages": 15, "precision": 1.0, "coverage": 1.0}})
+            mode_counts["D1"] += 2
+            shared["macro"] = step(5, a2["step_id"],
                                    f"15 successful agentic traces on {host}",
                                    "code.promote the search-and-extract trace",
                                    "macro compras-example/search@v1 written to case/05-macros/compras-example/",
@@ -263,12 +302,36 @@ def _render_run(
                                   "failed check; escalate to S2 (vision)", source_id=source_id,
                                   objective_id=objective, tdd_path=tdd_path, mode="S1")
                     mode_counts["S1"] += 1
+                    verify(failed, "founding date visible on the company page", "not_achieved", confidence=0.81)
                     parent, mode = failed["step_id"], "S2"
                     evaluated = "escalated to S2; passed SHACL, promoted to gold"
+                if source_id == "gaceta-example" and "kill" not in shared:  # a scanned PDF that never finishes
+                    shared["kill"] = step(5, parent, f"scanned gazette PDF for {row['tax_id']}",
+                                          {"tool": "pdf.ocr_loop"}, {"pages_processed": 3},
+                                          {"status": "killed", "reason": "timeout"}, source_id=source_id,
+                                          objective_id=objective, tdd_path=tdd_path, mode="S2", event="limit_kill")
+                    mode_counts["S2"] += 1
+                if source_id == "compras-example" and row["i"] in (0, 1):  # approve-before-submit gate
+                    risky = row["i"] == 1
+                    shared.setdefault("gates", []).append(step(
+                        5, parent, f"search form on {host}", {"tool": "browser.act", "action": "submit search form"},
+                        {"outcome": "pending_approval" if risky else "allowed"}, {"status": "ok"},
+                        source_id=source_id, objective_id=objective, tdd_path=tdd_path, mode="S1",
+                        event="action_gate", gate={
+                            "action": ("submit the clarification-request form" if risky
+                                       else f"type the RFC into the search box on {host}"),
+                            "risk_tier": "HIGH" if risky else "SAFE", "decided_by": "vultr" if risky else "code",
+                            "outcome": "pending_approval" if risky else "allowed",
+                            **({"approval_path": "05-actions/req-0001/APPROVAL_PENDING.md"} if risky else {})}))
+                    mode_counts["S1"] += 1
                 steps[source_id] = step(5, parent, f"page for {row['tax_id']} on {host}", "extract fields",
                                         "emit.observation", evaluated, source_id=source_id, objective_id=objective,
                                         tdd_path=tdd_path, mode=mode, value_ids=[])
                 mode_counts[mode] += 1
+                if mode in ("S1", "S2"):  # every browser action is checked by a vision model (Pattern B)
+                    if source_id == "compras-example" and row["i"] % 5 == 3:  # Jev pre-screen, then Vultr
+                        verify(steps[source_id], "supplier fields visible on the page", "uncertain", "jev", 0.55)
+                    verify(steps[source_id], "supplier fields visible on the page")
             return steps[source_id]["step_id"]
 
         for name, source_id in FIELD_SOURCE.items():
@@ -425,9 +488,12 @@ CASE_FILES = {
 
 
 def fixture_job(step: dict, n: int) -> dict:
-    """Synthetic sandbox proof checkpoints (CONTRACT section 8a, jobs.schema.json). Labelled as fixtures throughout."""
+    """Synthetic sandbox proof checkpoints (CONTRACT §8a + §12 limits/usage/secrets). Labelled as fixtures throughout."""
     failed = "fail" in str(step.get("evaluated") or "").lower()
+    killed = step.get("event") == "limit_kill"
     return {
+        "limits": {"memory_mb": 512, "cpus": 1, "pids": 128, "timeout_s": 60, "max_steps": 40},
+        "usage": {"peak_memory_mb": 180 + n % 90, "wall_s": 60 if killed else 4 + n % 9, "steps": 1 + n % 5},
         "job_id": f"job:{step['step_id'].split(':', 1)[1]}", "run_id": step["run_id"], "step_id": step["step_id"],
         "source_id": step.get("source_id"), "started_at": step.get("ts"), "ended_at": step.get("ts"),
         "generated_by": GEN,
@@ -444,6 +510,8 @@ def fixture_job(step: dict, n: int) -> dict:
                                       "detail": {"path": "/host/escape-test"}}]},
             "teardown": {"ok": True, "detail": {"pod_gone": True, "proxy_gone": True, "network_removed": True,
                                                 "verified": True}},
+            "secrets": {"ok": True, "env_keys_found": 0, "files_with_keys": 0, "metadata_ip": "BLOCKED",
+                        "mesh": "BLOCKED"},
         },
     }
 
@@ -502,6 +570,8 @@ def case_ontology() -> dict:
 DOD_QUERIES = {"prd_path": "01-scope/prd.json", "ontology_version": "v1", "generated_by": GEN, "queries": [
     {"criterion_id": "suppliers_found", "aggregate": "count_entities", "class_id": "supplier",
      "target": 50, "operator": ">="},
+    {"criterion_id": "profiles_meeting_dod", "aggregate": "entities_meeting_completeness", "class": "supplier",
+     "properties": "dod", "min_ratio": 0.8, "target": 50, "operator": ">="},
     {"criterion_id": "complete_profiles", "aggregate": "count_entities_with_properties", "class_id": "supplier",
      "properties": ["legal_name", "tax_id", "tax_list_status", "sanction_status"], "target": 50, "operator": ">="},
     {"criterion_id": "source_diversity", "aggregate": "count_distinct_source_classes", "target": 4, "operator": ">="},

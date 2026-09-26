@@ -19,6 +19,7 @@
 <div class="runview" id="runview" data-api="/api/run/{{ live_run_id }}" data-count="{{ m.steps|length }}" data-state="{{ p.state }}">
   <section class="stream" aria-labelledby="stream-h">
     <h2 id="stream-h">Steps, newest first</h2>
+    {% if m.steps|length > limit %}<p class="note muted">Showing the latest {{ limit }} of {{ m.steps|length }} steps. <a href="?limit=2000">Show the whole trail</a>.</p>{% endif %}
     <p class="muted note">Each step logs what it observed, what was requested, what ran and how it was judged. The mode shows how much inference it needed: D0 is a plain download, S2 is full computer use.</p>
     <ol class="steps" id="steps" aria-live="off" tabindex="0" aria-label="Steps, newest first">{% with steps = recent %}{% include "_steps.html" %}{% endwith %}</ol>
   </section>

@@ -49,6 +49,51 @@ def _failed(step: dict) -> bool:
     return any(w in _evaluated(step) for w in _FAIL_WORDS)
 
 
+def step_kind(step: dict) -> str | None:
+    """§12 step kinds: 'verify' (Pattern B vision check), 'repair' (Pattern A attempt), 'gate' (approve-before-submit),
+    'kill' (a resource limit stopped the job). Earlier guessed shapes are accepted too."""
+    ev = step.get("event")
+    req = step.get("requested") if isinstance(step.get("requested"), dict) else {}
+    evald = step.get("evaluated") if isinstance(step.get("evaluated"), dict) else {}
+    if ev == "verify" or isinstance(step.get("verify"), dict) or "vision" in str(req.get("tool") or "") \
+            or "verdict" in evald:
+        return "verify"
+    if ev == "repair" or isinstance(step.get("repair"), dict):
+        return "repair"
+    if ev == "action_gate" or isinstance(step.get("gate"), dict):
+        return "gate"
+    if ev == "limit_kill":
+        return "kill"
+    return None
+
+
+VERDICT_ALIASES = {"pass": "achieved", "fail": "not_achieved", "unsure": "uncertain"}
+
+
+def _details(s: dict, kind: str) -> dict:
+    evald = s.get("evaluated") if isinstance(s.get("evaluated"), dict) else {}
+    ex = s.get("executed") if isinstance(s.get("executed"), dict) else {}
+    if kind == "verify":
+        v = s.get("verify") if isinstance(s.get("verify"), dict) else evald
+        verdict = str(v.get("verdict") or v.get("status") or "uncertain").lower()
+        return {"verdict": VERDICT_ALIASES.get(verdict, verdict), "confidence": v.get("confidence"),
+                "backend": v.get("backend"), "model": v.get("model"), "goal": v.get("goal"),
+                "reason": v.get("reason"), "screenshot_key": v.get("screenshot_key") or s.get("screenshot_key")}
+    if kind == "repair":
+        r = s.get("repair") if isinstance(s.get("repair"), dict) else {}
+        return {"attempt": r.get("attempt") or evald.get("attempt"), "max_attempts": r.get("max_attempts"),
+                "result": r.get("result") or evald.get("status"),
+                "stderr": r.get("stderr_excerpt") or ex.get("stderr"), "diff_key": r.get("diff_key"),
+                "code_key": r.get("code_key"), "patch": ex.get("diff") or ex.get("patch"), "test": r.get("test") or {}}
+    if kind == "gate":
+        g = s.get("gate") if isinstance(s.get("gate"), dict) else {}
+        return {"action": g.get("action"), "risk_tier": g.get("risk_tier"), "decided_by": g.get("decided_by"),
+                "outcome": g.get("outcome"), "approval_path": g.get("approval_path")}
+    if kind == "kill":
+        return {"reason": evald.get("reason") or ex.get("reason")}
+    return {}
+
+
 def annotate(steps: list[dict]) -> list[dict]:
     """Add `event` to each step. An `event` key from the engine (even null) wins; inference is only a fallback."""
     by_id = {s.get("step_id"): s for s in steps}
@@ -64,9 +109,12 @@ def annotate(steps: list[dict]) -> list[dict]:
                 event = "escalation"  # a costlier mode after the cheaper one failed its check
             elif "crystalliz" in text or "code.promote" in text:
                 event = "crystallization"
-            elif _failed(s) and not s.get("value_ids"):
+            elif _failed(s) and not s.get("value_ids") and step_kind(s) is None:
                 event = "failure"
         s["event"] = event
+        s["kind"] = step_kind(s)
+        if s["kind"]:
+            s["detail"] = _details(s, s["kind"])
         out.append(s)
     return out
 
@@ -84,13 +132,18 @@ def summarize(steps: list[dict], status: dict | None, domain: Domain | None = No
     """Everything the side panel shows, from the step stream plus status.json."""
     status = status or {}
     modes = {m: 0 for m in MODE_RANK}
-    events = {"escalation": 0, "crystallization": 0, "repair": 0, "hard_stop": 0, "failure": 0}
+    events = {"escalation": 0, "crystallization": 0, "repair": 0, "hard_stop": 0, "failure": 0, "verify": 0,
+              "action_gate": 0, "limit_kill": 0}
+    verdicts = {"achieved": 0, "not_achieved": 0, "uncertain": 0}
     values = 0
     for s in steps:
         if s.get("mode") in modes:
             modes[s["mode"]] += 1
         if s.get("event") in events:
             events[s["event"]] += 1
+        if s.get("kind") == "verify":
+            verdicts[(s.get("detail") or {}).get("verdict", "uncertain")] = \
+                verdicts.get((s.get("detail") or {}).get("verdict", "uncertain"), 0) + 1
         values += len(s.get("value_ids") or [])
     phase = status.get("phase") or max((s.get("phase") or 1 for s in steps), default=1)
     metrics = status.get("metrics") or {}
@@ -106,6 +159,7 @@ def summarize(steps: list[dict], status: dict | None, domain: Domain | None = No
         "modes": modes,
         "mode_total": sum(modes.values()),
         "events": events,
+        "verdicts": verdicts,
         "value_count": values,
         "step_count": len(steps),
     }
@@ -117,7 +171,10 @@ CHECKPOINTS = [
     ("where", "Where it ran", "Hostname and uname from inside the pod"),
     ("isolation", "Isolation probe", "A non-allowlisted domain and a write outside the pod must be BLOCKED"),
     ("teardown", "Teardown", "Pod gone, no sandboxes left"),
+    ("secrets", "Secret hygiene", "No keys in the pod; the metadata IP and the NetBird mesh are BLOCKED"),
 ]
+KILL_LABELS = {"timeout": "wall-clock timeout", "memory": "memory cap", "pids": "process cap",
+               "max_steps": "step cap", "steps": "step cap"}
 
 
 def checkpoint_state(job: dict, key: str) -> str:
@@ -125,11 +182,16 @@ def checkpoint_state(job: dict, key: str) -> str:
     cp = (job.get("checkpoints") or {}).get(key)
     if not cp:
         return "pending"
+    if key == "secrets":
+        no_keys = not (cp.get("env_keys_found") or cp.get("files_with_keys"))
+        probes = [str(cp.get(k, "")).upper() for k in ("metadata_ip", "mesh") if k in cp]
+        probes += [str(p.get("result", "")).upper() for p in cp.get("probes") or []]
+        blocked = bool(probes) and all(p == "BLOCKED" for p in probes)
+        return "pass" if cp.get("ok", True) and no_keys and blocked else "fail"
     if key == "isolation":
         probes = cp.get("probes") or []
-        if probes and all(str(p.get("result", "")).upper() == "BLOCKED" for p in probes):
-            return "pass"
-        return "fail" if probes else "pending"
+        blocked = bool(probes) and all(str(p.get("result", "")).upper() == "BLOCKED" for p in probes)
+        return "pass" if blocked else ("fail" if probes else "pending")
     return "pass" if cp.get("ok") else "fail"
 
 
@@ -147,7 +209,7 @@ def isolation_tier(runtime: str | None) -> dict | None:
     return {"tier": None, "name": runtime, "ok": False, "note": "runtime not on the ladder"}
 
 
-def proof(jobs: list[dict]) -> dict:
+def proof(jobs: list[dict], steps: list[dict] | None = None) -> dict:
     """Aggregate proof over all jobs, plus the latest job whose checkpoints all resolved (the one to show judges)."""
     counts = {key: {"pass": 0, "fail": 0, "pending": 0} for key, _, _ in CHECKPOINTS}
     for job in jobs:
@@ -156,8 +218,15 @@ def proof(jobs: list[dict]) -> dict:
     complete = [j for j in jobs if all(checkpoint_state(j, k) != "pending" for k, _, _ in CHECKPOINTS)]
     featured = complete[-1] if complete else (jobs[-1] if jobs else None)
     runtime = (((featured or {}).get("checkpoints") or {}).get("host") or {}).get("runtime")
+    kills = [s for s in steps or [] if s.get("event") == "limit_kill"]
+    killed = [{"job_id": j.get("job_id"), "reason": j.get("killed_by"), "limits": j.get("limits"),
+               "usage": j.get("usage")} for j in jobs if j.get("killed_by")]
+    killed += [{"job_id": s.get("step_id"), "reason": _details(s, "kill")["reason"], "limits": None, "usage": None,
+                "source_id": s.get("source_id")} for s in kills]
     return {"jobs": len(jobs), "counts": counts, "featured": featured, "recent": jobs[-8:][::-1],
-            "checkpoints": CHECKPOINTS, "state": checkpoint_state, "tier": isolation_tier(runtime)}
+            "checkpoints": CHECKPOINTS, "state": checkpoint_state, "tier": isolation_tier(runtime),
+            "killed": killed[-5:][::-1], "killed_total": len(killed), "kill_labels": KILL_LABELS,
+            "with_limits": sum(1 for j in jobs if j.get("limits"))}
 
 
 # Replayer ------------------------------------------------------------------------------------------------------

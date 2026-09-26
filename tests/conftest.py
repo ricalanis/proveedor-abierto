@@ -63,3 +63,29 @@ def validator_for():
         )
 
     return make
+
+
+def s12_compat(doc: dict, schema: dict, kind: str) -> dict:
+    """CONTRACT §12 fields the fixtures emit ahead of the engine schemas: stripped only while the schema lacks them,
+    so validation tightens automatically once ontofill publishes §12 support."""
+    import copy
+
+    doc = copy.deepcopy(doc)
+    props = schema.get("properties") or {}
+    if kind == "trace":
+        for key in ("verify", "repair", "gate"):
+            if key not in props:
+                doc.pop(key, None)
+        if doc.get("event") not in (props.get("event") or {}).get("enum", [doc.get("event")]):
+            doc["event"] = None
+    elif kind == "jobs":
+        for key in ("limits", "usage"):
+            if key not in props:
+                doc.pop(key, None)
+        cps = ((props.get("checkpoints") or {}).get("properties") or {})
+        if "secrets" not in cps:
+            (doc.get("checkpoints") or {}).pop("secrets", None)
+    elif kind == "dod_queries":
+        allowed = schema["$defs"]["query"]["properties"]["aggregate"]["enum"]
+        doc["queries"] = [q for q in doc.get("queries") or [] if q.get("aggregate") in allowed]
+    return doc

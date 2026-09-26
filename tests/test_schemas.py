@@ -24,17 +24,23 @@ def legacy_root(tmp_path_factory) -> Path:
     return out
 
 
-def _jsonl_problems(path: Path, v) -> list[str]:
+def _jsonl_problems(path: Path, v, kind: str | None = None) -> list[str]:
+    from conftest import s12_compat
+
     problems = []
     for i, line in enumerate(path.read_text().splitlines()):
-        problems += [f"line {i + 1} {msg}" for msg in _errors(v, json.loads(line))]
+        doc = json.loads(line)
+        if kind:
+            doc = s12_compat(doc, v.schema, kind)
+        problems += [f"line {i + 1} {msg}" for msg in _errors(v, doc)]
     return problems
 
 
 @pytest.mark.parametrize("filename,schema", [("entities.jsonl", "entity.schema.json"),
                                              ("trace.jsonl", "trace-step.schema.json")])
 def test_jsonl_rows(fixture_root, validator_for, filename, schema):
-    problems = _jsonl_problems(_run_dir(fixture_root) / filename, validator_for(schema))
+    kind = "trace" if filename == "trace.jsonl" else None
+    problems = _jsonl_problems(_run_dir(fixture_root) / filename, validator_for(schema), kind)
     assert not problems, f"{len(problems)} violations, first: {problems[:5]}"
 
 
@@ -48,8 +54,14 @@ def test_legacy_layout_rows(legacy_root, validator_for, filename, schema):
 
 def test_section11_run_artifacts(fixture_root, validator_for):
     run_dir = _run_dir(fixture_root)
+    from conftest import s12_compat
+
     for name, schema in (("ontology.json", "ontology.schema.json"), ("dod-queries.json", "dod-queries.schema.json")):
-        errors = _errors(validator_for(schema), json.loads((run_dir / name).read_text()))
+        v = validator_for(schema)
+        doc = json.loads((run_dir / name).read_text())
+        if name == "dod-queries.json":
+            doc = s12_compat(doc, v.schema, "dod_queries")
+        errors = _errors(v, doc)
         assert not errors, (name, errors[:3])
 
 

@@ -252,15 +252,20 @@ class GoldStore:
                 entities = legacy_to_entities(_jsonl(self.source.read(f"{base}/suppliers.jsonl")),
                                               _jsonl(self.source.read(f"{base}/contracts.jsonl")))
                 layout = "legacy"
+            domain = self._domain(base, entities, layout)
+            queries = self._dod_queries(base)
+            for q in queries:  # §12: the per-entity threshold lives in the DoD query itself
+                if q.get("aggregate") == "entities_meeting_completeness" and q.get("min_ratio") is not None:
+                    domain.dod_threshold, domain.threshold_stated = float(q["min_ratio"]), True
             self._cache[run_id] = Run(
                 case_id=self.case_id,
                 run_id=run_id,
                 entities=entities,
                 trace=_jsonl(self.source.read(f"{base}/trace.jsonl")),
                 metrics=json.loads(metrics_raw) if metrics_raw else {},
-                domain=self._domain(base, entities, layout),
+                domain=domain,
                 layout=layout,
-                dod_queries=self._dod_queries(base),
+                dod_queries=queries,
             )
         return self._cache[run_id]
 

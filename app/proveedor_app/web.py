@@ -407,9 +407,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         docs = investigate.load_artifacts(case, item)
         paths = [{"path": p, "exists": case.exists(p)} for p in investigate.artifact_paths(item)]
         gen = item.meta.get("generated_by") or next((d.get("generated_by") for d in docs.values() if d.get("generated_by")), None)
+        shot = item.meta.get("screenshot_key") if item.checkpoint == "action" else None
+        has_screenshot = bool(shot) and settings.store.bronze(str(shot)) is not None
         return render(request, "approval.html", nav="approvals", run=None, a=item, docs=docs, paths=paths,
                       who=identity(request), error=error, gen=gen, backend=(gen or {}).get("backend"),
-                      taxonomy_stats=investigate.taxonomy_stats)
+                      taxonomy_stats=investigate.taxonomy_stats, has_screenshot=has_screenshot)
 
     @app.post("/approvals")
     async def approve(request: Request):
@@ -421,7 +423,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         phase_dir = form.get("phase_dir", "")
         decisions = {k.removeprefix("decision."): v for k, v in form.items() if k.startswith("decision.")}
         try:
-            investigate.approve(case, phase_dir, form.get("approver", ""), decisions=decisions or None)
+            investigate.approve(case, phase_dir, form.get("approver", ""), decisions=decisions or None,
+                                decision=form.get("decision"), reason=form.get("reason"))
         except ValueError as exc:
             back = f"/approvals/{quote(phase_dir)}" if phase_dir and case.exists(phase_dir) else "/approvals"
             return RedirectResponse(f"{back}?error={quote(str(exc))}", status_code=303)
@@ -440,7 +443,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             src.setdefault("discovered_by", investigate.discovered_by(src)
                            or (known.get(src.get("source_id")) or {}).get("discovered_by"))
         return {"run_id": run_id, "steps": steps, "new": steps[after:][::-1], "panel": panel,
-                "proof": live.proof(jobs), "backend": backend}
+                "proof": live.proof(jobs, steps), "backend": backend}
 
     @app.get("/run")
     def run_latest():
@@ -450,10 +453,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return RedirectResponse(f"/run/{run_id}", status_code=307)
 
     @app.get("/run/{run_id}", response_class=HTMLResponse)
-    def run_view(request: Request, run_id: str):
+    def run_view(request: Request, run_id: str, limit: int = 150):
         m = run_view_model(run_id)
+        limit = max(1, min(limit, 2000))
         status = settings.store.live_status(run_id) or {}
-        return render(request, "run.html", nav="run", run=None, live_run_id=run_id, m=m, recent=m["new"][:150],
+        return render(request, "run.html", nav="run", run=None, live_run_id=run_id, m=m, recent=m["new"][:limit],
+                      limit=limit,
                       backend=m["backend"], synthetic=settings.store.case_id.startswith("fixture"),
                       preview=bool(status.get("preview") or (status.get("metrics") or {}).get("preview")),
                       PHASES=live.PHASES, MODE_NAMES=live.MODE_NAMES,

@@ -143,9 +143,12 @@ def test_replay_output_matches_engine_schemas(lake, validator_for):
     run_dir = lake / "runs" / "fixture-case" / "rehearsal-schema"
     errors = list(validator_for("run-status.schema.json").iter_errors(json.loads((run_dir / "status.json").read_text())))
     assert not errors, [e.message for e in errors][:3]
+    from conftest import s12_compat
+
     step_validator = validator_for("trace-step.schema.json")
-    for line in (run_dir / "trace.live.jsonl").read_text().splitlines()[:50]:
-        assert not list(step_validator.iter_errors(json.loads(line)))
+    for line in (run_dir / "trace.live.jsonl").read_text().splitlines()[:80]:
+        doc = s12_compat(json.loads(line), step_validator.schema, "trace")
+        assert not list(step_validator.iter_errors(doc))
 
 
 def test_snapshot_then_replay_offline(lake, tmp_path, fixture_root):
@@ -185,12 +188,15 @@ def test_fixture_jobs_match_engine_schema(lake, validator_for):
     if not (Path(__file__).parents[2] / "ontofill" / "schemas" / "jobs.schema.json").exists():
         pytest.skip("engine jobs schema not present")
     v = validator_for("jobs.schema.json")
+    from conftest import s12_compat
+
     jobs = GoldStore(LocalSource(lake)).live_jobs("run-fixture-0001")
-    errors = [e.message for j in jobs[:30] for e in v.iter_errors(j)]
+    errors = [e.message for j in jobs[:30] for e in v.iter_errors(s12_compat(j, v.schema, "jobs"))]
     assert not errors, errors[:3]
     live.Replayer(lake, "run-fixture-0001", duration=0.0, new_run_id="jobs-replay").play(sleep=lambda s: None)
     raw = (lake / "runs" / "fixture-case" / "jobs-replay" / "jobs.jsonl").read_text().splitlines()
-    assert raw and not [e.message for line in raw[:30] for e in v.iter_errors(json.loads(line))]
+    assert raw and not [e.message for line in raw[:30]
+                        for e in v.iter_errors(s12_compat(json.loads(line), v.schema, "jobs"))]
 
 
 def test_preview_output_is_labelled(lake, fixture_root):
@@ -256,3 +262,23 @@ def test_isolation_tier_ladder():
     assert live.isolation_tier("runc")["ok"] is False
     assert live.isolation_tier("kata-fc")["tier"] == 4
     assert live.isolation_tier(None) is None
+
+
+def test_run_view_shows_the_track_patterns(lake, fixture_root):
+    """§12: vision verdicts (Pattern B), repair attempts (Pattern A), the action gate, a limit kill, and the proof
+    panel's secret-hygiene check and resource limits, all on /run."""
+    c = _client(lake, fixture_root / "case")
+    assert "Show the whole trail" in c.get("/run/run-fixture-0001").text
+    page = c.get("/run/run-fixture-0001", params={"limit": 2000}).text
+    for needle in ("Vision check of the page after the action", "verdict--achieved", "verdict--not_achieved",
+                   "Code attempt 1 of 3", "stderr fed back to the model", "KeyError",
+                   "Approve-before-submit gate", "pending approval", "Stopped by the wall-clock timeout",
+                   "Secret hygiene", "env keys found: <strong>0</strong>", "metadata IP: <strong>BLOCKED</strong>",
+                   "512 MB · 1 CPU · 128 processes · 60 s · 40 steps", "Stopped by a limit: 1"):
+        assert needle in page, needle
+    api = c.get("/api/run/run-fixture-0001", params={"after": 0}).json()
+    assert "Gated actions" in api["panel_html"] and "Vision checks" in api["panel_html"]
+    import re
+
+    uncertain = re.search(r'data-k="ev-ver-un">(\d+)<', api["panel_html"])  # Jev pre-screens, early in the run
+    assert uncertain and int(uncertain.group(1)) > 0

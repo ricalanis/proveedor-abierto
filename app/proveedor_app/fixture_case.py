@@ -6,6 +6,7 @@ finding about real procurement.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -161,6 +162,24 @@ def pending_md(phase: int, checkpoint: str, reason: str, paths: list[str]) -> st
     return f"---\n{yaml.safe_dump(meta, sort_keys=False)}---\n# Approval pending: {checkpoint} (synthetic fixture)\n\n{reason}.\n"
 
 
+# Approve-before-submit (CONTRACT §12): one synthetic action request waiting for the approver. The screenshot key
+# points at bytes that are never stored, so the review screen must cope with a missing capture.
+ACTION_REQUEST = {
+    "phase": 5, "checkpoint": "action", "requested_at": "2026-09-26T18:20:00+00:00",
+    "reason": "The search form is not on the TDD's list of read-only actions, so the engine asks before submitting it",
+    "artifact_paths": ["04-local/compras-example__supplier-identity/tdd.md"],
+    "intended_action": "Submit the search form on compras.example with query 'Proveedor Ejemplo 07'",
+    "risk_tier": "HIGH", "job_id": "job:fixture-action-0001",
+    "screenshot_key": "sha256:" + hashlib.sha256(b"synthetic fixture: action request screenshot").hexdigest(),
+    "generated_by": GEN,
+}
+
+
+def action_md(meta: dict) -> str:
+    return (f"---\n{yaml.safe_dump(meta, sort_keys=False)}---\n# Approval pending: action (synthetic fixture)\n\n"
+            f"{meta['intended_action']}.\n")
+
+
 def write(case: Path, ontology: dict | None = None) -> None:
     files = {
         "01-scope/prd.json": json.dumps(PRD, indent=2),
@@ -170,6 +189,7 @@ def write(case: Path, ontology: dict | None = None) -> None:
     }
     for phase_dir, phase, checkpoint, reason, paths in PENDING:
         files[f"{phase_dir}/APPROVAL_PENDING.md"] = pending_md(phase, checkpoint, reason, paths)
+    files["05-actions/req-0001/APPROVAL_PENDING.md"] = action_md(ACTION_REQUEST)
     for rel, text in files.items():
         (case / rel).parent.mkdir(parents=True, exist_ok=True)
         (case / rel).write_text(text)

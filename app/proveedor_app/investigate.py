@@ -252,7 +252,8 @@ def journal_chain(run: Run, case: CaseDir, value_id: str) -> list[dict]:
 
 # Approvals -------------------------------------------------------------------------------------------------------
 
-CHECKPOINTS = ("prd", "factors", "ontology")
+CHECKPOINTS = ("prd", "factors", "ontology", "action")
+RISK_TIERS = ("SAFE", "LOW", "HIGH")
 _JSON_BLOCK = re.compile(r"```json\s*(\{.*?\})\s*```", re.DOTALL)
 
 
@@ -269,6 +270,18 @@ class Approval:
         if cp in CHECKPOINTS:
             return cp
         return {"01-scope": "prd", "02-ontology": "ontology"}.get(self.phase_dir)
+
+    @property
+    def decision(self) -> str | None:
+        """'approve' or 'deny' once answered (a missing decision on an answered checkpoint means approve)."""
+        if not self.approved:
+            return None
+        return "deny" if self.approved.get("decision") == "deny" else "approve"
+
+    @property
+    def risk_tier(self) -> str | None:
+        tier = str(self.meta.get("risk_tier") or "").upper()
+        return tier if tier in RISK_TIERS else None
 
 
 def _front_matter(text: str) -> dict:
@@ -355,8 +368,12 @@ def taxonomy_stats(tax: dict) -> dict:
 
 
 def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = None,
-            decisions: dict[str, str] | None = None) -> dict:
-    """Write the APPROVED marker next to a pending checkpoint. Raises ValueError when the request is invalid."""
+            decisions: dict[str, str] | None = None, decision: str | None = None,
+            reason: str | None = None) -> dict:
+    """Write the APPROVED marker next to a pending checkpoint. Raises ValueError when the request is invalid.
+
+    An action checkpoint (approve-before-submit, CONTRACT §12) needs `decision` approve|deny; a deny needs a reason.
+    The answer is always one APPROVED file; a deny is recorded there as `decision: deny`."""
     approver = " ".join(approver.split())[:120]
     if not approver:
         raise ValueError("approver name is required")
@@ -365,11 +382,22 @@ def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = N
         raise ValueError(f"no pending approval in {phase_dir!r}")
     marker = target / "APPROVED"
     if marker.exists():
-        raise ValueError(f"{phase_dir} is already approved")
+        raise ValueError(f"{phase_dir} is already answered")
     item = next(a for a in approvals(case) if a.phase_dir == phase_dir)
     record: dict = {"approver": approver, "date": (today or datetime.now(UTC).date()).isoformat()}
     if item.checkpoint:
         record["checkpoint"] = item.checkpoint
+    if item.checkpoint == "action":
+        if decision not in ("approve", "deny"):
+            raise ValueError("choose approve or deny for this action")
+        record["decision"] = decision
+        if decision == "deny":
+            reason = " ".join((reason or "").split())[:500]
+            if not reason:
+                raise ValueError("say why you deny this action")
+            record["reason"] = reason
+    elif decision is not None:
+        raise ValueError("approve/deny decisions only apply to action checkpoints")
     if decisions:
         if item.checkpoint != "factors":
             raise ValueError("per-factor decisions only apply to the factors checkpoint")

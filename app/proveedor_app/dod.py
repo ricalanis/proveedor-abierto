@@ -140,10 +140,22 @@ def _condition(entity: dict, cond: dict) -> bool:
 
 def evaluate_query(query: dict, entities: list[dict], domain: Domain) -> float:
     """Exact value of one declarative DoD query over the gold entities."""
-    cls = query.get("class_id")
+    cls = query.get("class_id") or query.get("class")
+    if query.get("aggregate") == "entities_meeting_completeness":
+        cls = cls or domain.primary_class
     pool = [e for e in entities if not cls or e.get("class") == cls]
     pool = [e for e in pool if all(_condition(e, c) for c in query.get("conditions") or [])]
     agg = query.get("aggregate")
+    if agg == "entities_meeting_completeness":
+        props = query.get("properties")
+        names = [p.id for p in domain.dod_props(cls)] if props in (None, "dod") else list(props)
+        ratio = float(query.get("min_ratio") or domain.dod_threshold)
+
+        def share(e: dict) -> float:
+            values = e.get("properties") or {}
+            return sum(is_filled(values.get(n)) for n in names) / len(names) if names else 0.0
+
+        return sum(share(e) >= ratio - 1e-9 for e in pool)
     if agg == "count_entities":
         return len(pool)
     if agg == "count_entities_with_properties":
@@ -161,9 +173,13 @@ def evaluate_query(query: dict, entities: list[dict], domain: Domain) -> float:
 def query_text(query: dict) -> str:
     """Compact, readable rendering of a declarative query (what metrics.dod[].query shows)."""
     head = query.get("aggregate", "?")
-    parts = [query["class_id"]] if query.get("class_id") else []
-    if query.get("properties"):
-        parts.append(", ".join(query["properties"]))
+    cls = query.get("class_id") or query.get("class")
+    parts = [cls] if cls else []
+    props = query.get("properties")
+    if props:
+        parts.append(props if isinstance(props, str) else ", ".join(props))
+    if query.get("min_ratio") is not None:
+        parts.append(f"min_ratio {query['min_ratio']}")
     for c in query.get("conditions") or []:
         parts.append(f"{c['property']} {c['operator']}" + (f" {c['value']!r}" if "value" in c else ""))
     return f"{head}({'; '.join(parts)}) {query.get('operator', '>=')} {query.get('target')}"
@@ -172,7 +188,7 @@ def query_text(query: dict) -> str:
 def criterion_label(query: str, criterion_id: str, domain: Domain) -> str:
     q = f"{query} {criterion_id}".lower()
     plural = domain.class_label(plural=True)
-    if "entities_meeting_dod" in q:
+    if "entities_meeting_dod" in q or "entities_meeting_completeness" in q:
         share = round(domain.dod_threshold * 100)
         return f"{plural} with ≥ {share}% of their definition-of-done properties"
     if "entities_total" in q:
