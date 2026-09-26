@@ -282,3 +282,20 @@ def test_run_view_shows_the_track_patterns(lake, fixture_root):
 
     uncertain = re.search(r'data-k="ev-ver-un">(\d+)<', api["panel_html"])  # Jev pre-screens, early in the run
     assert uncertain and int(uncertain.group(1)) > 0
+
+
+def test_run_view_shows_the_quarantined_hostile_page(lake, fixture_root):
+    """§12a: a page the gateway flagged is withheld from planning, kept as evidence, and shown as a containment step."""
+    c = _client(lake, fixture_root / "case")
+    page = c.get("/run/run-fixture-0001", params={"limit": 2000}).text
+    for needle in ("step--quarantine", "Hostile page quarantined: withheld from planning, kept as evidence",
+                   "Flagged by the inference gateway", "<span class=\"mono\">injection</span> (0.97)",
+                   "content safety <span class=\"mono\">unsafe</span>"):
+        assert needle in page, needle
+    api = c.get("/api/run/run-fixture-0001", params={"after": 0}).json()
+    import re
+
+    quarantined = re.search(r'data-k="ev-quar">(\d+)<', api["panel_html"])
+    assert quarantined and int(quarantined.group(1)) == 1
+    steps = live.annotate([{"step_id": "s1", "event": "quarantine", "screen": {"flagged": True, "by": "controller"}}])
+    assert steps[0]["kind"] == "quarantine" and steps[0]["detail"]["by"] == "controller"

@@ -51,8 +51,12 @@ def _failed(step: dict) -> bool:
 
 def step_kind(step: dict) -> str | None:
     """§12 step kinds: 'verify' (Pattern B vision check), 'repair' (Pattern A attempt), 'gate' (approve-before-submit),
-    'kill' (a resource limit stopped the job). Earlier guessed shapes are accepted too."""
+    'kill' (a resource limit stopped the job), 'quarantine' (§12a: a hostile page withheld from planning). Earlier
+    guessed shapes are accepted too."""
     ev = step.get("event")
+    screen = step.get("screen") if isinstance(step.get("screen"), dict) else {}
+    if ev == "quarantine" or screen.get("flagged") is True:
+        return "quarantine"
     req = step.get("requested") if isinstance(step.get("requested"), dict) else {}
     evald = step.get("evaluated") if isinstance(step.get("evaluated"), dict) else {}
     if ev == "verify" or isinstance(step.get("verify"), dict) or "vision" in str(req.get("tool") or "") \
@@ -91,6 +95,11 @@ def _details(s: dict, kind: str) -> dict:
                 "outcome": g.get("outcome"), "approval_path": g.get("approval_path")}
     if kind == "kill":
         return {"reason": evald.get("reason") or ex.get("reason")}
+    if kind == "quarantine":
+        sc = s.get("screen") if isinstance(s.get("screen"), dict) else {}
+        return {"jev_choice": sc.get("jev_choice"), "jev_confidence": sc.get("jev_confidence"),
+                "safety_verdict": sc.get("safety_verdict"), "reason": sc.get("reason"), "by": sc.get("by"),
+                "screenshot_key": s.get("screenshot_key")}
     return {}
 
 
@@ -133,7 +142,7 @@ def summarize(steps: list[dict], status: dict | None, domain: Domain | None = No
     status = status or {}
     modes = {m: 0 for m in MODE_RANK}
     events = {"escalation": 0, "crystallization": 0, "repair": 0, "hard_stop": 0, "failure": 0, "verify": 0,
-              "action_gate": 0, "limit_kill": 0}
+              "action_gate": 0, "limit_kill": 0, "quarantine": 0}
     verdicts = {"achieved": 0, "not_achieved": 0, "uncertain": 0}
     values = 0
     for s in steps:

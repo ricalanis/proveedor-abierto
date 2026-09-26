@@ -73,7 +73,7 @@ def s12_compat(doc: dict, schema: dict, kind: str) -> dict:
     doc = copy.deepcopy(doc)
     props = schema.get("properties") or {}
     if kind == "trace":
-        for key in ("verify", "repair", "gate"):
+        for key in ("verify", "repair", "gate", "screen"):
             if key not in props:
                 doc.pop(key, None)
         if doc.get("event") not in (props.get("event") or {}).get("enum", [doc.get("event")]):

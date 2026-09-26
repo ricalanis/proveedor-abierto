@@ -1,4 +1,4 @@
-{% set EVENT_LABELS = {"escalation": "Escalated: the cheaper mode failed its check", "crystallization": "Crystallized into a reusable macro", "repair": "Self-healing: code attempt", "hard_stop": "Hard stop: login, captcha or policy; flagged for a human", "failure": "Failed check", "verify": "Vision check", "action_gate": "Approve-before-submit gate", "limit_kill": "Stopped by a resource limit"} %}
+{% set EVENT_LABELS = {"escalation": "Escalated: the cheaper mode failed its check", "crystallization": "Crystallized into a reusable macro", "repair": "Self-healing: code attempt", "hard_stop": "Hard stop: login, captcha or policy; flagged for a human", "failure": "Failed check", "verify": "Vision check", "action_gate": "Approve-before-submit gate", "limit_kill": "Stopped by a resource limit", "quarantine": "Hostile page quarantined: withheld from planning, kept as evidence"} %}
 {% set VERDICT_LABELS = {"achieved": "achieved", "not_achieved": "not achieved", "uncertain": "uncertain"} %}
 {% set KILL_LABELS = {"timeout": "wall-clock timeout", "memory": "memory cap", "pids": "process cap", "max_steps": "step cap"} %}
 {% for s in steps %}{% set d = s.detail or {} %}
@@ -19,6 +19,10 @@
     {% elif s.kind == "gate" %}
     <p class="step__what"><span class="risk risk--{{ d.risk_tier }}">{{ d.risk_tier or "?" }}</span> {{ d.action or s.requested|brief }}</p>
     <p class="step__did">Decided by <span class="mono">{{ d.decided_by or "—" }}</span> · <span class="gate-outcome gate-outcome--{{ d.outcome }}">{{ (d.outcome or "?")|replace("_", " ") }}</span>{% if d.outcome == "pending_approval" %} · <span class="muted">waiting for the approver</span>{% endif %}</p>
+    {% elif s.kind == "quarantine" %}
+    <p class="step__what"><span class="step__phase">Phase {{ s.phase }}</span>{% if s.source_id %} · <span class="mono">{{ s.source_id }}</span>{% endif %} · {{ s.observed|brief }}</p>
+    <p class="step__did">Flagged by the {{ "inference gateway" if d.by == "gateway" else (d.by or "screen") }}{% if d.jev_choice %} · <span class="backend backend--jev">Jev</span> <span class="mono">{{ d.jev_choice }}</span>{% if d.jev_confidence is number %} ({{ "%.2f"|format(d.jev_confidence) }}){% endif %}{% endif %}{% if d.safety_verdict %} · content safety <span class="mono">{{ d.safety_verdict }}</span>{% endif %}</p>
+    {% if d.reason %}<p class="step__eval">{{ d.reason }}</p>{% endif %}
     {% elif s.kind == "kill" %}
     <p class="step__what"><span class="step__phase">Phase {{ s.phase }}</span>{% if s.source_id %} · <span class="mono">{{ s.source_id }}</span>{% endif %} · {{ s.requested|brief }}</p>
     <p class="step__did">Stopped by the {{ KILL_LABELS.get(d.reason, d.reason or "limit") }}. The pod was destroyed; the host was not touched.</p>
