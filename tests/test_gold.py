@@ -44,9 +44,17 @@ def test_load_store_prefers_env_dir(fixture_root, tmp_path):
     assert st.run().run_id == "run-fixture-0001"
 
 
-def test_load_store_local_lake_yaml(fixture_root, tmp_path):
-    (tmp_path / "lake.yaml").write_text(f"bronze:\n  kind: local\n  path: {fixture_root / 'lake'}\n")
-    assert load_store(tmp_path, {}).case_id == "fixture-case"
+def test_load_store_file_lake_yaml(fixture_root, tmp_path):
+    (tmp_path / "lake.yaml").write_text(
+        f"case_id: fixture-case\nbronze:\n  kind: file\n  root: {fixture_root / 'lake'}\n"
+    )
+    assert load_store(tmp_path, {}).run().run_id == "run-fixture-0001"
+
+
+def test_bronze_meta_sidecar(store):
+    ev = store.run().suppliers[0]["fields"]["legal_name"]["evidence"][0]
+    assert store.bronze_meta(ev["screenshot_key"])["content_type"] == "image/svg+xml"
+    assert store.bronze_meta("sha256:00") == {}
 
 
 def test_load_store_without_config_explains(tmp_path):

@@ -54,11 +54,13 @@ class _Bronze:
     def __init__(self, lake: Path):
         self.lake = lake
 
-    def put(self, data: bytes) -> str:
+    def put(self, data: bytes, content_type: str, url: str) -> str:
         key = _sha(data)
         path = self.lake / "bronze" / "sha256" / key.split(":", 1)[1]
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
+        meta = {"content_type": content_type, "url": url, "captured_at": None, "source_id": None, "step_id": None}
+        path.with_name(path.name + ".meta.json").write_text(json.dumps(meta))
         return key
 
     def screenshot(self, host: str, label: str, value: str) -> str:
@@ -75,11 +77,11 @@ class _Bronze:
             f'<text x="20" y="181" font-family="sans-serif" font-size="20" fill="#111">{esc(value)}</text>'
             "</svg>"
         )
-        return self.put(svg.encode())
+        return self.put(svg.encode(), "image/svg+xml", f"https://{host}")
 
     def page(self, host: str, path: str, label: str, value: str) -> str:
         html = f"<!-- synthetic fixture --><html><body><h1>{host}{path}</h1><dl><dt>{label}</dt><dd>{value}</dd></dl>"
-        return self.put(html.encode())
+        return self.put(html.encode(), "text/html", f"https://{host}{path}")
 
 
 def _evidence(bronze: _Bronze, source_id: str, path: str, label: str, value: str, captured_at: str) -> dict:

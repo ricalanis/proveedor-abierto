@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Completeness{% endblock %}
+{% block main %}
+<section class="page-head">
+  <h1>Completeness</h1>
+  <p class="lede">How much of the definition of done this run meets, measured on gold. Numbers are recomputed here from the export and checked against the engine's own <span class="mono">metrics.json</span>.</p>
+</section>
+
+<div class="live" data-live-src="/api/completeness{% if request.query_params.get('run') %}?run={{ request.query_params.get('run')|urlencode }}{% endif %}">
+  <label class="live__toggle"><input type="checkbox" id="live" {% if not request.query_params.get('run') %}checked{% endif %}> Follow the latest run</label>
+  <span class="mono muted" id="live-status">run {{ m.run_id }}{% if m.prev_run_id %} · compared with {{ m.prev_run_id }}{% endif %}</span>
+</div>
+
+<section class="dod" aria-labelledby="dod-h">
+  <h2 id="dod-h" class="visually-hidden">Definition of done</h2>
+  <dl class="dod__grid">
+    <div class="dod__item" data-key="suppliers_at_80pct_core">
+      <dt>Suppliers with ≥ 80% of core fields</dt>
+      <dd><span class="dod__num" data-bind="recomputed.suppliers_at_80pct_core">{{ m.recomputed.suppliers_at_80pct_core }}</span><span class="dod__of">of {{ m.total }}, target {{ m.targets.suppliers_at_80pct_core }}</span></dd>
+      <dd class="dod__state" data-met="{{ m.met.suppliers_at_80pct_core|lower }}">{{ "Met" if m.met.suppliers_at_80pct_core else "Not yet" }}</dd>
+    </div>
+    <div class="dod__item" data-key="distinct_source_types">
+      <dt>Distinct public source types</dt>
+      <dd><span class="dod__num" data-bind="recomputed.distinct_source_types">{{ m.recomputed.distinct_source_types }}</span><span class="dod__of">target {{ m.targets.distinct_source_types }}</span></dd>
+      <dd class="dod__state" data-met="{{ m.met.distinct_source_types|lower }}">{{ "Met" if m.met.distinct_source_types else "Not yet" }}</dd>
+    </div>
+    <div class="dod__item" data-key="gold_values_without_evidence">
+      <dt>Gold values without evidence</dt>
+      <dd><span class="dod__num" data-bind="recomputed.gold_values_without_evidence">{{ m.recomputed.gold_values_without_evidence }}</span><span class="dod__of">must be 0</span></dd>
+      <dd class="dod__state" data-met="{{ m.met.gold_values_without_evidence|lower }}">{{ "Met" if m.met.gold_values_without_evidence else "Not met" }}</dd>
+    </div>
+  </dl>
+  <p class="crosscheck {% if m.mismatches %}crosscheck--bad{% endif %}" id="crosscheck">
+    {% if m.mismatches %}Engine metrics disagree with the export: {{ m.mismatches|join("; ") }}{% else %}Recomputed from gold: matches the engine's metrics.json.{% endif %}
+  </p>
+</section>
+
+<section class="block" aria-labelledby="fields-h">
+  <h2 id="fields-h">Core fields in gold</h2>
+  <p class="muted note">Share of suppliers whose field is gold and backed by at least one capture. The tick marks 80%.</p>
+  <table class="bars" id="field-bars">
+    <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
+    <thead class="visually-hidden"><tr><th scope="col">Field</th><th scope="col">Share in gold</th><th scope="col">Suppliers and change</th></tr></thead>
+    <tbody>
+    {% for f in m.fields %}
+      <tr data-field="{{ f.name }}">
+        <th scope="row">{{ f.label }}</th>
+        <td class="bars__track" title="{{ f.label }}: {{ f.ratio|pct }} ({{ f.count }} of {{ m.total }})">
+          <span class="bar" style="--v: {{ (f.ratio * 100)|round(1) }}%"></span><span class="bars__target" aria-hidden="true"></span>
+        </td>
+        <td class="num mono"><span data-bind="ratio">{{ f.ratio|pct }}</span> <span class="muted" data-bind="count">{{ f.count }}/{{ m.total }}</span> <span class="muted delta" data-bind="delta">{% if f.delta is not none %}{{ "%+d"|format((f.delta * 100)|round|int) }} pts{% endif %}</span></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="block" aria-labelledby="cov-h">
+  <h2 id="cov-h">Taxonomy coverage</h2>
+  <p class="muted note">Level Ratio Coverage: share of each level's taxonomy nodes that at least one gold supplier is classified under. Uncovered nodes are where fan-out looks next.</p>
+  {% if m.coverage %}
+  <table class="bars">
+    <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
+    <thead class="visually-hidden"><tr><th scope="col">Taxonomy and level</th><th scope="col">Coverage</th><th scope="col">Share</th></tr></thead>
+    <tbody>
+    {% for tax, levels in m.coverage.items() %}{% for ratio in levels %}
+      <tr>
+        <th scope="row"><span class="mono">{{ tax }}</span> <span class="muted">level {{ loop.index }}</span></th>
+        <td class="bars__track" title="{{ tax }} level {{ loop.index }}: {{ ratio|pct }}"><span class="bar" style="--v: {{ (ratio * 100)|round(1) }}%"></span></td>
+        <td class="num mono">{{ ratio|pct }}</td>
+      </tr>
+    {% endfor %}{% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="muted">No taxonomy coverage in this run's metrics.</p>{% endif %}
+</section>
+
+<section class="block" aria-labelledby="modes-h">
+  <h2 id="modes-h">How values were collected</h2>
+  {% set mode_names = {"D0": "Deterministic: bulk file, API or fixed script", "D1": "Inference-assisted script", "S1": "Agentic loop over the page structure", "S2": "Full computer use with vision"} %}
+  {% set mode_total = m.modes.values()|sum %}
+  {% if mode_total %}
+  <table class="bars">
+    <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
+    <thead class="visually-hidden"><tr><th scope="col">Mode</th><th scope="col">Share of steps</th><th scope="col">Steps</th></tr></thead>
+    <tbody>
+    {% for mode in ["D0", "D1", "S1", "S2"] %}{% set n = m.modes.get(mode, 0) %}
+      <tr>
+        <th scope="row"><span class="mono">{{ mode }}</span> <span class="muted">{{ mode_names[mode] }}</span></th>
+        <td class="bars__track" title="{{ mode }}: {{ n }} steps"><span class="bar bar--quiet" style="--v: {{ (n / mode_total * 100)|round(1) }}%"></span></td>
+        <td class="num mono">{{ n }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  {% if m.jobs %}
+  <p class="note">Jobs: <span class="mono">{{ m.jobs.ok or 0 }}</span> ok{% for reason, n in (m.jobs.failed_by_reason or {}).items() %}, <span class="mono">{{ n }}</span> stopped ({{ reason|replace("_", " ") }}){% endfor %}.</p>
+  {% endif %}
+</section>
+{% endblock %}

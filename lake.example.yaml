@@ -1,8 +1,13 @@
-# Pointer to this case's external data lake on Vultr. Secrets come from env vars, never this file.
+# Pointer to this case's external data lake. Copy to lake.yaml (gitignored). Secrets come from env vars, never
+# this file: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY (AWS_REGION optional). Layout: coord CONTRACT v0.1 §3–4.
+case_id: proveedor-abierto
 bronze:
-  kind: s3            # Vultr Object Storage
+  kind: s3            # Vultr Object Storage (or MinIO); gold/ and bronze/sha256/<hex> live in this bucket
   bucket: <bucket-name>
   endpoint: <region>.vultrobjects.com
+  # Local dev / cached fallback run, same layout on disk:
+  # kind: file
+  # root: ../.lake
 silver:
   postgres_url_env: SILVER_DATABASE_URL
   rdf_store_url_env: OXIGRAPH_URL

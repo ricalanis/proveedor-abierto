@@ -191,11 +191,24 @@ class GoldStore:
     def refresh(self) -> None:
         self._cache.clear()
 
-    def bronze(self, key: str) -> bytes | None:
+    def _bronze_path(self, key: str) -> str | None:
         algo, _, hexdigest = key.partition(":")
         if algo != "sha256" or not hexdigest or not all(c in "0123456789abcdef" for c in hexdigest):
             return None
-        return self.source.read(self.bronze_key_template.format(hex=hexdigest))
+        return self.bronze_key_template.format(hex=hexdigest)
+
+    def bronze(self, key: str) -> bytes | None:
+        path = self._bronze_path(key)
+        return self.source.read(path) if path else None
+
+    def bronze_meta(self, key: str) -> dict:
+        """Sidecar `<object>.meta.json`: {content_type, url, captured_at, source_id, step_id} (CONTRACT section 3)."""
+        path = self._bronze_path(key)
+        raw = self.source.read(f"{path}.meta.json") if path else None
+        try:
+            return json.loads(raw) if raw else {}
+        except ValueError:
+            return {}
 
 
 def sniff_media_type(data: bytes) -> str:
@@ -231,13 +244,16 @@ def load_store(repo_root: Path, env: dict[str, str] | None = None) -> GoldStore:
         )
     lake = yaml.safe_load(lake_path.read_text()) or {}
     bronze = lake.get("bronze") or {}
-    if bronze.get("kind") == "local":
-        return GoldStore(LocalSource(lake_path.parent / bronze["path"]), case_id, bronze.get("key_template", template))
+    case_id = case_id or lake.get("case_id")
+    template = bronze.get("key_template", template)
+    if bronze.get("kind") in ("file", "local"):  # local dev / cached fallback run, same layout as the bucket
+        root = Path(os.path.expandvars(str(bronze.get("root") or bronze.get("path"))))
+        return GoldStore(LocalSource(root if root.is_absolute() else lake_path.parent / root), case_id, template)
     if bronze.get("kind") != "s3":
         raise ValueError(f"unsupported bronze kind in {lake_path}: {bronze.get('kind')!r}")
     endpoint = env.get(bronze["endpoint_env"]) if bronze.get("endpoint_env") else bronze.get("endpoint")
-    source = S3Source(bronze["bucket"], endpoint, bronze.get("region"))
-    return GoldStore(source, case_id or lake.get("case_id"), bronze.get("key_template", template))
+    source = S3Source(bronze["bucket"], endpoint, bronze.get("region") or env.get("AWS_REGION"))
+    return GoldStore(source, case_id, template)
 
 
 def iter_evidence(field_data: dict) -> Iterable[dict]:

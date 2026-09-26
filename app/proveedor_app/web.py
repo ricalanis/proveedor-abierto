@@ -160,14 +160,49 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(404, f"no value {value_id}")
         return render(request, "_evidence.html", run=r, selected=ref)
 
+    def completeness_model(r: Run) -> dict:
+        recomputed = dod.compute(r.suppliers)
+        engine = r.metrics or {}
+        runs = settings.store.run_ids()
+        prev_id = runs[runs.index(r.run_id) - 1] if r.run_id in runs and runs.index(r.run_id) > 0 else None
+        prev = settings.store.run(prev_id).metrics if prev_id else {}
+        total = recomputed["suppliers_total"]
+        fields = []
+        for name in CORE_FIELDS:
+            ratio = recomputed["per_field_completeness"][name]
+            before = (prev.get("per_field_completeness") or {}).get(name)
+            fields.append({
+                "name": name, "label": FIELD_LABELS.get(name, name), "ratio": ratio,
+                "count": round(ratio * total), "delta": None if before is None else ratio - before,
+            })
+        return {
+            "run_id": r.run_id, "prev_run_id": prev_id, "total": total, "fields": fields,
+            "recomputed": recomputed, "engine": engine, "mismatches": dod.cross_check(recomputed, engine) if engine else
+            ["engine metrics.json not found for this run"], "met": dod.dod_met(recomputed), "targets": dod.TARGETS,
+            "coverage": engine.get("level_ratio_coverage") or {}, "modes": engine.get("mode_counts") or {},
+            "jobs": engine.get("jobs") or {},
+        }
+
+    @app.get("/completeness", response_class=HTMLResponse)
+    def completeness(request: Request):
+        r = run(request)
+        return render(request, "completeness.html", nav="completeness", run=r, m=completeness_model(r))
+
+    @app.get("/api/completeness")
+    def completeness_api(request: Request) -> dict:
+        settings.store.refresh()  # pick up a new latest.json while a run is in progress
+        return completeness_model(run(request))
+
     @app.get("/bronze/{key}")
     def bronze(key: str):
         data = settings.store.bronze(key)
         if data is None:
             raise HTTPException(404, "bronze object not found")
+        declared = str(settings.store.bronze_meta(key).get("content_type") or "")
+        media_type = declared if declared.startswith(("image/", "application/pdf")) else sniff_media_type(data)
         return Response(
             data,
-            media_type=sniff_media_type(data),
+            media_type=media_type,
             headers={
                 "Cache-Control": "public, max-age=31536000, immutable",  # content-addressed
                 "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
