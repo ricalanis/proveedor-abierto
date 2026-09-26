@@ -1,82 +1,231 @@
-"""Recompute the CONTRACT section 4 DoD keys from a gold export and cross-check the engine's metrics.json.
+"""Recompute the definition of done from the gold entities, and cross-check the engine's metrics.json.
 
     uv run pa-app dod [--gold-dir DIR] [--run-id ID]
 
-Exit code 0 when the recomputed keys match the engine's metrics.json, 1 on any mismatch.
+Generic over the case's ontology (CONTRACT v0.7 §11): which class is primary and which properties count toward
+the DoD come from the ontology. Reads both the §11 metrics keys and the pre-§11 ones (through the legacy adapter).
+Exit code 0 when the recomputed values match the engine's metrics.json, 1 on any mismatch.
 """
 
 from __future__ import annotations
 
-from . import CORE_FIELDS
+import re
 
-TARGETS = {"suppliers_at_80pct_core": 50, "distinct_source_types": 4, "gold_values_without_evidence": 0}
-DOD_KEYS = ("suppliers_total", "suppliers_at_80pct_core", "distinct_source_types", "gold_values_without_evidence")
+from .domain import Domain
+
+# Criteria used when neither metrics.json nor the PRD states them (labelled as defaults in the UI).
+DEFAULT_CRITERIA = [
+    {"criterion_id": "entities_meeting_dod", "query": "entities_meeting_dod", "target": 50},
+    {"criterion_id": "distinct_source_classes", "query": "distinct_source_classes", "target": 4},
+    {"criterion_id": "values_without_evidence", "query": "values_without_evidence", "target": 0},
+]
+LOWER_IS_BETTER = ("values_without_evidence",)
 
 
-def jev_only(field: dict | None) -> bool:
+def jev_only(value: dict | None) -> bool:
     """A value whose only decision came from Jev (CONTRACT section 10): never enough for gold on its own."""
-    return bool(field) and (field.get("generated_by") or {}).get("backend") == "jev"
+    return bool(value) and (value.get("generated_by") or {}).get("backend") == "jev"
 
 
-def is_filled(field: dict | None) -> bool:
-    """A core field counts as complete when it is gold, backed by evidence, and not decided by Jev alone."""
-    return bool(field) and field.get("status") == "gold" and bool(field.get("evidence")) and not jev_only(field)
+def is_filled(value: dict | None) -> bool:
+    """A value counts when it is gold, backed by evidence, and not decided by Jev alone."""
+    return bool(value) and value.get("status") == "gold" and bool(value.get("evidence")) and not jev_only(value)
 
 
-def core_ratio(supplier: dict) -> float:
-    fields = supplier.get("fields") or {}
-    return sum(is_filled(fields.get(name)) for name in CORE_FIELDS) / len(CORE_FIELDS)
+def dod_ratio(entity: dict, domain: Domain) -> float:
+    props = domain.dod_props(entity.get("class"))
+    if not props:
+        return 0.0
+    values = entity.get("properties") or {}
+    return sum(is_filled(values.get(p.id)) for p in props) / len(props)
 
 
-def compute(suppliers: list[dict]) -> dict:
-    per_field = {
-        name: (sum(is_filled((s.get("fields") or {}).get(name)) for s in suppliers) / len(suppliers))
-        if suppliers
-        else 0.0
-        for name in CORE_FIELDS
-    }
-    source_types: set[str] = set()
+def compute(entities: list[dict], domain: Domain) -> dict:
+    """The §11 metric keys, recomputed from entities."""
+    primary = [e for e in entities if e.get("class") == domain.primary_class]
+    totals: dict[str, int] = {}
+    for e in entities:
+        totals[e.get("class") or "?"] = totals.get(e.get("class") or "?", 0) + 1
+    per_prop = {p.id: (sum(is_filled((e.get("properties") or {}).get(p.id)) for e in primary) / len(primary))
+                if primary else 0.0 for p in domain.dod_props()}
+    classes: set[str] = set()
     without_evidence = 0
-    for s in suppliers:
-        for f in (s.get("fields") or {}).values():
-            if f.get("status") != "gold":
+    for e in entities:
+        for v in (e.get("properties") or {}).values():
+            if not isinstance(v, dict) or v.get("status") != "gold":
                 continue
-            if not f.get("evidence"):
+            if not v.get("evidence"):
                 without_evidence += 1
-            source_types.update(e["source_type"] for e in f.get("evidence") or [] if e.get("source_type"))
+            classes.update(ev["source_type"] for ev in v.get("evidence") or [] if ev.get("source_type"))
     return {
-        "suppliers_total": len(suppliers),
-        "suppliers_at_80pct_core": sum(core_ratio(s) >= 0.8 for s in suppliers),
-        "per_field_completeness": per_field,
-        "distinct_source_types": len(source_types),
-        "gold_values_without_evidence": without_evidence,
+        "primary_class": domain.primary_class,
+        "entities_total": totals,
+        "entities_meeting_dod": {domain.primary_class: sum(dod_ratio(e, domain) >= domain.dod_threshold - 1e-9
+                                                            for e in primary)},
+        "per_property_completeness": {domain.primary_class: per_prop},
+        "distinct_source_classes": len(classes),
+        "values_without_evidence": without_evidence,
     }
 
 
-def cross_check(recomputed: dict, engine: dict, tol: float = 1e-6) -> list[str]:
+def _engine_view(engine: dict, domain: Domain) -> dict:
+    """The engine's metrics in §11 terms, whether it wrote §11 keys or the pre-§11 ones."""
+    cls = domain.primary_class
+    if "entities_total" in engine or "dod" in engine:
+        return {"entities_total": (engine.get("entities_total") or {}).get(cls),
+                "entities_meeting_dod": (engine.get("entities_meeting_dod") or {}).get(cls),
+                "per_property_completeness": (engine.get("per_property_completeness") or {}).get(cls) or {},
+                "distinct_source_classes": engine.get("distinct_source_classes"),
+                "values_without_evidence": engine.get("values_without_evidence")}
+    return {"entities_total": engine.get("suppliers_total"),
+            "entities_meeting_dod": engine.get("suppliers_at_80pct_core"),
+            "per_property_completeness": engine.get("per_field_completeness") or {},
+            "distinct_source_classes": engine.get("distinct_source_types"),
+            "values_without_evidence": engine.get("gold_values_without_evidence")}
+
+
+def cross_check(recomputed: dict, engine: dict, domain: Domain, tol: float = 1e-6) -> list[str]:
     """Human-readable mismatches between our recomputation and the engine's metrics.json."""
+    cls = domain.primary_class
+    ours = {"entities_total": recomputed["entities_total"].get(cls, 0),
+            "entities_meeting_dod": recomputed["entities_meeting_dod"][cls],
+            "distinct_source_classes": recomputed["distinct_source_classes"],
+            "values_without_evidence": recomputed["values_without_evidence"]}
+    theirs = _engine_view(engine, domain)
     problems = []
-    for key in DOD_KEYS:
-        if key not in engine:
+    for key, value in ours.items():
+        if theirs.get(key) is None:
             problems.append(f"{key}: missing from engine metrics.json")
-        elif engine[key] != recomputed[key]:
-            problems.append(f"{key}: engine={engine[key]} recomputed={recomputed[key]}")
-    engine_fields = engine.get("per_field_completeness") or {}
-    for name, ratio in recomputed["per_field_completeness"].items():
-        if name not in engine_fields:
-            problems.append(f"per_field_completeness.{name}: missing from engine metrics.json")
-        elif abs(engine_fields[name] - ratio) > tol:
-            problems.append(f"per_field_completeness.{name}: engine={engine_fields[name]:.4f} recomputed={ratio:.4f}")
+        elif theirs[key] != value:
+            problems.append(f"{key}: engine={theirs[key]} recomputed={value}")
+    for prop, ratio in recomputed["per_property_completeness"][cls].items():
+        engine_ratio = theirs["per_property_completeness"].get(prop)
+        if engine_ratio is None:
+            problems.append(f"per_property_completeness.{prop}: missing from engine metrics.json")
+        elif abs(engine_ratio - ratio) > tol:
+            problems.append(f"per_property_completeness.{prop}: engine={engine_ratio:.4f} recomputed={ratio:.4f}")
     return problems
 
 
-def dod_met(metrics: dict, inference_backend: str | None = None) -> dict[str, bool]:
-    """Targets met. Anything produced by recorded (mocked) inference never counts as done (CONTRACT section 7)."""
-    if (inference_backend or metrics.get("inference_backend")) == "recorded":
-        return {key: False for key in TARGETS}
-    return {
-        "suppliers_at_80pct_core": metrics.get("suppliers_at_80pct_core", 0) >= TARGETS["suppliers_at_80pct_core"],
-        "distinct_source_types": metrics.get("distinct_source_types", 0) >= TARGETS["distinct_source_types"],
-        "gold_values_without_evidence": metrics.get("gold_values_without_evidence", 1)
-        == TARGETS["gold_values_without_evidence"],
-    }
+def _resolve(query: str, recomputed: dict, domain: Domain) -> float | None:
+    """Value of a DoD query we can recompute: queries that name a §11 metric key (optionally class-qualified)."""
+    q = (query or "").lower()
+    cls = domain.primary_class
+    for key in ("entities_meeting_dod", "entities_total"):
+        if key in q:
+            return recomputed[key].get(cls, 0)
+    if "distinct_source" in q:
+        return recomputed["distinct_source_classes"]
+    if "without_evidence" in q:
+        return recomputed["values_without_evidence"]
+    m = re.search(r"per_property_completeness[.\[]\W*(\w+)\W*[.\[]\W*(\w+)", q)
+    if m:
+        return (recomputed["per_property_completeness"].get(m.group(1)) or {}).get(m.group(2))
+    return None
+
+
+# Declarative DoD queries (ontofill schemas/dod-queries.schema.json) ------------------------------------------------
+
+OPS = {">=": lambda a, b: a >= b, ">": lambda a, b: a > b, "=": lambda a, b: a == b,
+       "<=": lambda a, b: a <= b, "<": lambda a, b: a < b}
+
+
+def _condition(entity: dict, cond: dict) -> bool:
+    v = (entity.get("properties") or {}).get(cond.get("property") or "") or {}
+    if cond.get("operator") == "exists":
+        return is_filled(v)
+    value = v.get("value") if v.get("status") == "gold" else None
+    return (value == cond.get("value")) if cond.get("operator") == "eq" else (value != cond.get("value"))
+
+
+def evaluate_query(query: dict, entities: list[dict], domain: Domain) -> float:
+    """Exact value of one declarative DoD query over the gold entities."""
+    cls = query.get("class_id")
+    pool = [e for e in entities if not cls or e.get("class") == cls]
+    pool = [e for e in pool if all(_condition(e, c) for c in query.get("conditions") or [])]
+    agg = query.get("aggregate")
+    if agg == "count_entities":
+        return len(pool)
+    if agg == "count_entities_with_properties":
+        return sum(all(is_filled((e.get("properties") or {}).get(p)) for p in query.get("properties") or [])
+                   for e in pool)
+    values = [v for e in pool for v in (e.get("properties") or {}).values()
+              if isinstance(v, dict) and v.get("status") == "gold"]
+    if agg == "count_distinct_source_classes":
+        return len({ev["source_type"] for v in values for ev in v.get("evidence") or [] if ev.get("source_type")})
+    if agg == "count_values_without_evidence":
+        return sum(1 for v in values if not v.get("evidence"))
+    raise ValueError(f"unknown DoD aggregate {agg!r}")
+
+
+def query_text(query: dict) -> str:
+    """Compact, readable rendering of a declarative query (what metrics.dod[].query shows)."""
+    head = query.get("aggregate", "?")
+    parts = [query["class_id"]] if query.get("class_id") else []
+    if query.get("properties"):
+        parts.append(", ".join(query["properties"]))
+    for c in query.get("conditions") or []:
+        parts.append(f"{c['property']} {c['operator']}" + (f" {c['value']!r}" if "value" in c else ""))
+    return f"{head}({'; '.join(parts)}) {query.get('operator', '>=')} {query.get('target')}"
+
+
+def criterion_label(query: str, criterion_id: str, domain: Domain) -> str:
+    q = f"{query} {criterion_id}".lower()
+    plural = domain.class_label(plural=True)
+    if "entities_meeting_dod" in q:
+        share = round(domain.dod_threshold * 100)
+        return f"{plural} with ≥ {share}% of their definition-of-done properties"
+    if "entities_total" in q:
+        return f"{plural} found"
+    if "distinct_source" in q:
+        return "Distinct public source classes"
+    if "without_evidence" in q:
+        return "Gold values without evidence"
+    return (criterion_id or query).replace("_", " ").capitalize()
+
+
+def _met(key: str, actual: float | None, target: float | None) -> bool | None:
+    if actual is None or target is None:
+        return None
+    return actual <= target if any(k in key for k in LOWER_IS_BETTER) else actual >= target
+
+
+def criteria(recomputed: dict, engine: dict, domain: Domain, backend: str | None = None,
+             queries: list[dict] | None = None, entities: list[dict] | None = None) -> list[dict]:
+    """The DoD criteria to show: the engine's `metrics.dod[]` when present, else the case's declarative queries,
+    else defaults. Each row carries the engine's actual/met and our recomputation: exact when a declarative query
+    for the criterion is available, else when the query names a metric we can recompute. Recorded (simulated)
+    inference never counts as met."""
+    by_id = {q["criterion_id"]: q for q in queries or [] if isinstance(q, dict) and q.get("criterion_id")}
+    rows = engine.get("dod") if isinstance(engine.get("dod"), list) else None
+    source = "engine" if rows else ("queries" if by_id else "default")
+    if not rows and by_id:
+        rows_in = [{"criterion_id": q["criterion_id"], "query": query_text(q), "target": q.get("target")}
+                   for q in by_id.values()]
+    else:
+        rows_in = rows or DEFAULT_CRITERIA
+    out = []
+    for row in rows_in:
+        query = str(row.get("query") or row.get("criterion_id") or "")
+        target = row.get("target")
+        declared = by_id.get(str(row.get("criterion_id") or ""))
+        key = query.lower() + " " + str(row.get("criterion_id") or "").lower()
+        if declared is not None and entities is not None:
+            ours = evaluate_query(declared, entities, domain)
+            met_ours = OPS.get(declared.get("operator", ">="), OPS[">="])(ours, declared.get("target", target))
+        else:
+            ours = _resolve(query, recomputed, domain)
+            met_ours = _met(key, ours, target)
+        met_engine = row.get("met") if rows else None
+        mock = backend == "recorded"
+        out.append({"criterion_id": row.get("criterion_id") or query, "query": query, "target": target,
+                    "label": criterion_label(query, str(row.get("criterion_id") or ""), domain),
+                    "lower_is_better": (declared or {}).get("operator") in ("<=", "<", "=") and not target
+                    if declared else any(k in key for k in LOWER_IS_BETTER),
+                    "engine_actual": row.get("actual") if rows else None, "engine_met": met_engine,
+                    "actual": ours, "met": (False if mock else (met_ours if met_ours is not None else met_engine)),
+                    "recomputed": ours is not None,
+                    "agrees": None if ours is None or not rows or row.get("actual") is None
+                    else abs(float(row["actual"]) - float(ours)) < 1e-6,
+                    "mock": mock, "source": source})
+    return out

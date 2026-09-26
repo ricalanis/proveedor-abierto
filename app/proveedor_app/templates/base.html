@@ -22,7 +22,7 @@
     </div>
     <nav class="tabs" aria-label="Sections">
       <a href="/run" {% if nav == "run" %}aria-current="page"{% endif %}>Live run</a>
-      <a href="/" {% if nav == "suppliers" %}aria-current="page"{% endif %}>Suppliers</a>
+      <a href="/" {% if nav == "entities" %}aria-current="page"{% endif %}>{{ domain.class_label(plural=True) }}</a>
       <a href="/signals" {% if nav == "signals" %}aria-current="page"{% endif %}>Signals</a>
       <a href="/relationships" {% if nav == "relationships" %}aria-current="page"{% endif %}>Relationships</a>
       <a href="/journal" {% if nav == "journal" %}aria-current="page"{% endif %}>Case journal</a>
@@ -41,7 +41,7 @@
   <p class="banner banner--sim" role="note"><strong>Preview past a checkpoint.</strong> This output was produced beyond a checkpoint no one has approved yet (developer preview). It is not the case's latest result.</p>
   {% endif %}
   {% if synthetic %}
-  <p class="banner" role="note"><strong>Synthetic fixture data.</strong> Every company, tax ID and source here is invented ("Proveedor Ejemplo", RFCs starting with ZZZ, <span class="mono">.example</span> sites) for rehearsal and tests.</p>
+  <p class="banner" role="note"><strong>Synthetic fixture data.</strong> Every entity, identifier and source here is invented (<span class="mono">.example</span> sites, obviously fake names) for rehearsal and tests.</p>
   {% endif %}
   <main id="main">
     {% block main %}{% endblock %}

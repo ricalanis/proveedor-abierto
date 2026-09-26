@@ -11,14 +11,14 @@ from pathlib import Path
 
 from .gold import GoldStore
 
-RUN_FILES = ("suppliers.jsonl", "contracts.jsonl", "trace.jsonl", "metrics.json")
+RUN_FILES = ("entities.jsonl", "ontology.json", "suppliers.jsonl", "contracts.jsonl", "trace.jsonl", "metrics.json")
 LIVE_FILES = ("trace.live.jsonl", "status.json", "jobs.jsonl")
 
 
 def _keys(run, live_steps: list[dict]) -> set[str]:
     keys: set[str] = set()
-    evidence = [e for s in run.suppliers for f in (s.get("fields") or {}).values() for e in f.get("evidence") or []]
-    evidence += [e for c in run.contracts for e in c.get("evidence") or []]
+    evidence = [e for ent in run.entities for v in (ent.get("properties") or {}).values() if isinstance(v, dict)
+                for e in v.get("evidence") or []]
     for e in evidence:
         keys.update(k for k in (e.get("bronze_key"), e.get("screenshot_key")) if k)
     keys.update(s["screenshot_key"] for s in live_steps if s.get("screenshot_key"))

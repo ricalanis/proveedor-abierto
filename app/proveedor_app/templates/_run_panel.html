@@ -2,20 +2,22 @@
 <section class="panel-block" aria-labelledby="dod-live-h">
   <h2 id="dod-live-h" class="visually-hidden">Progress</h2>
   <dl class="live-stats">
-    <div><dt>Suppliers found</dt><dd class="mono" data-k="sup-total">{{ mt.suppliers_total if mt.suppliers_total is not none else "—" }}</dd></div>
-    <div><dt>At ≥ 80% of core fields</dt><dd class="mono" data-k="sup-80">{{ mt.suppliers_at_80pct_core if mt.suppliers_at_80pct_core is not none else "—" }}<span class="of"> / 50</span></dd></div>
+    {% set total = (mt.entities_total or {}).get(domain.primary_class, mt.suppliers_total) %}
+    {% set meeting = (mt.entities_meeting_dod or {}).get(domain.primary_class, mt.suppliers_at_80pct_core) %}
+    <div><dt>{{ domain.class_label(plural=True) }} found</dt><dd class="mono" data-k="sup-total">{{ total if total is not none else "—" }}</dd></div>
+    <div><dt>Meeting the definition of done</dt><dd class="mono" data-k="sup-80">{{ meeting if meeting is not none else "—" }}</dd></div>
     <div><dt>Values captured</dt><dd class="mono" data-k="values">{{ p.value_count }}</dd></div>
     <div><dt>Steps</dt><dd class="mono" data-k="steps">{{ p.step_count }}</dd></div>
   </dl>
 </section>
 <section class="panel-block" aria-labelledby="fields-live-h">
-  <h2 id="fields-live-h">Core fields in gold</h2>
+  <h2 id="fields-live-h">Definition-of-done properties in gold</h2>
   <table class="bars bars--compact">
     <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
     <tbody>
     {% for f in p.fields %}
       <tr>
-        <th scope="row">{{ f.name|field_label }}</th>
+        <th scope="row">{{ f.label }}</th>
         <td class="bars__track"><span class="bar" data-k="bar-{{ f.name }}" style="--v: {{ ((f.ratio or 0) * 100)|round(1) }}%"></span><span class="bars__target" aria-hidden="true"></span></td>
         <td class="num mono" data-k="pct-{{ f.name }}">{{ f.ratio|pct if f.ratio is not none else "—" }}</td>
       </tr>
@@ -52,7 +54,7 @@
     <thead><tr><th scope="col">Source</th><th scope="col">Found by</th><th scope="col" class="num">OK</th><th scope="col" class="num">Failed</th><th scope="col" class="num">Values</th></tr></thead>
     <tbody>
     {% for src in p.sources %}{% set h = src.health or {} %}
-      <tr><th scope="row"><span class="mono">{{ src.source_id }}</span><span class="sub">{{ SOURCE_TYPE_LABELS.get(src.source_type, src.source_type or "") }}</span></th>
+      <tr><th scope="row"><span class="mono">{{ src.source_id }}</span><span class="sub">{{ domain.source_label(src.source_type) }}</span></th>
         <td class="mono found-by" data-k="found-{{ src.source_id }}">{{ src.discovered_by or "—" }}</td>
         <td class="num mono" data-k="ok-{{ src.source_id }}">{{ h.ok or 0 }}</td>
         <td class="num mono{% if h.failed %} failed{% endif %}" data-k="failed-{{ src.source_id }}">{{ h.failed or 0 }}</td>

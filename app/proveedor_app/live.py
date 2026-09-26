@@ -16,7 +16,8 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
-from . import CORE_FIELDS, dod
+from . import dod
+from .domain import Domain
 from .gold import GoldStore, LocalSource
 
 MODE_RANK = {"D0": 0, "D1": 1, "S1": 2, "S2": 3}
@@ -70,7 +71,16 @@ def annotate(steps: list[dict]) -> list[dict]:
     return out
 
 
-def summarize(steps: list[dict], status: dict | None) -> dict:
+def property_ratios(metrics: dict, domain: Domain | None) -> list[dict]:
+    """Per-property completeness bars from metrics in §11 shape (or the pre-§11 per_field_completeness)."""
+    if domain is None:
+        return []
+    per = ((metrics.get("per_property_completeness") or {}).get(domain.primary_class)
+           or metrics.get("per_field_completeness") or {})
+    return [{"name": p.id, "label": p.label, "ratio": per.get(p.id)} for p in domain.dod_props()]
+
+
+def summarize(steps: list[dict], status: dict | None, domain: Domain | None = None) -> dict:
     """Everything the side panel shows, from the step stream plus status.json."""
     status = status or {}
     modes = {m: 0 for m in MODE_RANK}
@@ -92,7 +102,7 @@ def summarize(steps: list[dict], status: dict | None) -> dict:
         "live_view_url": status.get("live_view_url"),
         "sources": status.get("sources") or [],
         "metrics": metrics,
-        "fields": [{"name": f, "ratio": (metrics.get("per_field_completeness") or {}).get(f)} for f in CORE_FIELDS],
+        "fields": property_ratios(metrics, domain),
         "modes": modes,
         "mode_total": sum(modes.values()),
         "events": events,
@@ -202,20 +212,29 @@ class Replayer:
         return None
 
     def _partial_metrics(self, emitted: set[str]) -> dict:
-        suppliers = []
-        for s in self.run.suppliers:
-            fields = {}
-            for name, f in (s.get("fields") or {}).items():
-                fields[name] = f if f.get("value_id") in emitted else {**f, "status": "missing", "evidence": []}
-            if any(f.get("value_id") in emitted for f in (s.get("fields") or {}).values()):
-                suppliers.append({**s, "fields": fields})
-        return dod.compute(suppliers)
+        """Metrics as far as the replay has got, in the same shape (§11 or pre-§11) as the recorded run's."""
+        seen = []
+        for e in self.run.entities:
+            props = {name: (v if v.get("value_id") in emitted else {**v, "status": "missing", "evidence": []})
+                     for name, v in (e.get("properties") or {}).items() if isinstance(v, dict)}
+            if any(v.get("value_id") in emitted for v in (e.get("properties") or {}).values() if isinstance(v, dict)):
+                seen.append({**e, "properties": props})
+        m = dod.compute(seen, self.run.domain)
+        cls = self.run.domain.primary_class
+        if "suppliers_total" in self.run.metrics:  # pre-§11 recording: keep its keys
+            return {"suppliers_total": m["entities_total"].get(cls, 0),
+                    "suppliers_at_80pct_core": m["entities_meeting_dod"][cls],
+                    "per_field_completeness": m["per_property_completeness"][cls],
+                    "distinct_source_types": m["distinct_source_classes"],
+                    "gold_values_without_evidence": m["values_without_evidence"]}
+        m.pop("primary_class", None)
+        return m
 
     def _status(self, state: str, phase: int, emitted: set[str], health: dict) -> dict:
         types = {}
-        for s in self.run.suppliers:
-            for f in (s.get("fields") or {}).values():
-                for e in f.get("evidence") or []:
+        for ent in self.run.entities:
+            for v in (ent.get("properties") or {}).values():
+                for e in (v.get("evidence") if isinstance(v, dict) else None) or []:
                     types.setdefault(e.get("source_id"), e.get("source_type"))
         return {
             "run_id": self.new_run_id, "state": state, "phase": phase, "checkpoint_pending": None,
@@ -296,8 +315,12 @@ class Replayer:
         out = self.target / "gold" / self.case_id / self.new_run_id
         out.mkdir(parents=True, exist_ok=True)
         trace = [dict(s, run_id=self.new_run_id) for s in self.run.trace]
-        for name, rows in (("suppliers", self.run.suppliers), ("contracts", self.run.contracts), ("trace", trace)):
-            (out / f"{name}.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+        (out / "trace.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in trace))
+        src = self.source.prefix + "/" + self.run.run_id
+        for name in ("entities.jsonl", "ontology.json", "suppliers.jsonl", "contracts.jsonl"):
+            data = self.source.source.read(f"{src}/{name}")  # copied verbatim, whatever layout was recorded
+            if data is not None:
+                (out / name).write_bytes(data)
         metrics = copy.deepcopy(self.run.metrics)
         metrics["run_id"] = self.new_run_id
         (out / "metrics.json").write_text(json.dumps(metrics, indent=2))

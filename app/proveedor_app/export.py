@@ -1,6 +1,8 @@
-"""Open exports of a gold run: CSV, an OCDS 1.1 release package, and RDF Turtle.
+"""Open exports of a gold run: CSV, RDF Turtle, and (when the ontology aligns to it) an OCDS 1.1 release package.
 
-All functions are pure over a `gold.Run`; pass `supplier_ids` to export a subset (e.g. a watchlist).
+Generic over the case's ontology (CONTRACT v0.7 §11): columns and predicates come from its classes and
+properties, using each property's `aligned_to` IRI when it has one. Pass `ids` to export a subset of primary
+entities (e.g. a watchlist).
 
 OCDS note: the ocid prefix `ocds-pa0000` is a placeholder, not a prefix registered with the Open Contracting
 Partnership. Register one before publishing these releases anywhere official.
@@ -13,49 +15,57 @@ import io
 from datetime import UTC, datetime
 from urllib.parse import quote
 
-from . import CORE_FIELDS
 from .gold import Run
 
-EXPORT_FIELDS = (*CORE_FIELDS, "legal_representative")
 OCID_PREFIX = "ocds-pa0000"
+OCDS_MARK = "open-contracting"
 
 
-def _selected(run: Run, supplier_ids) -> list[dict]:
-    if supplier_ids is None:
-        return list(run.suppliers)
-    wanted = set(supplier_ids)
-    return [s for s in run.suppliers if s["id"] in wanted]
+def _selected(run: Run, ids) -> list[dict]:
+    if ids is None:
+        return list(run.primary)
+    wanted = set(ids)
+    return [e for e in run.primary if e["id"] in wanted]
 
 
-def _value(supplier: dict, name: str):
-    f = (supplier.get("fields") or {}).get(name) or {}
-    return f.get("value") if f.get("status") in ("gold", "conflict") else None
+def _value(entity: dict, prop: str | None):
+    v = ((entity.get("properties") or {}).get(prop or "") or {})
+    return v.get("value") if v.get("status") in ("gold", "conflict") else None
+
+
+def _linked(run: Run, entities: list[dict], other_class_only: bool = True) -> list[dict]:
+    out, seen = [], set()
+    for e in entities:
+        for link in e.get("links") or []:
+            t = run.entities_by_id.get(link.get("target"))
+            if t and t["id"] not in seen and (not other_class_only or t.get("class") != e.get("class")):
+                seen.add(t["id"])
+                out.append(t)
+    return out
 
 
 # ---------------------------------------------------------------- CSV
 
 
-def to_csv(run: Run, supplier_ids=None) -> str:
+def to_csv(run: Run, ids=None) -> str:
+    d = run.domain
+    props = [p.id for p in d.props()]
     buf = io.StringIO()
     writer = csv.writer(buf, lineterminator="\n")
-    header = ["id"]
-    for name in EXPORT_FIELDS:
+    header = ["id", "class"]
+    for name in props:
         header += [name, f"{name}_status", f"{name}_confidence", f"{name}_source_url"]
-    header += ["flags", "contracts"]
+    header += ["flags", "links"]
     writer.writerow(header)
-    for s in _selected(run, supplier_ids):
-        fields = s.get("fields") or {}
-        row = [s["id"]]
-        for name in EXPORT_FIELDS:
-            f = fields.get(name) or {}
+    for e in _selected(run, ids):
+        values = e.get("properties") or {}
+        row = [e["id"], e.get("class")]
+        for name in props:
+            f = values.get(name) or {}
             ev = f.get("evidence") or []
-            row += [
-                "" if f.get("value") is None else f["value"],
-                f.get("status", "missing"),
-                "" if f.get("confidence") is None else f["confidence"],
-                ev[0]["url"] if ev else "",
-            ]
-        row += [";".join(fl["rule_id"] for fl in s.get("flags") or []), len(s.get("contract_ids") or [])]
+            row += ["" if f.get("value") is None else f["value"], f.get("status", "missing"),
+                    "" if f.get("confidence") is None else f["confidence"], ev[0]["url"] if ev else ""]
+        row += [";".join(fl["rule_id"] for fl in e.get("flags") or []), len(e.get("links") or [])]
         writer.writerow(row)
     return buf.getvalue()
 
@@ -63,63 +73,73 @@ def to_csv(run: Run, supplier_ids=None) -> str:
 # ---------------------------------------------------------------- OCDS
 
 
-def _buyer_id(name: str) -> str:
-    return "buyer:" + quote(name.lower().replace(" ", "-"), safe="-._")
+def _ocds_contract_class(run: Run) -> str | None:
+    for cid, c in run.domain.classes.items():
+        if OCDS_MARK in str(c.get("aligned_to") or "") and "contract" in str(c.get("aligned_to") or ""):
+            return cid
+    return None
 
 
-def _supplier_party(s: dict) -> dict:
-    party: dict = {"id": s["id"], "name": _value(s, "legal_name") or s["id"], "roles": ["supplier"]}
-    tax_id = _value(s, "tax_id")
-    if tax_id:
-        party["identifier"] = {"scheme": "MX-RFC", "id": str(tax_id), "legalName": party["name"]}
-    address = _value(s, "address")
-    if address:
-        party["address"] = {"streetAddress": str(address)}
-    return party
+def ocds_available(run: Run) -> bool:
+    return _ocds_contract_class(run) is not None
 
 
-def to_ocds(run: Run, supplier_ids=None, publisher: str = "Proveedor Abierto (Ontofill)") -> dict:
-    selected = {s["id"] for s in _selected(run, supplier_ids)}
+def _by_name(entity: dict, *names: str):
+    """A contract property by its OCDS-ish name, whatever the ontology called it (id or aligned_to suffix)."""
+    values = entity.get("properties") or {}
+    for key, v in values.items():
+        if key.lower() in names and isinstance(v, dict):
+            return v.get("value")
+    return None
+
+
+def to_ocds(run: Run, ids=None, publisher: str = "Proveedor Abierto (Ontofill)") -> dict:
+    d = run.domain
+    contract_class = _ocds_contract_class(run)
+    selected = _selected(run, ids)
+    selected_ids = {e["id"] for e in selected}
+    scheme = (d.classes.get(d.primary_class) or {}).get("identifier_scheme")
+    address_prop = next((p.id for p in d.props() if str(p.aligned_to or "").endswith("/address")), None)
     now = datetime.now(UTC).replace(microsecond=0).isoformat()
     releases = []
-    for c in run.contracts:
-        if not selected.intersection(c.get("supplier_ids") or []):
+    for c in (x for x in run.entities if x.get("class") == contract_class):
+        parties_ids = {link["target"] for link in c.get("links") or []} | {
+            e["id"] for e in run.primary if any(link.get("target") == c["id"] for link in e.get("links") or [])}
+        if not selected_ids & parties_ids:
             continue
-        local = c["id"].removeprefix("con:")
-        buyer = {"id": _buyer_id(c["buyer"]), "name": c["buyer"]}
-        suppliers = [run.suppliers_by_id[sid] for sid in c["supplier_ids"] if sid in run.suppliers_by_id]
-        value = {"amount": c["amount"], "currency": c["currency"]}
-        award_id = f"{local}-award"
+        suppliers = [run.entities_by_id[i] for i in sorted(parties_ids)
+                     if i in run.entities_by_id and run.entities_by_id[i].get("class") == d.primary_class]
+        local = c["id"].split(":", 1)[-1]
+        date = str(_by_name(c, "date", "datesigned") or "")
+        iso = f"{date}T00:00:00Z" if len(date) == 10 else date or None
+        buyer_name = _by_name(c, "buyer")
+        buyer = {"id": "buyer:" + quote(str(buyer_name or "unknown").lower().replace(" ", "-"), safe="-._"),
+                 "name": buyer_name}
+        value = {"amount": _by_name(c, "amount", "value"), "currency": _by_name(c, "currency")}
+
+        def party(e: dict) -> dict:
+            p = {"id": e["id"], "name": run.title(e), "roles": ["supplier"]}
+            ident = run.identifier(e)
+            if ident and scheme:
+                p["identifier"] = {"scheme": scheme, "id": str(ident), "legalName": p["name"]}
+            addr = _value(e, address_prop)
+            if addr:
+                p["address"] = {"streetAddress": str(addr)}
+            return p
+
         releases.append({
-            "ocid": f"{OCID_PREFIX}-{local}",
-            "id": f"{local}-{run.run_id}",
-            "date": f"{c['date']}T00:00:00Z" if len(c["date"]) == 10 else c["date"],
-            "tag": ["contract"],
+            "ocid": f"{OCID_PREFIX}-{local}", "id": f"{local}-{run.run_id}", "date": iso, "tag": ["contract"],
             "initiationType": "tender",
-            "parties": [{**buyer, "roles": ["buyer"]}] + [_supplier_party(s) for s in suppliers],
+            "parties": [{**buyer, "roles": ["buyer"]}] + [party(e) for e in suppliers],
             "buyer": buyer,
-            "tender": {"id": f"{local}-tender", "procurementMethodDetails": c["procedure_type"]},
-            "awards": [{
-                "id": award_id,
-                "suppliers": [{"id": s["id"], "name": _value(s, "legal_name") or s["id"]} for s in suppliers],
-                "value": value,
-                "date": f"{c['date']}T00:00:00Z" if len(c["date"]) == 10 else c["date"],
-            }],
-            "contracts": [{
-                "id": local,
-                "awardID": award_id,
-                "title": c["title"],
-                "value": value,
-                "dateSigned": f"{c['date']}T00:00:00Z" if len(c["date"]) == 10 else c["date"],
-            }],
+            "tender": {"id": f"{local}-tender", "procurementMethodDetails": _by_name(c, "procedure_type")},
+            "awards": [{"id": f"{local}-award", "suppliers": [{"id": e["id"], "name": run.title(e)} for e in suppliers],
+                        "value": value, "date": iso}],
+            "contracts": [{"id": local, "awardID": f"{local}-award", "title": _by_name(c, "title"), "value": value,
+                           "dateSigned": iso}],
         })
-    return {
-        "uri": f"https://proveedor-abierto.example/export/{run.case_id}/{run.run_id}/ocds.json",
-        "version": "1.1",
-        "publishedDate": now,
-        "publisher": {"name": publisher},
-        "releases": releases,
-    }
+    return {"uri": f"https://proveedor-abierto.example/export/{run.case_id}/{run.run_id}/ocds.json", "version": "1.1",
+            "publishedDate": now, "publisher": {"name": publisher}, "releases": releases}
 
 
 # ---------------------------------------------------------------- Turtle
@@ -131,16 +151,6 @@ PREFIXES = """@prefix pa: <https://proveedor-abierto.example/id/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 """
-
-SUPPLIER_PREDICATES = {
-    "legal_name": "schema:legalName",
-    "tax_id": "schema:taxID",
-    "address": "schema:address",
-    "founding_date": "schema:foundingDate",
-    "tax_list_status": "pav:taxListStatus",
-    "sanction_status": "pav:sanctionStatus",
-    "legal_representative": "pav:legalRepresentative",
-}
 
 
 def turtle_string(value) -> str:
@@ -160,9 +170,13 @@ def _node(identifier: str) -> str:
     return f"<https://proveedor-abierto.example/id/{quote(kind, safe='')}/{quote(rest, safe='-._~')}>"
 
 
-def _literal(name: str, value) -> str:
-    if name == "founding_date" and isinstance(value, str) and len(value) == 10:
-        return f"{turtle_string(value)}^^xsd:date"
+def _term(aligned: str | None, local: str) -> str:
+    return _iri(aligned) if aligned and aligned.startswith(("http://", "https://")) else f"pav:{quote(local, safe='_')}"
+
+
+def _literal(datatype: str, value) -> str:
+    if datatype.startswith("xsd:") and datatype != "xsd:string":
+        return f"{turtle_string(value)}^^{datatype}"
     return turtle_string(value)
 
 
@@ -171,61 +185,52 @@ def _block(subject: str, props: list[tuple[str, str]]) -> str:
     return f"{subject}\n    {body} .\n"
 
 
-def to_turtle(run: Run, supplier_ids=None) -> str:
-    out = [PREFIXES]
-    selected = _selected(run, supplier_ids)
-    selected_ids = {s["id"] for s in selected}
-    for s in selected:
-        subj = _node(s["id"])
-        props = [("a", "schema:Organization")]
-        observations = []
-        for name, f in (s.get("fields") or {}).items():
-            if f.get("status") not in ("gold", "conflict") or f.get("value") is None:
-                continue
-            pred = SUPPLIER_PREDICATES.get(name, f"pav:{quote(name, safe='_')}")
-            props.append((pred, _literal(name, f["value"])))
-            if f.get("value_id"):
-                obs = _node(f["value_id"])
-                props.append(("pav:observation", obs))
-                oprops = [
-                    ("a", "pav:Observation"),
-                    ("pav:field", turtle_string(name)),
-                    ("pav:value", _literal(name, f["value"])),
-                    ("pav:status", turtle_string(f["status"])),
-                    ("pav:confidence", f'"{float(f.get("confidence") or 0):.4f}"^^xsd:decimal'),
-                ]
-                for e in f.get("evidence") or []:
-                    if e.get("url", "").startswith(("http://", "https://")):
-                        oprops.append(("prov:wasDerivedFrom", _iri(e["url"])))
-                    if e.get("bronze_key"):
-                        oprops.append(("pav:bronzeKey", turtle_string(e["bronze_key"])))
-                    if e.get("screenshot_key"):
-                        oprops.append(("pav:screenshotKey", turtle_string(e["screenshot_key"])))
-                    if e.get("captured_at"):
-                        oprops.append(("prov:generatedAtTime", f"{turtle_string(e['captured_at'])}^^xsd:dateTime"))
-                observations.append(_block(obs, oprops))
-        for i, fl in enumerate(s.get("flags") or []):
-            sig = _node(f"signal:{s['id'].removeprefix('sup:')}-{i}")
-            props.append(("pav:signal", sig))
-            sprops = [("a", "pav:Signal"), ("pav:rule", turtle_string(fl["rule_id"])),
-                      ("rdfs:label", turtle_string(fl["label"])),
-                      ("rdfs:comment", turtle_string(fl.get("explanation", "")))]
-            sprops += [("pav:evidence", _node(v)) for v in fl.get("evidence_value_ids") or []]
-            observations.append(_block(sig, sprops))
-        out.append(_block(subj, props))
-        out.extend(observations)
-    for c in run.contracts:
-        if not selected_ids.intersection(c.get("supplier_ids") or []):
+def _entity_blocks(run: Run, e: dict) -> list[str]:
+    d = run.domain
+    cls = e.get("class") or ""
+    declared = {p.id: p for p in d.props(cls)}
+    subj = _node(e["id"])
+    props = [("a", _term((d.classes.get(cls) or {}).get("aligned_to"), cls))]
+    extra = []
+    for name, f in (e.get("properties") or {}).items():
+        if not isinstance(f, dict) or f.get("status") not in ("gold", "conflict") or f.get("value") is None:
             continue
-        props = [
-            ("a", "pav:Contract"),
-            ("schema:name", turtle_string(c["title"])),
-            ("pav:amount", f'"{c["amount"]}"^^xsd:decimal'),
-            ("pav:currency", turtle_string(c["currency"])),
-            ("pav:buyer", turtle_string(c["buyer"])),
-            ("pav:procedureType", turtle_string(c["procedure_type"])),
-            ("pav:date", f"{turtle_string(c['date'])}^^xsd:date"),
-        ]
-        props += [("pav:supplier", _node(sid)) for sid in c["supplier_ids"]]
-        out.append(_block(_node(c["id"]), props))
+        p = declared.get(name)
+        datatype = p.datatype if p else ""
+        props.append((_term(p.aligned_to if p else None, name), _literal(datatype, f["value"])))
+        if f.get("value_id"):
+            obs = _node(f["value_id"])
+            props.append(("pav:observation", obs))
+            oprops = [("a", "pav:Observation"), ("pav:property", turtle_string(name)),
+                      ("pav:value", _literal(datatype, f["value"])), ("pav:status", turtle_string(f["status"])),
+                      ("pav:confidence", f'"{float(f.get("confidence") or 0):.4f}"^^xsd:decimal')]
+            for ev in f.get("evidence") or []:
+                if ev.get("url", "").startswith(("http://", "https://")):
+                    oprops.append(("prov:wasDerivedFrom", _iri(ev["url"])))
+                if ev.get("bronze_key"):
+                    oprops.append(("pav:bronzeKey", turtle_string(ev["bronze_key"])))
+                if ev.get("screenshot_key"):
+                    oprops.append(("pav:screenshotKey", turtle_string(ev["screenshot_key"])))
+                if ev.get("captured_at"):
+                    oprops.append(("prov:generatedAtTime", f"{turtle_string(ev['captured_at'])}^^xsd:dateTime"))
+            extra.append(_block(obs, oprops))
+    for link in e.get("links") or []:
+        if link.get("target") in run.entities_by_id:
+            props.append((_term((d.relations.get(link.get("property")) or {}).get("aligned_to"),
+                                link.get("property") or "related"), _node(link["target"])))
+    for i, fl in enumerate(e.get("flags") or []):
+        sig = _node(f"signal:{e['id'].split(':', 1)[-1]}-{i}")
+        props.append(("pav:signal", sig))
+        sprops = [("a", "pav:Signal"), ("pav:rule", turtle_string(fl["rule_id"])),
+                  ("rdfs:label", turtle_string(fl["label"])), ("rdfs:comment", turtle_string(fl.get("explanation", "")))]
+        sprops += [("pav:evidence", _node(v)) for v in fl.get("evidence_value_ids") or []]
+        extra.append(_block(sig, sprops))
+    return [_block(subj, props), *extra]
+
+
+def to_turtle(run: Run, ids=None) -> str:
+    selected = _selected(run, ids)
+    out = [PREFIXES]
+    for e in selected + _linked(run, selected):
+        out.extend(_entity_blocks(run, e))
     return "\n".join(out)

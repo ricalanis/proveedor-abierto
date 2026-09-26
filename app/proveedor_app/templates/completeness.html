@@ -14,33 +14,27 @@
 <section class="dod" aria-labelledby="dod-h">
   <h2 id="dod-h" class="visually-hidden">Definition of done</h2>
   <dl class="dod__grid">
-    <div class="dod__item" data-key="suppliers_at_80pct_core">
-      <dt>Suppliers with ≥ 80% of core fields</dt>
-      <dd><span class="dod__num" data-bind="recomputed.suppliers_at_80pct_core">{{ m.recomputed.suppliers_at_80pct_core }}</span><span class="dod__of">of {{ m.total }}, target {{ m.targets.suppliers_at_80pct_core }}</span></dd>
-      <dd class="dod__state" data-met="{{ m.met.suppliers_at_80pct_core|lower }}">{{ "Met" if m.met.suppliers_at_80pct_core else "Not yet" }}</dd>
+    {% for c in m.criteria %}
+    <div class="dod__item" data-key="{{ c.criterion_id }}">
+      <dt>{{ c.label }}</dt>
+      <dd><span class="dod__num" data-bind="actual">{{ c.actual if c.recomputed else (c.engine_actual if c.engine_actual is not none else "—") }}</span><span class="dod__of">{{ "must be" if c.lower_is_better and c.target == 0 else "target" }} {{ c.target }}</span></dd>
+      <dd class="dod__state" data-met="{{ c.met|lower }}">{{ "Not counted (mock)" if c.mock else ("Met" if c.met else "Not yet") }}</dd>
+      <dd class="dod__query mono" title="DoD query">{{ c.query }}{% if not c.recomputed %} · reported by the engine, not recomputed{% elif c.agrees is sameas false %} · engine says {{ c.engine_actual }}{% endif %}</dd>
     </div>
-    <div class="dod__item" data-key="distinct_source_types">
-      <dt>Distinct public source types</dt>
-      <dd><span class="dod__num" data-bind="recomputed.distinct_source_types">{{ m.recomputed.distinct_source_types }}</span><span class="dod__of">target {{ m.targets.distinct_source_types }}</span></dd>
-      <dd class="dod__state" data-met="{{ m.met.distinct_source_types|lower }}">{{ "Met" if m.met.distinct_source_types else "Not yet" }}</dd>
-    </div>
-    <div class="dod__item" data-key="gold_values_without_evidence">
-      <dt>Gold values without evidence</dt>
-      <dd><span class="dod__num" data-bind="recomputed.gold_values_without_evidence">{{ m.recomputed.gold_values_without_evidence }}</span><span class="dod__of">must be 0</span></dd>
-      <dd class="dod__state" data-met="{{ m.met.gold_values_without_evidence|lower }}">{{ "Met" if m.met.gold_values_without_evidence else "Not met" }}</dd>
-    </div>
+    {% endfor %}
   </dl>
+  {% if m.criteria and m.criteria[0].source == "default" %}<p class="note muted">The engine's metrics carry no <span class="mono">dod[]</span>; these are the default criteria.</p>{% endif %}
   <p class="crosscheck {% if m.mismatches %}crosscheck--bad{% endif %}" id="crosscheck">
     {% if m.mismatches %}Engine metrics disagree with the export: {{ m.mismatches|join("; ") }}{% else %}Recomputed from gold: matches the engine's metrics.json.{% endif %}
   </p>
 </section>
 
 <section class="block" aria-labelledby="fields-h">
-  <h2 id="fields-h">Core fields in gold</h2>
-  <p class="muted note">Share of suppliers whose field is gold and backed by at least one capture. The tick marks 80%.</p>
+  <h2 id="fields-h">Definition-of-done properties in gold</h2>
+  <p class="muted note">Share of {{ m.primary_label|lower }} whose property is gold and backed by at least one capture. The tick marks {{ (m.threshold * 100)|round|int }}%{% if not m.threshold_stated %} (the default share; the ontology does not state one){% endif %}.</p>
   <table class="bars" id="field-bars">
     <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
-    <thead class="visually-hidden"><tr><th scope="col">Field</th><th scope="col">Share in gold</th><th scope="col">Suppliers and change</th></tr></thead>
+    <thead class="visually-hidden"><tr><th scope="col">Field</th><th scope="col">Share in gold</th><th scope="col">Count and change</th></tr></thead>
     <tbody>
     {% for f in m.fields %}
       <tr data-field="{{ f.name }}">
@@ -57,7 +51,7 @@
 
 <section class="block" aria-labelledby="cov-h">
   <h2 id="cov-h">Taxonomy coverage</h2>
-  <p class="muted note">Level Ratio Coverage: share of each level's taxonomy nodes that at least one gold supplier is classified under. Uncovered nodes are where fan-out looks next.</p>
+  <p class="muted note">Level Ratio Coverage: share of each level's taxonomy nodes that at least one gold entity is classified under. Uncovered nodes are where fan-out looks next.</p>
   {% if m.coverage %}
   <table class="bars">
     <colgroup><col class="col-label"><col><col class="col-num"></colgroup>

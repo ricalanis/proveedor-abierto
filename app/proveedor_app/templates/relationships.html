@@ -3,7 +3,7 @@
 {% block main %}
 <section class="page-head">
   <h1>Relationships</h1>
-  <p class="lede">Suppliers connected by a shared address, a shared legal representative, or a procedure they both took part in. Each line links to the value that connects them.</p>
+  <p class="lede">{{ domain.class_label(plural=True) }} connected by the relations the case ontology defines. Each line links to the value that connects them.</p>
 </section>
 
 <form class="filters filters--types" method="get" action="/relationships">
@@ -11,25 +11,25 @@
   <fieldset>
     <legend>Connect by</legend>
     {% for t in LINK_TYPES %}
-    <label class="check"><input type="checkbox" name="t" value="{{ t }}" {% if t in chosen %}checked{% endif %} data-type="{{ t }}"> <span class="edge-key edge-key--{{ t }}" aria-hidden="true"></span>{{ LINK_LABELS[t] }}</label>
+    <label class="check"><input type="checkbox" name="t" value="{{ t }}" {% if t in chosen %}checked{% endif %} data-type="{{ t }}"> <span class="edge-key edge-key--{{ t }}" aria-hidden="true"></span>{{ domain.relation_label(t) }}</label>
     {% endfor %}
     <button type="submit" class="btn btn--quiet">Apply</button>
   </fieldset>
 </form>
 
-<p class="count">{{ clusters|length }} {{ "group" if clusters|length == 1 else "groups" }} of connected suppliers</p>
+<p class="count">{{ clusters|length }} {{ "group" if clusters|length == 1 else "groups" }} of connected {{ domain.class_label(plural=True)|lower }}</p>
 <div class="clusters">
 {% for c in clusters %}
   {% set pos = c.layout(280) %}
-  <section class="cluster {% if focus in c.members %}cluster--focus{% endif %}" aria-label="Group of {{ c.members|length }} suppliers">
+  <section class="cluster {% if focus in c.members %}cluster--focus{% endif %}" aria-label="Group of {{ c.members|length }} {{ domain.class_label(plural=True)|lower }}">
     {% if c.members|length <= 12 %}
-    <svg class="graph" viewBox="0 0 280 280" role="img" aria-label="Network of {{ c.members|length }} connected suppliers">
+    <svg class="graph" viewBox="0 0 280 280" role="img" aria-label="Network of {{ c.members|length }} connected {{ domain.class_label(plural=True)|lower }}">
       {% for e in c.edges %}{% set a = pos[e.a] %}{% set b = pos[e.b] %}
-        <line class="edge edge--{{ e.type }}" x1="{{ a[0]|round(1) }}" y1="{{ a[1]|round(1) }}" x2="{{ b[0]|round(1) }}" y2="{{ b[1]|round(1) }}"><title>{{ LINK_LABELS[e.type] }}</title></line>
+        <line class="edge edge--{{ e.type }}" x1="{{ a[0]|round(1) }}" y1="{{ a[1]|round(1) }}" x2="{{ b[0]|round(1) }}" y2="{{ b[1]|round(1) }}"><title>{{ domain.relation_label(e.type) }}</title></line>
       {% endfor %}
       {% for m in c.members %}{% set p = pos[m] %}
-        <a href="/suppliers/{{ m }}">
-          <circle class="node {% if m == focus %}node--focus{% endif %} {% if (run.suppliers_by_id[m].flags or []) %}node--signal{% endif %}" cx="{{ p[0]|round(1) }}" cy="{{ p[1]|round(1) }}" r="11"><title>{{ supplier_name(run.suppliers_by_id[m]) }}</title></circle>
+        <a href="/entities/{{ m }}">
+          <circle class="node {% if m == focus %}node--focus{% endif %} {% if (run.entities_by_id[m].flags or []) %}node--signal{% endif %}" cx="{{ p[0]|round(1) }}" cy="{{ p[1]|round(1) }}" r="11"><title>{{ run.title(run.entities_by_id[m]) }}</title></circle>
           <text class="node-label" x="{{ p[0]|round(1) }}" y="{{ (p[1] + 4)|round(1) }}" text-anchor="middle">{{ loop.index }}</text>
         </a>
       {% endfor %}
@@ -37,15 +37,15 @@
     {% endif %}
     <div class="cluster__list">
       <ol class="members">
-        {% for m in c.members %}{% set ms = run.suppliers_by_id[m] %}
-        <li><a href="/suppliers/{{ m }}" {% if m == focus %}aria-current="true"{% endif %}>{{ supplier_name(ms) }}</a>{% if ms.flags %} <span class="signal-count" title="Signals">{{ ms.flags|length }} {{ "signal" if ms.flags|length == 1 else "signals" }}</span>{% endif %}</li>
+        {% for m in c.members %}{% set ms = run.entities_by_id[m] %}
+        <li><a href="/entities/{{ m }}" {% if m == focus %}aria-current="true"{% endif %}>{{ run.title(ms) }}</a>{% if ms.flags %} <span class="signal-count" title="Signals">{{ ms.flags|length }} {{ "signal" if ms.flags|length == 1 else "signals" }}</span>{% endif %}</li>
         {% endfor %}
       </ol>
       <ul class="edges">
         {% for line in summarize(c) %}
         <li>
           <span class="edge-key edge-key--{{ line.type }}" aria-hidden="true"></span>
-          {{ LINK_LABELS[line.type] }}{% if line.value %}: <a href="/suppliers/{{ line.supplier_id }}?ev={{ line.value_id|urlencode }}#evidence">{{ line.value }}</a>{% endif %}
+          {{ domain.relation_label(line.type) }}{% if line.value %}: <a href="/entities/{{ line.entity_id }}?ev={{ line.value_id|urlencode }}#evidence">{{ line.value }}</a>{% endif %}
           <span class="edge__pair">{% if line.value %}{{ line.members|join(", ") }}{% else %}{% for a, b in line.pairs %}{{ a }}–{{ b }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}</span>
         </li>
         {% endfor %}

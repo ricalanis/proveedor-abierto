@@ -15,20 +15,42 @@ def _run_dir(fixture_root: Path) -> Path:
     return gold / json.loads((gold / "latest.json").read_text())["run_id"]
 
 
-@pytest.mark.parametrize(
-    "filename,schema",
-    [
-        ("suppliers.jsonl", "supplier.schema.json"),
-        ("contracts.jsonl", "contract.schema.json"),
-        ("trace.jsonl", "trace-step.schema.json"),
-    ],
-)
-def test_jsonl_rows(fixture_root, validator_for, filename, schema):
-    v = validator_for(schema)
+@pytest.fixture(scope="session")
+def legacy_root(tmp_path_factory) -> Path:
+    from proveedor_app import fixtures
+
+    out = tmp_path_factory.mktemp("legacy")
+    fixtures.generate(out, layout="legacy")
+    return out
+
+
+def _jsonl_problems(path: Path, v) -> list[str]:
     problems = []
-    for i, line in enumerate((_run_dir(fixture_root) / filename).read_text().splitlines()):
+    for i, line in enumerate(path.read_text().splitlines()):
         problems += [f"line {i + 1} {msg}" for msg in _errors(v, json.loads(line))]
+    return problems
+
+
+@pytest.mark.parametrize("filename,schema", [("entities.jsonl", "entity.schema.json"),
+                                             ("trace.jsonl", "trace-step.schema.json")])
+def test_jsonl_rows(fixture_root, validator_for, filename, schema):
+    problems = _jsonl_problems(_run_dir(fixture_root) / filename, validator_for(schema))
     assert not problems, f"{len(problems)} violations, first: {problems[:5]}"
+
+
+@pytest.mark.parametrize("filename,schema", [("suppliers.jsonl", "supplier.schema.json"),
+                                             ("contracts.jsonl", "contract.schema.json")])
+def test_legacy_layout_rows(legacy_root, validator_for, filename, schema):
+    """The pre-§11 layout the adapter still reads stays valid against the engine's legacy schemas."""
+    problems = _jsonl_problems(_run_dir(legacy_root) / filename, validator_for(schema))
+    assert not problems, f"{len(problems)} violations, first: {problems[:5]}"
+
+
+def test_section11_run_artifacts(fixture_root, validator_for):
+    run_dir = _run_dir(fixture_root)
+    for name, schema in (("ontology.json", "ontology.schema.json"), ("dod-queries.json", "dod-queries.schema.json")):
+        errors = _errors(validator_for(schema), json.loads((run_dir / name).read_text()))
+        assert not errors, (name, errors[:3])
 
 
 def test_metrics_and_latest(fixture_root, validator_for):

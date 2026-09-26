@@ -1,5 +1,11 @@
 # App layer
 
+The app is generic over the case's ontology (CONTRACT v0.7 §11): `domain.py` reads the approved `ontology.json`
+(primary class, property labels and order, DoD properties, relations, rules, source classes) and every screen takes
+its words from it. `pa-app fixtures --domain libraries` builds an unrelated second domain that renders with no code
+changes (`tests/test_genericity.py`). The pre-§11 export (`suppliers.jsonl` + `contracts.jsonl`) is still read
+through one adapter, `domain.legacy_to_entities`.
+
 Investigation, not a dashboard. Reads the gold export (CONTRACT section 4) from the lake over the S3 API, or from
 a local directory with the same layout. Served behind NetBird: one gated URL per role, zero open ports.
 
@@ -7,8 +13,8 @@ Run it: `uv run pa-app serve --fixtures` (synthetic data), or point `PA_GOLD_DIR
 
 | Screen | Route | Module / template |
 |--------|-------|-------------------|
-| Supplier index | `/` | `web.py`, `templates/index.html` |
-| Supplier dossier: every field with value, confidence, status and evidence (link + screenshot) | `/suppliers/<id>` | `templates/dossier.html`, `_evidence.html` |
+| Index of the ontology's primary class | `/` | `web.py`, `templates/index.html` |
+| Dossier: every property with value, confidence, status and evidence (link + screenshot) | `/entities/<id>` (`/suppliers/<id>` alias) | `templates/dossier.html`, `_evidence.html` |
 | Red-flag explainer: rule, evidence, plain-language explanation, dispute path | `/signals`, `/signals/<id>/<n>` | `investigate.py`, `templates/signals.html`, `signal.html` |
 | Relationship view: shared address, representative or procedure | `/relationships` | `investigate.clusters`, `templates/relationships.html` |
 | Case journal: value → step → TDD → objective → ontology → PRD → brief | `/journal`, `/journal/<value_id>` | `investigate.journal_chain`, `templates/journal.html` |

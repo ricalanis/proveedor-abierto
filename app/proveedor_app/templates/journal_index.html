@@ -30,7 +30,7 @@
     <tbody>
     {% for s in sources %}
       <tr><th scope="row">{% if s.url and safe_url(s.url) %}<a href="{{ s.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ host_of(s.url) }}</a>{% else %}{{ s.url or "—" }}{% endif %}<span class="mono sub">{{ s.source_id }}</span></th>
-        <td>{{ SOURCE_TYPE_LABELS.get(s.source_type, (s.source_type or "—")|replace("_", " ")) }}</td>
+        <td>{{ domain.source_label(s.source_type) if s.source_type else "—" }}</td>
         <td class="mono">{{ s.discovered_by or "—" }}</td>
         <td class="mono">{{ s.objectives|join(", ") }}</td></tr>
     {% endfor %}

@@ -181,6 +181,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .dod__of { color: var(--color-ink-2); font-size: var(--text-sm); }
 .dod__state { font-size: var(--text-sm); font-weight: 700; }
 .dod__state[data-met="true"] { color: var(--color-ok); }
+.dod__query { font-size: var(--text-xs); color: var(--color-ink-3); overflow-wrap: anywhere; }
 .dod__state[data-met="true"]::before { content: "✓ "; }
 .dod__state[data-met="false"] { color: var(--color-signal); }
 .dod__state[data-met="false"]::before { content: "○ "; }

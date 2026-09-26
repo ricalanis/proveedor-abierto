@@ -52,9 +52,12 @@
   <h2 id="dod-h">Definition of done, on gold {{ mock() }}</h2>
   {% set d = card.dod %}
   <table class="ledger"><thead><tr><th scope="col">Criterion</th><th scope="col" class="num">Now</th><th scope="col" class="num">Target</th><th scope="col">State</th></tr></thead><tbody>
-    <tr><th scope="row">Suppliers with ≥ 80% of core fields</th><td class="num mono">{{ d.recomputed.suppliers_at_80pct_core }}</td><td class="num mono">{{ d.targets.suppliers_at_80pct_core }}</td><td>{{ "met" if d.met.suppliers_at_80pct_core else ("not counted (mock)" if card.mock else "not yet") }}</td></tr>
-    <tr><th scope="row">Distinct public source classes</th><td class="num mono">{{ d.recomputed.distinct_source_types }}</td><td class="num mono">{{ d.targets.distinct_source_types }}</td><td>{{ "met" if d.met.distinct_source_types else ("not counted (mock)" if card.mock else "not yet") }}</td></tr>
-    <tr><th scope="row">Gold values without evidence</th><td class="num mono">{{ d.recomputed.gold_values_without_evidence }}</td><td class="num mono">0</td><td>{{ "met" if d.met.gold_values_without_evidence else ("not counted (mock)" if card.mock else "not met") }}</td></tr>
+  {% for c in d.criteria %}
+    <tr><th scope="row">{{ c.label }}<span class="mono sub">{{ c.query }}</span></th>
+      <td class="num mono">{{ c.actual if c.recomputed else (c.engine_actual if c.engine_actual is not none else "—") }}</td>
+      <td class="num mono">{{ c.target }}</td>
+      <td>{{ "not counted (mock)" if c.mock else ("met" if c.met else "not yet") }}{% if not c.recomputed %} <span class="muted">(engine value)</span>{% endif %}</td></tr>
+  {% endfor %}
   </tbody></table>
   <p class="note {% if d.mismatches %}crosscheck--bad{% endif %}">{% if d.mismatches %}Engine metrics disagree with the export: {{ d.mismatches|join("; ") }}{% else %}The engine's metrics.json matches this recomputation.{% endif %}</p>
 </section>
@@ -85,7 +88,7 @@
   </tbody></table>
   {% else %}<p class="muted">No decision provenance in this run.</p>{% endif %}
   {% if card.jev_only_gold %}
-  <p class="note crosscheck--bad">{{ card.jev_only_gold|length }} gold {{ "value rests" if card.jev_only_gold|length == 1 else "values rest" }} on a Jev decision alone and {{ "is" if card.jev_only_gold|length == 1 else "are" }} not counted: {% for sid, field, vid in card.jev_only_gold[:10] %}<a href="/suppliers/{{ sid }}?ev={{ vid|urlencode }}#evidence">{{ field|field_label }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% if card.jev_only_gold|length > 10 %} …{% endif %}</p>
+  <p class="note crosscheck--bad">{{ card.jev_only_gold|length }} gold {{ "value rests" if card.jev_only_gold|length == 1 else "values rest" }} on a Jev decision alone and {{ "is" if card.jev_only_gold|length == 1 else "are" }} not counted: {% for sid, field, vid in card.jev_only_gold[:10] %}<a href="/entities/{{ sid }}?ev={{ vid|urlencode }}#evidence">{{ domain.prop_label(field) }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% if card.jev_only_gold|length > 10 %} …{% endif %}</p>
   {% else %}<p class="note">No gold value rests on a Jev decision alone.</p>{% endif %}
 </section>
 

@@ -17,9 +17,11 @@ from pathlib import Path
 
 import yaml
 
-from . import CORE_FIELDS, dod, fixture_case
+from . import dod, fixture_case
+from .domain import LEGACY_ONTOLOGY, Domain, legacy_to_entities
 
 CASE_ID = "fixture-case"
+CORE_FIELDS = ("legal_name", "tax_id", "address", "founding_date", "tax_list_status", "sanction_status")
 RUNS = ("run-fixture-0000", "run-fixture-0001")
 TAXONOMY = {
     "obra-publica": ["carreteras", "edificacion", "agua"],
@@ -320,7 +322,7 @@ def _render_run(
     contracts = run_contracts
 
     _add_flags_and_links(suppliers, contracts)
-    metrics = dod.compute(suppliers)
+    metrics = {}  # layout-specific keys are added by generate()
     used = {n for s in suppliers for n in s["classified_as"]}
     level1 = {n.split("/")[1] for n in used}
     metrics.update(
@@ -480,19 +482,84 @@ def _write_live_record(lake: Path, run_id: str, suppliers: list[dict], trace: li
     (lake / "runs" / CASE_ID / "latest.json").write_text(json.dumps({"run_id": run_id}))
 
 
-def generate(out: Path, n_suppliers: int = 60, seed: int = 7) -> Path:
-    """Write OUT/lake and OUT/case. Returns the lake root (use as PA_GOLD_DIR)."""
+FIXTURE_ONTOLOGY_EXTRA = {  # the §11a keys this synthetic case's ontology carries (procurement vocabulary)
+    **{k: LEGACY_ONTOLOGY[k] for k in ("primary_class", "rules", "source_classes")},
+    "relations": LEGACY_ONTOLOGY["relations"] + [
+        {"id": "awarded_to", "label": "Awarded to", "domain": "contract", "range": "supplier", "symmetric": False}],
+}
+
+
+def case_ontology() -> dict:
+    """Engine-shaped ontology (fixture_case.ONTOLOGY) plus the §11a keys, classes and properties it describes."""
+    onto = dict(fixture_case.ONTOLOGY)
+    onto.update(FIXTURE_ONTOLOGY_EXTRA)
+    onto["classes"] = LEGACY_ONTOLOGY["classes"]
+    onto["properties"] = LEGACY_ONTOLOGY["properties"]
+    onto["dod_queries_path"] = "02-ontology/dod-queries.json"
+    return onto
+
+
+DOD_QUERIES = {"prd_path": "01-scope/prd.json", "ontology_version": "v1", "generated_by": GEN, "queries": [
+    {"criterion_id": "suppliers_found", "aggregate": "count_entities", "class_id": "supplier",
+     "target": 50, "operator": ">="},
+    {"criterion_id": "complete_profiles", "aggregate": "count_entities_with_properties", "class_id": "supplier",
+     "properties": ["legal_name", "tax_id", "tax_list_status", "sanction_status"], "target": 50, "operator": ">="},
+    {"criterion_id": "source_diversity", "aggregate": "count_distinct_source_classes", "target": 4, "operator": ">="},
+    {"criterion_id": "evidence_integrity", "aggregate": "count_values_without_evidence", "target": 0,
+     "operator": "="},
+]}
+
+
+def section11_metrics(entities: list[dict], base: dict) -> dict:
+    """metrics.json in CONTRACT §11 shape, with dod[] evaluated from the case's declarative DoD queries."""
+    domain = Domain.from_ontology(case_ontology())
+    m = dod.compute(entities, domain)
+    m.pop("primary_class")
+    rows = []
+    for q in DOD_QUERIES["queries"]:
+        actual = dod.evaluate_query(q, entities, domain)
+        rows.append({"criterion_id": q["criterion_id"], "query": dod.query_text(q), "target": q["target"],
+                     "actual": actual, "met": dod.OPS[q["operator"]](actual, q["target"])})
+    return {**base, **m, "dod": rows, "decisions_by_backend": {"recorded": len(entities)}}
+
+
+def legacy_metrics(suppliers: list[dict], base: dict) -> dict:
+    """metrics.json in the pre-§11 shape, for the adapter's tests."""
+    domain = Domain.from_ontology(LEGACY_ONTOLOGY, legacy=True)
+    m = dod.compute(legacy_to_entities(suppliers, []), domain)
+    return {**base, "suppliers_total": m["entities_total"].get("supplier", 0),
+            "suppliers_at_80pct_core": m["entities_meeting_dod"]["supplier"],
+            "per_field_completeness": m["per_property_completeness"]["supplier"],
+            "distinct_source_types": m["distinct_source_classes"],
+            "gold_values_without_evidence": m["values_without_evidence"]}
+
+
+def generate(out: Path, n_suppliers: int = 60, seed: int = 7, layout: str = "entities") -> Path:
+    """Write OUT/lake and OUT/case. Returns the lake root (use as PA_GOLD_DIR).
+
+    layout="entities" writes the CONTRACT §11 export (entities.jsonl + ontology.json + metrics with dod[]);
+    layout="legacy" writes the pre-§11 suppliers.jsonl + contracts.jsonl, which the app reads through its adapter.
+    """
     lake, case = out / "lake", out / "case"
     bronze = _Bronze(lake)
     rng = random.Random(seed)
     base = _suppliers(rng, n_suppliers)
     contracts = _contracts(rng, base)
     for run_id, count, degrade in ((RUNS[0], n_suppliers - 6, 0.12), (RUNS[1], n_suppliers, 0.03)):
-        suppliers, run_contracts, trace, metrics = _render_run(run_id, base[:count], contracts, bronze,
-                                                               random.Random(seed + count), degrade)
+        suppliers, run_contracts, trace, base_metrics = _render_run(run_id, base[:count], contracts, bronze,
+                                                                    random.Random(seed + count), degrade)
         run_dir = lake / "gold" / CASE_ID / run_id
         run_dir.mkdir(parents=True, exist_ok=True)
-        for name, rows in (("suppliers", suppliers), ("contracts", run_contracts), ("trace", trace)):
+        if layout == "legacy":
+            files = (("suppliers", suppliers), ("contracts", run_contracts), ("trace", trace))
+            metrics = legacy_metrics(suppliers, base_metrics)
+        else:
+            entities = legacy_to_entities(suppliers, run_contracts)
+            files = (("entities", entities), ("trace", trace))
+            metrics = section11_metrics(entities, base_metrics)
+            (run_dir / "ontology.json").write_text(json.dumps(case_ontology(), indent=2))
+            (run_dir / "dod-queries.json").write_text(json.dumps(DOD_QUERIES, indent=2))
+        for name, rows in files:
             (run_dir / f"{name}.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
         (run_dir / "metrics.json").write_text(json.dumps(metrics, indent=2))
         if run_id == RUNS[1]:
@@ -506,7 +573,9 @@ def generate(out: Path, n_suppliers: int = 60, seed: int = 7) -> Path:
         (case / rel).write_text(text)
     for stale in case.glob("**/APPROVED"):  # regenerated fixtures start with every checkpoint pending
         stale.unlink()
-    fixture_case.write(case)
+    fixture_case.write(case, case_ontology() if layout != "legacy" else None)
+    if layout != "legacy":
+        (case / "02-ontology" / "dod-queries.json").write_text(json.dumps(DOD_QUERIES, indent=2))
     objectives = {"ontology_version": "v1", "prd_path": "01-scope/prd.md", "generated_by": GEN, "objectives": [
         {"id": objective, "source_id": source_id, "source_url": f"https://{host}/",
          "target_fields": sorted(f for f, s in FIELD_SOURCE.items() if s == source_id) or ["founding_date"],

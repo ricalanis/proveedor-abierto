@@ -13,66 +13,32 @@ import yaml
 
 from .gold import Run
 
-# Plain-language rule descriptions for rule ids we know. Unknown rule ids fall back to the flag's own label.
-RULES = {
-    "tax_list_listed": {
-        "checks": "Whether the supplier's RFC appears on the tax authority's published list of companies presumed "
-                  "or confirmed to issue invoices for simulated operations.",
-        "verify": ["Open the list capture and confirm the RFC matches exactly (not a similar name).",
-                   "Check the listing stage: 'presunto' can still be rebutted; 'definitivo' is a final finding.",
-                   "Compare the listing date with the contract dates."],
-    },
-    "sanctioned_supplier": {
-        "checks": "Whether the supplier appears in the registry of sanctioned suppliers.",
-        "verify": ["Confirm the registry entry refers to this legal entity (RFC, not only the name).",
-                   "Check the sanction's start and end dates and whether it covers the contracting agency.",
-                   "Look for a later court decision that suspends the sanction."],
-    },
-    "founded_shortly_before_award": {
-        "checks": "Whether the company was founded within a year before its first recorded public contract.",
-        "verify": ["Confirm the founding date in the company registry or official gazette capture.",
-                   "Check the procedure's experience requirements and whether the company met them.",
-                   "Look for a predecessor company with the same partners or address."],
-    },
-    "shared_address_bidders": {
-        "checks": "Whether two participants in the same procedure declare the same address.",
-        "verify": ["Compare both address captures character by character.",
-                   "Check whether the address is a large office building or a business centre.",
-                   "Look for shared representatives, partners or phone numbers between the two companies."],
-    },
-}
-
-LINK_TYPES = ("shared_address", "shared_representative", "same_procedure")
-
-
-def rule_info(rule_id: str, label: str = "") -> dict:
-    return RULES.get(rule_id, {"checks": label or rule_id, "verify": []})
-
 
 def signals_by_rule(run: Run) -> list[dict]:
-    """[{rule_id, label, info, hits: [(supplier, index, flag)]}] sorted by number of hits."""
+    """[{rule_id, label, info, hits: [(entity, index, flag)]}] sorted by number of hits. Rule text comes from the
+    ontology's rules (CONTRACT §11a); unknown rule ids fall back to the flag's own label."""
     groups: dict[str, dict] = {}
-    for s in run.suppliers:
-        for i, f in enumerate(s.get("flags") or []):
+    for e in run.primary:
+        for i, f in enumerate(e.get("flags") or []):
             g = groups.setdefault(f["rule_id"], {"rule_id": f["rule_id"], "label": f["label"], "hits": []})
-            g["hits"].append((s, i, f))
+            g["hits"].append((e, i, f))
     out = sorted(groups.values(), key=lambda g: (-len(g["hits"]), g["rule_id"]))
     for g in out:
-        g["info"] = rule_info(g["rule_id"], g["label"])
+        g["info"] = run.domain.rule(g["rule_id"], g["label"])
     return out
 
 
-def dispute_record(run: Run, supplier: dict, flag: dict) -> dict:
-    """What a company would send to contest a signal: the rule, the values and the captures behind them."""
+def dispute_record(run: Run, entity: dict, flag: dict) -> dict:
+    """What the entity's representative would send to contest a signal: the rule, the values and the captures."""
     values = []
     for vid in flag.get("evidence_value_ids") or []:
         ref = run.values.get(vid)
         if ref:
-            values.append({"value_id": vid, "supplier_id": ref.supplier_id, "field": ref.field,
+            values.append({"value_id": vid, "entity_id": ref.entity_id, "property": ref.prop,
                            "value": ref.data.get("value"),
                            "evidence": [{"url": e.get("url"), "bronze_key": e.get("bronze_key"),
                                          "captured_at": e.get("captured_at")} for e in ref.data.get("evidence") or []]})
-    return {"case_id": run.case_id, "run_id": run.run_id, "supplier_id": supplier["id"], "rule_id": flag["rule_id"],
+    return {"case_id": run.case_id, "run_id": run.run_id, "entity_id": entity["id"], "rule_id": flag["rule_id"],
             "signal": flag["label"], "values": values,
             "correction": "<what is wrong, and the official document that shows the correct value>"}
 
@@ -94,15 +60,15 @@ class Cluster:
 
 
 def cluster_summary(run: Run, cluster: Cluster) -> list[dict]:
-    """What connects a group, one line per shared value: {type, value, value_id, supplier_id, members: [1-based]}."""
+    """What connects a group, one line per shared value: {type, value, value_id, entity_id, members: [1-based]}."""
     index = {m: i + 1 for i, m in enumerate(cluster.members)}
     lines: dict[tuple, dict] = {}
     for e in cluster.edges:
         ref = run.values.get(e.get("via_value_id") or "")
-        shared = None if e["type"] == "same_procedure" or not ref else ref.data.get("value")
+        shared = ref.data.get("value") if ref else None
         line = lines.setdefault((e["type"], shared), {
-            "type": e["type"], "value": shared, "value_id": ref.value_id if ref and shared else None,
-            "supplier_id": ref.supplier_id if ref and shared else None, "members": set(), "pairs": [],
+            "type": e["type"], "value": shared, "value_id": ref.value_id if ref and shared is not None else None,
+            "entity_id": ref.entity_id if ref and shared is not None else None, "members": set(), "pairs": [],
         })
         line["members"].update((index[e["a"]], index[e["b"]]))
         line["pairs"].append((index[e["a"]], index[e["b"]]))
@@ -111,12 +77,13 @@ def cluster_summary(run: Run, cluster: Cluster) -> list[dict]:
         line["members"] = sorted(line["members"])
         line["pairs"].sort()
         out.append(line)
-    order = {t: i for i, t in enumerate(LINK_TYPES)}
-    return sorted(out, key=lambda x: (order.get(x["type"], 9), x["members"]))
+    order = {t: i for i, t in enumerate(run.domain.relations)}
+    return sorted(out, key=lambda x: (order.get(x["type"], 99), x["members"]))
 
 
 def clusters(run: Run, types: tuple[str, ...]) -> list[Cluster]:
-    """Connected components over the chosen link types, largest first. Edges are deduplicated (a-b == b-a)."""
+    """Connected components over the chosen relations between primary entities, largest first. Edges are
+    deduplicated (a-b == b-a)."""
     parent: dict[str, str] = {}
 
     def find(x: str) -> str:
@@ -126,15 +93,16 @@ def clusters(run: Run, types: tuple[str, ...]) -> list[Cluster]:
             x = parent[x]
         return x
 
+    primary = {e["id"] for e in run.primary}
     edges: dict[tuple, dict] = {}
-    for s in run.suppliers:
-        for link in s.get("links") or []:
-            if link["type"] not in types or link["target"] not in run.suppliers_by_id:
+    for e in run.primary:
+        for link in e.get("links") or []:
+            if link.get("property") not in types or link.get("target") not in primary:
                 continue
-            a, b = sorted((s["id"], link["target"]))
-            key = (a, b, link["type"])
+            a, b = sorted((e["id"], link["target"]))
+            key = (a, b, link["property"])
             if key not in edges:
-                edges[key] = {"a": a, "b": b, "type": link["type"], "via_value_id": link.get("via_value_id")}
+                edges[key] = {"a": a, "b": b, "type": link["property"], "via_value_id": link.get("via_value_id")}
             parent[find(a)] = find(b)
     groups: dict[str, Cluster] = {}
     for e in edges.values():
@@ -151,16 +119,16 @@ def clusters(run: Run, types: tuple[str, ...]) -> list[Cluster]:
 
 # Watchlist: what changed between two runs ------------------------------------------------------------------------
 
-def diff_supplier(old: dict | None, new: dict | None) -> list[dict]:
-    """Human-readable changes for one supplier between two runs."""
+def diff_entity(old: dict | None, new: dict | None) -> list[dict]:
+    """Human-readable changes for one entity between two runs."""
     if new is None:
         return [{"kind": "gone", "text": "No longer in the latest run"}]
     if old is None:
         return [{"kind": "new", "text": "First appears in this run"}]
     changes = []
-    of, nf = old.get("fields") or {}, new.get("fields") or {}
-    for name in sorted(set(of) | set(nf)):
-        a, b = of.get(name) or {}, nf.get(name) or {}
+    op, np_ = old.get("properties") or {}, new.get("properties") or {}
+    for name in sorted(set(op) | set(np_)):
+        a, b = op.get(name) or {}, np_.get(name) or {}
         if a.get("value") != b.get("value") or a.get("status") != b.get("status"):
             changes.append({"kind": "field", "field": name, "before": a.get("value"), "after": b.get("value"),
                             "status_before": a.get("status"), "status_after": b.get("status"),
@@ -173,9 +141,10 @@ def diff_supplier(old: dict | None, new: dict | None) -> list[dict]:
     for f in old.get("flags") or []:
         if f["rule_id"] not in new_rules:
             changes.append({"kind": "signal_cleared", "text": f["label"]})
-    added = set(new.get("contract_ids") or []) - set(old.get("contract_ids") or [])
+    old_links = {(x.get("property"), x.get("target")) for x in old.get("links") or []}
+    added = [x for x in new.get("links") or [] if (x.get("property"), x.get("target")) not in old_links]
     if added:
-        changes.append({"kind": "contracts", "text": f"{len(added)} new contract{'s' if len(added) > 1 else ''}"})
+        changes.append({"kind": "links", "text": f"{len(added)} new link{'s' if len(added) > 1 else ''}"})
     return changes
 
 

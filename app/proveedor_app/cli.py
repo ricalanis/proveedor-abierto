@@ -47,7 +47,12 @@ def _serve(args: argparse.Namespace) -> int:
 
 
 def _fixtures(args: argparse.Namespace) -> int:
-    lake = fixtures.generate(Path(args.out), n_suppliers=args.suppliers)
+    if args.domain == "libraries":
+        from . import fixture_libraries
+
+        lake = fixture_libraries.generate(Path(args.out))
+    else:
+        lake = fixtures.generate(Path(args.out), n_suppliers=args.suppliers, layout=args.layout)
     print(f"PA_GOLD_DIR={lake}")
     print(f"PA_CASE_DIR={Path(args.out) / 'case'}")
     return 0
@@ -81,31 +86,27 @@ def _snapshot(args: argparse.Namespace) -> int:
 def _dod(args: argparse.Namespace) -> int:
     store = GoldStore(LocalSource(args.gold_dir)) if args.gold_dir else load_store(REPO_ROOT)
     run = store.run(args.run_id)
-    recomputed = dod.compute(run.suppliers)
-    problems = dod.cross_check(recomputed, run.metrics)
+    recomputed = dod.compute(run.entities, run.domain)
+    problems = dod.cross_check(recomputed, run.metrics, run.domain)
     backend = run.inference_backend
-    met = dod.dod_met(recomputed, backend)
-    report = {"case_id": store.case_id, "run_id": run.run_id, "inference_backend": backend, "recomputed": recomputed,
-              "dod_met": met, "mismatches": problems}
+    rows = dod.criteria(recomputed, run.metrics, run.domain, backend, run.dod_queries, run.entities)
+    report = {"case_id": store.case_id, "run_id": run.run_id, "layout": run.layout,
+              "primary_class": run.domain.primary_class, "inference_backend": backend, "recomputed": recomputed,
+              "criteria": rows, "mismatches": problems}
     if args.json:
         print(json.dumps(report, indent=2))
     else:
-        print(f"run {run.run_id} ({store.case_id}), inference backend: {backend or 'not stated'}")
+        cls = run.domain.primary_class
+        print(f"run {run.run_id} ({store.case_id}), primary class {cls}, layout {run.layout}, "
+              f"inference backend: {backend or 'not stated'}")
         if backend == "recorded":
             print("  NOT DONE: this run used recorded (simulated) inference; it cannot satisfy the DoD")
-        for key in dod.DOD_KEYS:
-            target = dod.TARGETS.get(key)
-            if target is None:
-                mark = ""
-            elif backend == "recorded":
-                mark = "  not counted (recorded inference)"
-            elif met[key]:
-                mark = "  ok"
-            else:
-                mark = f"  target {target} not met"
-            print(f"  {key:30} {recomputed[key]}{mark}")
-        for name, ratio in recomputed["per_field_completeness"].items():
-            print(f"  completeness.{name:19} {ratio:.1%}")
+        for row in rows:
+            state = "not counted (recorded inference)" if row["mock"] else ("met" if row["met"] else "not met")
+            actual = row["actual"] if row["recomputed"] else f"{row['engine_actual']} (engine; not recomputed)"
+            print(f"  {row['criterion_id']:28} {actual} vs target {row['target']}  {state}")
+        for prop, ratio in recomputed["per_property_completeness"][cls].items():
+            print(f"  completeness.{prop:19} {ratio:.1%}")
         print("  cross-check vs engine metrics.json: " + ("match" if not problems else "MISMATCH"))
         for p in problems:
             print(f"    - {p}")
@@ -149,6 +150,10 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("fixtures", help="write a synthetic gold export + case package")
     p.add_argument("out", nargs="?", default=str(FIXTURE_DIR))
     p.add_argument("--suppliers", type=int, default=60)
+    p.add_argument("--domain", choices=("procurement", "libraries"), default="procurement",
+                   help="libraries: a second, unrelated domain for the genericity proof")
+    p.add_argument("--layout", choices=("entities", "legacy"), default="entities",
+                   help="legacy: the pre-§11 suppliers.jsonl/contracts.jsonl export the adapter reads")
     p.set_defaults(fn=_fixtures)
 
     p = sub.add_parser("dod", help="recompute the DoD keys from gold and cross-check metrics.json")

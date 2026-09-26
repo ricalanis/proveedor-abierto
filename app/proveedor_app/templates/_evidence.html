@@ -1,6 +1,6 @@
 <div class="ev" data-value-id="{{ selected.value_id }}">
   <p class="ev__what">
-    <span class="ev__field">{{ selected.field|field_label }}</span>
+    <span class="ev__field">{{ domain.prop_label(selected.prop) }}</span>
     <span class="ev__value">{{ selected.data.value if selected.data.value is not none else "not found" }}</span>
   </p>
   <p class="ev__meta">
@@ -23,7 +23,7 @@
   {% for e in selected.data.evidence or [] %}
     <li class="capture">
       <p class="capture__src">
-        <span class="capture__type">{{ SOURCE_TYPE_LABELS.get(e.source_type, (e.source_type or "")|replace("_", " ")) }}{% if e.format %} · <span class="mono">{{ e.format }}</span>{% endif %}</span>
+        <span class="capture__type">{{ domain.source_label(e.source_type) }}{% if e.format %} · <span class="mono">{{ e.format }}</span>{% endif %}</span>
         {% set href = safe_url(e.url) %}
         {% if href %}<a class="source-link" href="{{ href }}" target="_blank" rel="noopener noreferrer nofollow">{{ host_of(e.url) }}<span class="mono path">{{ e.url[(e.url.find(host_of(e.url)) + host_of(e.url)|length):] }}</span></a>{% else %}<span class="mono">{{ e.url }}</span>{% endif %}
       </p>

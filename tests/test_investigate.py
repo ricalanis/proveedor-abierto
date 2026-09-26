@@ -15,7 +15,7 @@ def case_copy(fixture_root, tmp_path):
 def test_signals_pages(client, store):
     r = client.get("/signals")
     assert r.status_code == 200 and "tax_list_listed" in r.text
-    s = next(s for s in store.run().suppliers if s["flags"])
+    s = next(s for s in store.run().primary if s["flags"])
     page = client.get(f"/signals/{s['id']}/0")
     assert page.status_code == 200
     assert "Dispute this signal" in page.text and "In plain language" in page.text
@@ -26,9 +26,9 @@ def test_signals_pages(client, store):
 
 def test_dispute_record_lists_values_and_captures(store):
     run = store.run()
-    s = next(s for s in run.suppliers if s["flags"])
+    s = next(s for s in run.primary if s["flags"])
     rec = investigate.dispute_record(run, s, s["flags"][0])
-    assert rec["supplier_id"] == s["id"] and rec["values"] and rec["values"][0]["evidence"][0]["url"]
+    assert rec["entity_id"] == s["id"] and rec["values"] and rec["values"][0]["evidence"][0]["url"]
 
 
 def test_clusters_dedupe_and_group(store):
@@ -49,7 +49,7 @@ def test_relationships_page_focus(client):
 
 
 def test_journal_replays_value_to_brief(client, store):
-    ref = next(v for v in store.run().values.values() if v.field == "founding_date" and len(v.data["evidence"]) > 1)
+    ref = next(v for v in store.run().values.values() if v.prop == "founding_date" and len(v.data["evidence"]) > 1)
     r = client.get(f"/journal/{ref.value_id}")
     assert r.status_code == 200
     assert r.text.count("Phase 5 · Execute") == 2  # registry and gazette paths
@@ -66,9 +66,9 @@ def test_case_file_is_path_safe(client):
 def test_watchlist_diff_against_previous_run(client, store):
     runs = store.run_ids()
     old, new = store.run(runs[0]), store.run(runs[1])
-    added = next(i for i in new.suppliers_by_id if i not in old.suppliers_by_id)
-    changed = next(i for i in old.suppliers_by_id
-                   if investigate.diff_supplier(old.suppliers_by_id[i], new.suppliers_by_id[i]))
+    added = next(e["id"] for e in new.primary if e["id"] not in old.entities_by_id)
+    changed = next(i for i in old.entities_by_id
+                   if investigate.diff_entity(old.entities_by_id[i], new.entities_by_id[i]))
     r = client.get("/watchlist", params={"ids": f"{added},{changed},sup:not-there"})
     assert r.status_code == 200
     assert "First appears in this run" in r.text

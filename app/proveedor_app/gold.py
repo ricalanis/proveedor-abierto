@@ -24,6 +24,8 @@ from typing import Protocol
 
 import yaml
 
+from .domain import LEGACY_ONTOLOGY, Domain, legacy_to_entities
+
 DEFAULT_BRONZE_TEMPLATE = "bronze/sha256/{hex}"
 
 
@@ -94,41 +96,70 @@ def _jsonl(raw: bytes | None) -> list[dict]:
 
 @dataclass
 class ValueRef:
-    """One field value of one supplier, indexed by its value_id."""
+    """One property value of one entity, indexed by its value_id."""
 
     value_id: str
-    supplier_id: str
-    field: str
+    entity_id: str
+    prop: str
     data: dict
+
+
+def inferred_ontology(entities: list[dict]) -> dict:
+    """Last resort when an export ships entities without an ontology: most common class is primary."""
+    counts: dict[str, int] = {}
+    props: dict[str, dict[str, None]] = {}
+    for e in entities:
+        counts[e.get("class") or "entity"] = counts.get(e.get("class") or "entity", 0) + 1
+        props.setdefault(e.get("class") or "entity", {}).update(dict.fromkeys(e.get("properties") or {}))
+    primary = max(counts, key=counts.get) if counts else "entity"
+    return {"primary_class": primary, "classes": [{"id": c} for c in counts],
+            "properties": [{"id": p, "domain": c} for c, ps in props.items() for p in ps]}
 
 
 @dataclass
 class Run:
-    """One gold export run, fully loaded and indexed."""
+    """One gold export run, fully loaded and indexed. Entities follow CONTRACT §11; `domain` explains them."""
 
     case_id: str
     run_id: str
-    suppliers: list[dict]
-    contracts: list[dict]
+    entities: list[dict]
     trace: list[dict]
     metrics: dict
-    suppliers_by_id: dict[str, dict] = field(default_factory=dict)
-    contracts_by_id: dict[str, dict] = field(default_factory=dict)
+    domain: Domain
+    layout: str = "entities"  # or "legacy" (suppliers.jsonl + contracts.jsonl through the adapter)
+    dod_queries: list[dict] = field(default_factory=list)  # declarative DoD queries (dod-queries.json), if any
+    entities_by_id: dict[str, dict] = field(default_factory=dict)
     values: dict[str, ValueRef] = field(default_factory=dict)
     steps_by_id: dict[str, dict] = field(default_factory=dict)
     steps_by_value: dict[str, list[dict]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        self.suppliers_by_id = {s["id"]: s for s in self.suppliers}
-        self.contracts_by_id = {c["id"]: c for c in self.contracts}
-        for s in self.suppliers:
-            for name, f in (s.get("fields") or {}).items():
-                if f.get("value_id"):
-                    self.values[f["value_id"]] = ValueRef(f["value_id"], s["id"], name, f)
+        self.entities_by_id = {e["id"]: e for e in self.entities}
+        for e in self.entities:
+            for name, f in (e.get("properties") or {}).items():
+                if isinstance(f, dict) and f.get("value_id"):
+                    self.values[f["value_id"]] = ValueRef(f["value_id"], e["id"], name, f)
         for step in self.trace:
             self.steps_by_id[step["step_id"]] = step
             for vid in step.get("value_ids") or []:
                 self.steps_by_value.setdefault(vid, []).append(step)
+
+    @property
+    def primary(self) -> list[dict]:
+        """Entities of the ontology's primary class: the ones a dossier is about."""
+        return [e for e in self.entities if e.get("class") == self.domain.primary_class]
+
+    def title(self, entity: dict | None) -> str:
+        if not entity:
+            return "Unknown"
+        prop = self.domain.title_property(entity.get("class"))
+        f = (entity.get("properties") or {}).get(prop or "") or {}
+        return str(f.get("value")) if f.get("value") not in (None, "") else entity["id"]
+
+    def identifier(self, entity: dict | None) -> str | None:
+        prop = self.domain.identifier_property((entity or {}).get("class"))
+        f = ((entity or {}).get("properties") or {}).get(prop or "") or {}
+        return f.get("value")
 
     @cached_property
     def inference_backend(self) -> str | None:
@@ -178,6 +209,7 @@ class GoldStore:
         self.bronze_key_template = bronze_key_template
         self._case_id = case_id
         self._cache: dict[str, Run] = {}
+        self.case_dir: Path | None = None  # set by the app: the case's approved ontology describes the entities
         self.pinned_run_id: str | None = None  # PA_RUN_ID: serve this run even without latest.json (mock runs)
 
     @property
@@ -212,15 +244,60 @@ class GoldStore:
         if run_id not in self._cache:
             base = f"{self.prefix}/{run_id}"
             metrics_raw = self.source.read(f"{base}/metrics.json")
+            entities_raw = self.source.read(f"{base}/entities.jsonl")
+            layout = "entities"
+            if entities_raw is not None:
+                entities = _jsonl(entities_raw)
+            else:  # pre-§11 export: the one adapter
+                entities = legacy_to_entities(_jsonl(self.source.read(f"{base}/suppliers.jsonl")),
+                                              _jsonl(self.source.read(f"{base}/contracts.jsonl")))
+                layout = "legacy"
             self._cache[run_id] = Run(
                 case_id=self.case_id,
                 run_id=run_id,
-                suppliers=_jsonl(self.source.read(f"{base}/suppliers.jsonl")),
-                contracts=_jsonl(self.source.read(f"{base}/contracts.jsonl")),
+                entities=entities,
                 trace=_jsonl(self.source.read(f"{base}/trace.jsonl")),
                 metrics=json.loads(metrics_raw) if metrics_raw else {},
+                domain=self._domain(base, entities, layout),
+                layout=layout,
+                dod_queries=self._dod_queries(base),
             )
         return self._cache[run_id]
+
+    def _domain(self, base: str, entities: list[dict], layout: str) -> Domain:
+        """Run's own ontology.json, else the case's approved ontology, else the legacy layout, else inferred."""
+        for raw in (self.source.read(f"{base}/ontology.json"), self._case_ontology()):
+            try:
+                onto = json.loads(raw) if raw else None
+            except ValueError:
+                onto = None
+            if isinstance(onto, dict) and (onto.get("primary_class") or any(
+                    isinstance(c, dict) and c.get("primary") for c in onto.get("classes") or [])):
+                return Domain.from_ontology(onto)
+        if layout == "legacy":
+            return Domain.from_ontology(LEGACY_ONTOLOGY, legacy=True)
+        return Domain.from_ontology(inferred_ontology(entities))
+
+    def _dod_queries(self, base: str) -> list[dict]:
+        """Run's dod-queries.json, else the case's (02-ontology/dod-queries.json)."""
+        raws = [self.source.read(f"{base}/dod-queries.json")]
+        if self.case_dir:
+            path = Path(self.case_dir) / "02-ontology" / "dod-queries.json"
+            raws.append(path.read_bytes() if path.is_file() else None)
+        for raw in raws:
+            try:
+                doc = json.loads(raw) if raw else None
+            except ValueError:
+                doc = None
+            if isinstance(doc, dict) and isinstance(doc.get("queries"), list):
+                return doc["queries"]
+        return []
+
+    def _case_ontology(self) -> bytes | None:
+        if not self.case_dir:
+            return None
+        path = Path(self.case_dir) / "02-ontology" / "ontology.json"
+        return path.read_bytes() if path.is_file() else None
 
     def refresh(self) -> None:
         self._cache.clear()

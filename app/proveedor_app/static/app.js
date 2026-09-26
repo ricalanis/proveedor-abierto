@@ -6,7 +6,7 @@
   async function showEvidence(link) {
     const valueId = link.dataset.evidence;
     const target = new URL(link.href, location.href);
-    if (!panel || target.pathname !== location.pathname) return false; // evidence of another supplier: navigate
+    if (!panel || target.pathname !== location.pathname) return false; // evidence of another entity: navigate
     aside.setAttribute("aria-busy", "true");
     try {
       const run = new URLSearchParams(location.search).get("run");
@@ -58,12 +58,14 @@
         row.querySelector('[data-bind="delta"]').textContent =
           f.delta === null ? "" : `${f.delta >= 0 ? "+" : ""}${Math.round(f.delta * 100)} pts`;
       }
-      for (const item of document.querySelectorAll(".dod__item")) {
-        const key = item.dataset.key;
-        item.querySelector(".dod__num").textContent = m.recomputed[key];
+      for (const c of m.criteria || []) {
+        const item = document.querySelector(`.dod__item[data-key="${CSS.escape(c.criterion_id)}"]`);
+        if (!item) continue;
+        const actual = c.recomputed ? c.actual : c.engine_actual;
+        item.querySelector('[data-bind="actual"]').textContent = actual === null || actual === undefined ? "—" : actual;
         const state = item.querySelector(".dod__state");
-        state.dataset.met = String(m.met[key]);
-        state.textContent = m.met[key] ? "Met" : "Not yet";
+        state.dataset.met = String(c.met);
+        state.textContent = c.mock ? "Not counted (mock)" : c.met ? "Met" : "Not yet";
       }
       const cc = document.getElementById("crosscheck");
       cc.classList.toggle("crosscheck--bad", m.mismatches.length > 0);
@@ -92,7 +94,7 @@
     const sync = () => {
       const on = read().includes(id);
       btn.setAttribute("aria-pressed", String(on));
-      btn.textContent = on ? "Watching" : "Watch this supplier";
+      btn.textContent = on ? "Watching" : "Watch";
     };
     sync();
     btn.addEventListener("click", (event) => {

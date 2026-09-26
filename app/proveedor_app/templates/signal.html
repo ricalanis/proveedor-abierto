@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}{{ flag.label }} · {{ supplier_name(s) }}{% endblock %}
+{% block title %}{{ flag.label }} · {{ run.title(e) }}{% endblock %}
 {% block main %}
-<nav class="crumbs" aria-label="Breadcrumb"><a href="/signals">Signals</a> <span aria-hidden="true">/</span> <a href="/suppliers/{{ s.id }}">{{ supplier_name(s) }}</a></nav>
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/signals">Signals</a> <span aria-hidden="true">/</span> <a href="/entities/{{ e.id }}">{{ run.title(e) }}</a></nav>
 <article class="explainer">
   <header class="explainer__head">
     <p class="explainer__kind">Signal to verify · <span class="mono">{{ flag.rule_id }}</span></p>
     <h1>{{ flag.label }}</h1>
-    <p class="explainer__who">{{ supplier_name(s) }} <span class="mono muted">{{ ((s.fields or {}).tax_id or {}).value or s.id }}</span></p>
+    <p class="explainer__who">{{ run.title(e) }} <span class="mono muted">{{ run.identifier(e) or e.id }}</span></p>
   </header>
 
   <section class="block" aria-labelledby="why-h">
@@ -25,7 +25,7 @@
     <div class="ev-stack">
     {% for selected in refs %}
       <div class="ev-card">
-        {% if selected.supplier_id != s.id %}<p class="note">From <a href="/suppliers/{{ selected.supplier_id }}">{{ supplier_name(run.suppliers_by_id.get(selected.supplier_id)) }}</a></p>{% endif %}
+        {% if selected.entity_id != e.id %}<p class="note">From <a href="/entities/{{ selected.entity_id }}">{{ run.title(run.entities_by_id.get(selected.entity_id)) }}</a></p>{% endif %}
         {% include "_evidence.html" %}
       </div>
     {% endfor %}
@@ -41,7 +41,7 @@
 
   <section class="block dispute" aria-labelledby="dispute-h">
     <h2 id="dispute-h">Dispute this signal</h2>
-    <p>If you represent this company and a value is wrong, two things fix it. First, request the correction from the official source that published it; the capture above links to it. Second, send the record below with the document that shows the correct value. Once the source changes, the next run re-captures it, and the signal clears if the rule no longer holds.</p>
+    <p>If you represent this {{ domain.class_label()|lower }} and a value is wrong, two things fix it. First, request the correction from the official source that published it; the capture above links to it. Second, send the record below with the document that shows the correct value. Once the source changes, the next run re-captures it, and the signal clears if the rule no longer holds.</p>
     <details>
       <summary>Dispute record for this signal</summary>
       <pre class="record" id="dispute-record">{{ dispute }}</pre>

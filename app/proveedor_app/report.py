@@ -92,9 +92,11 @@ def build(store: GoldStore, run: Run, case: CaseDir) -> dict:
     card["taxonomies"] = taxonomies
     card["ontology_present"] = onto is not None
 
-    recomputed = dod.compute(run.suppliers)
-    card["dod"] = {"recomputed": recomputed, "met": dod.dod_met(recomputed, backend), "targets": dod.TARGETS,
-                   "mismatches": dod.cross_check(recomputed, run.metrics) if run.metrics else ["no metrics.json"]}
+    recomputed = dod.compute(run.entities, run.domain)
+    card["dod"] = {"recomputed": recomputed, "criteria": dod.criteria(recomputed, run.metrics or {}, run.domain, backend, run.dod_queries,
+                                                   run.entities),
+                   "mismatches": dod.cross_check(recomputed, run.metrics, run.domain) if run.metrics
+                   else ["no metrics.json"]}
 
     steps = store.live_steps(run.run_id) or list(run.trace)
     card["honesty"] = honesty(steps)
@@ -105,7 +107,7 @@ def build(store: GoldStore, run: Run, case: CaseDir) -> dict:
             if b:
                 by_backend[b] = by_backend.get(b, 0) + 1
     card["backends"] = by_backend
-    card["jev_only_gold"] = [(ref.supplier_id, ref.field, ref.value_id) for ref in run.values.values()
+    card["jev_only_gold"] = [(ref.entity_id, ref.prop, ref.value_id) for ref in run.values.values()
                              if ref.data.get("status") == "gold" and dod.jev_only(ref.data)]
     card["macros"] = macro_replays(case)
     proof = live.proof(store.live_jobs(run.run_id))

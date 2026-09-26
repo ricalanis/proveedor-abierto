@@ -9,16 +9,17 @@ def test_latest_run_and_indexes(store):
     assert store.case_id == "fixture-case"
     assert run.run_id == "run-fixture-0001"
     assert store.run_ids() == ["run-fixture-0000", "run-fixture-0001"]
-    assert len(run.suppliers) == 60
-    s = run.suppliers[0]
-    vid = s["fields"]["legal_name"]["value_id"]
-    assert run.values[vid].supplier_id == s["id"]
+    assert len(run.primary) == 60
+    s = run.primary[0]
+    vid = s["properties"]["legal_name"]["value_id"]
+    assert run.values[vid].entity_id == s["id"]
 
 
 def test_every_value_is_traceable_to_phase_1(store):
     run = store.run()
+    primary = {e["id"] for e in run.primary}
     for vid in run.values:
-        if run.values[vid].data["status"] == "missing":
+        if run.values[vid].data["status"] == "missing" or run.values[vid].entity_id not in primary:
             continue
         chains = run.lineage(vid)
         assert chains, vid
@@ -28,7 +29,7 @@ def test_every_value_is_traceable_to_phase_1(store):
 
 
 def test_bronze_lookup_and_key_validation(store):
-    ev = store.run().suppliers[0]["fields"]["legal_name"]["evidence"][0]
+    ev = store.run().primary[0]["properties"]["legal_name"]["evidence"][0]
     shot = store.bronze(ev["screenshot_key"])
     assert shot and sniff_media_type(shot) == "image/svg+xml"
     assert store.bronze("sha256:../../etc/passwd") is None
@@ -53,7 +54,7 @@ def test_load_store_file_lake_yaml(fixture_root, tmp_path):
 
 
 def test_bronze_meta_sidecar(store):
-    ev = store.run().suppliers[0]["fields"]["legal_name"]["evidence"][0]
+    ev = store.run().primary[0]["properties"]["legal_name"]["evidence"][0]
     assert store.bronze_meta(ev["screenshot_key"])["content_type"] == "image/svg+xml"
     assert store.bronze_meta("sha256:00") == {}
 

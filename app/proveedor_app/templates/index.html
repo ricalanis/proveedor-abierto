@@ -1,20 +1,24 @@
 {% extends "base.html" %}
-{% block title %}Suppliers{% endblock %}
+{% set plural = domain.class_label(plural=True) %}
+{% set dod_props = domain.dod_props() %}
+{% set title_prop = domain.title_property() %}
+{% set id_prop = domain.identifier_property() %}
+{% block title %}{{ plural }}{% endblock %}
 {% block main %}
 <section class="page-head">
-  <h1>Suppliers</h1>
-  <p class="lede">{{ run.suppliers|length }} legal entities that received public contracts in this run. Open one to see every field with the capture it came from.</p>
+  <h1>{{ plural }}</h1>
+  <p class="lede">{{ rows|length if not q and show == "all" else run.primary|length }} {{ plural|lower }} in this run. Open one to see every property with the capture it came from.</p>
 </section>
 
 <form class="finder" method="get" action="/" role="search">
-  <label class="finder__label" for="q">Name, RFC or ID</label>
+  <label class="finder__label" for="q">{{ domain.prop_label(title_prop) if title_prop else "Name" }}{% if id_prop %}, {{ domain.prop_label(id_prop) }}{% endif %} or ID</label>
   <div class="finder__row">
-    <input id="q" name="q" type="search" value="{{ q }}" autocomplete="off" placeholder="e.g. Proveedor Ejemplo 07 or ZZZ…">
+    <input id="q" name="q" type="search" value="{{ q }}" autocomplete="off">
     <input type="hidden" name="show" value="{{ show }}">
     <button type="submit">Search</button>
   </div>
   <div class="filters" role="group" aria-label="Filter">
-    {% for key, label in [("all", "All"), ("signals", "With signals"), ("incomplete", "Core profile below 80%"), ("conflicts", "Conflicting sources")] %}
+    {% for key, label in [("all", "All"), ("signals", "With signals"), ("incomplete", "Profile below " ~ (domain.dod_threshold * 100)|round|int ~ "%"), ("conflicts", "Conflicting sources")] %}
       <a href="/?q={{ q|urlencode }}&show={{ key }}" {% if show == key %}aria-current="true"{% endif %}>{{ label }}</a>
     {% endfor %}
   </div>
@@ -26,36 +30,36 @@
 <table class="ledger ledger--index">
   <thead>
     <tr>
-      <th scope="col">Supplier</th>
-      <th scope="col">Core profile <span class="th-note">{% for f in CORE_FIELDS %}{{ f|field_label }}{% if not loop.last %} · {% endif %}{% endfor %}</span></th>
+      <th scope="col">{{ domain.class_label() }}</th>
+      <th scope="col">Profile <span class="th-note">{% for p in dod_props %}{{ p.label }}{% if not loop.last %} · {% endif %}{% endfor %}</span></th>
       <th scope="col" class="num">Signals</th>
-      <th scope="col" class="num">Contracts</th>
+      <th scope="col" class="num">Linked</th>
     </tr>
   </thead>
   <tbody>
   {% for row in rows %}
-    {% set s = row.s %}
+    {% set e = row.e %}
     <tr>
       <th scope="row">
-        <a class="entity" href="/suppliers/{{ s.id }}">{{ supplier_name(s) }}</a>
-        <span class="mono sub">{{ (row.fields.tax_id or {}).value or "RFC missing" }}</span>
+        <a class="entity" href="/entities/{{ e.id }}">{{ run.title(e) }}</a>
+        {% if id_prop %}<span class="mono sub">{{ (row.props[id_prop] or {}).value or (domain.prop_label(id_prop) ~ " missing") }}</span>{% endif %}
       </th>
       <td>
-        <span class="cells" aria-label="Core profile {{ row.ratio|pct }} complete">
-          {% for f in CORE_FIELDS %}{% set st = (row.fields[f] or {}).status or "missing" %}<span class="cell cell--{{ st }}" title="{{ f|field_label }}: {{ st }}"></span>{% endfor %}
+        <span class="cells" aria-label="Profile {{ row.ratio|pct }} complete">
+          {% for p in dod_props %}{% set st = (row.props[p.id] or {}).status or "missing" %}<span class="cell cell--{{ st }}" title="{{ p.label }}: {{ st }}"></span>{% endfor %}
         </span>
         <span class="mono sub">{{ row.ratio|pct }}</span>
       </td>
       <td class="num">
-        {% if s.flags %}<span class="signal-count">{{ s.flags|length }}</span>{% else %}<span class="muted">0</span>{% endif %}
+        {% if e.flags %}<span class="signal-count">{{ e.flags|length }}</span>{% else %}<span class="muted">0</span>{% endif %}
       </td>
-      <td class="num">{{ (s.contract_ids or [])|length }}</td>
+      <td class="num">{{ row.linked }}</td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
 {% else %}
-<p class="empty">No supplier matches. Clear the search or pick another filter.</p>
+<p class="empty">Nothing matches. Clear the search or pick another filter.</p>
 {% endif %}
 {% endblock %}

@@ -52,10 +52,10 @@ def page(browser):
 def test_dossier_evidence_click_shows_source_link(page, base_url, store):
     page.goto(base_url + "/")
     page.locator("a.entity", has_text="Proveedor Ejemplo 05").click()
-    page.wait_for_url("**/suppliers/sup:fixture-005")
+    page.wait_for_url("**/entities/sup:fixture-005")
     assert page.locator("h1").inner_text() == "Proveedor Ejemplo 05 S.A. de C.V."
 
-    field = store.run().suppliers_by_id["sup:fixture-005"]["fields"]["tax_id"]
+    field = store.run().entities_by_id["sup:fixture-005"]["properties"]["tax_id"]
     page.locator(f'a.ev-link[data-evidence="{field["value_id"]}"]').click()
     link = page.locator("#evidence-panel a.source-link").first
     link.wait_for()
@@ -77,7 +77,7 @@ def test_signal_evidence_link_opens_capture(page, base_url):
 def test_no_js_evidence_fallback(browser, base_url, store):
     ctx = browser.new_context(java_script_enabled=False)
     pg = ctx.new_page()
-    field = store.run().suppliers_by_id["sup:fixture-001"]["fields"]["address"]
+    field = store.run().entities_by_id["sup:fixture-001"]["properties"]["address"]
     pg.goto(base_url + "/suppliers/sup:fixture-001")
     pg.locator(f'a.ev-link[data-evidence="{field["value_id"]}"]').click()
     assert pg.locator("#evidence-panel a.source-link").first.get_attribute("href") == field["evidence"][0]["url"]
@@ -88,9 +88,11 @@ def test_completeness_view(page, base_url, store):
     page.goto(base_url + "/completeness")
     rows = page.locator("#field-bars tbody tr")
     assert rows.count() == 6
-    assert page.locator(".dod__item[data-key=suppliers_at_80pct_core] .dod__num").inner_text() == str(
-        store.run().metrics["suppliers_at_80pct_core"]
-    )
+    run = store.run()
+    first = run.metrics["dod"][1]
+    tile = page.locator(f'.dod__item[data-key="{first["criterion_id"]}"]')
+    assert tile.locator(".dod__num").inner_text() == str(first["actual"])
+    assert first["query"] in tile.inner_text()
     assert "matches" in page.locator("#crosscheck").inner_text()
 
 

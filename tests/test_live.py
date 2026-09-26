@@ -63,7 +63,7 @@ def test_replay_writes_feed_and_publishes_gold(lake):
     store = GoldStore(LocalSource(lake))
     assert store.live_run_id() == "rehearsal-1"
     status = store.live_status("rehearsal-1")
-    assert status["state"] == "done" and status["metrics"]["suppliers_total"] == 60
+    assert status["state"] == "done" and status["metrics"]["entities_total"]["supplier"] == 60
     assert len(store.live_steps("rehearsal-1")) == len(store.run("run-fixture-0001").trace)
     jobs = store.live_jobs("rehearsal-1")
     assert jobs and all(live.checkpoint_state(j, "teardown") == "pass" for j in jobs)
@@ -80,7 +80,9 @@ def test_simulated_inference_banner_and_dod(lake, fixture_root):
     assert "Simulated inference." in c.get("/").text
     page = c.get("/completeness").text
     assert "Simulated inference." in page and "✓" not in page.split("dod__grid")[1].split("</dl>")[0]
-    assert all(v is False for v in dod.dod_met(metrics, "recorded").values())
+    run = GoldStore(LocalSource(lake)).run()
+    rows = dod.criteria(dod.compute(run.entities, run.domain), run.metrics, run.domain, "recorded")
+    assert all(r["met"] is False and r["mock"] for r in rows)
     status = json.loads((lake / "runs/fixture-case/run-fixture-0001/status.json").read_text())
     status["generated_by"] = {"backend": "recorded", "model": "double", "at": "2026-09-26T18:00:00Z"}
     (lake / "runs/fixture-case/run-fixture-0001/status.json").write_text(json.dumps(status))
@@ -88,12 +90,13 @@ def test_simulated_inference_banner_and_dod(lake, fixture_root):
 
 
 def test_value_level_recorded_tag(lake, fixture_root):
-    path = lake / "gold" / "fixture-case" / "run-fixture-0001" / "suppliers.jsonl"
+    path = lake / "gold" / "fixture-case" / "run-fixture-0001" / "entities.jsonl"
     rows = [json.loads(line) for line in path.read_text().splitlines()]
-    rows[0]["fields"]["address"]["generated_by"] = {"backend": "recorded", "model": "double", "at": "2026-09-26"}
+    rows.sort(key=lambda r: r["class"] != "supplier")  # suppliers first; contracts keep their place after
+    rows[0]["properties"]["address"]["generated_by"] = {"backend": "recorded", "model": "double", "at": "2026-09-26"}
     path.write_text("".join(json.dumps(r) + "\n" for r in rows))
     c = _client(lake, fixture_root / "case")
-    frag = c.get(f"/fragments/evidence/{rows[0]['fields']['address']['value_id']}").text
+    frag = c.get(f"/fragments/evidence/{rows[0]['properties']['address']['value_id']}").text
     assert "Simulated inference" in frag
     assert "Simulated inference." in c.get("/").text  # one recorded value marks the whole run
 
@@ -153,7 +156,7 @@ def test_snapshot_then_replay_offline(lake, tmp_path, fixture_root):
     assert report["missing_bronze"] == 0 and report["bronze"] > 100
     snap = GoldStore(LocalSource(out))
     run = snap.run()
-    ev = run.suppliers[0]["fields"]["address"]["evidence"][0]
+    ev = run.primary[0]["properties"]["address"]["evidence"][0]
     assert snap.bronze(ev["screenshot_key"]) and snap.bronze_meta(ev["screenshot_key"])
     assert snap.live_jobs("run-fixture-0001")
     rep = live.Replayer(out, "run-fixture-0001", speed=1000.0, new_run_id="offline-1")
@@ -202,11 +205,12 @@ def test_preview_output_is_labelled(lake, fixture_root):
 
 
 def test_evidence_format_is_shown(lake, fixture_root):
-    path = lake / "gold" / "fixture-case" / "run-fixture-0001" / "suppliers.jsonl"
+    path = lake / "gold" / "fixture-case" / "run-fixture-0001" / "entities.jsonl"
     rows = [json.loads(line) for line in path.read_text().splitlines()]
-    rows[0]["fields"]["tax_id"]["evidence"][0]["format"] = "xlsx"
+    rows.sort(key=lambda r: r["class"] != "supplier")  # suppliers first; contracts keep their place after
+    rows[0]["properties"]["tax_id"]["evidence"][0]["format"] = "xlsx"
     path.write_text("".join(json.dumps(r) + "\n" for r in rows))
-    frag = _client(lake, fixture_root / "case").get(f"/fragments/evidence/{rows[0]['fields']['tax_id']['value_id']}")
+    frag = _client(lake, fixture_root / "case").get(f"/fragments/evidence/{rows[0]['properties']['tax_id']['value_id']}")
     assert "Procurement portal" in frag.text and "xlsx" in frag.text
 
 
@@ -227,13 +231,14 @@ def test_engine_report_card_without_phase_artifacts(lake, tmp_path):
 def test_jev_only_gold_is_flagged_and_not_counted(lake, fixture_root):
     from proveedor_app import dod
 
-    path = lake / "gold" / "fixture-case" / "run-fixture-0001" / "suppliers.jsonl"
+    path = lake / "gold" / "fixture-case" / "run-fixture-0001" / "entities.jsonl"
     rows = [json.loads(line) for line in path.read_text().splitlines()]
-    target = rows[0]["fields"]["tax_id"]
+    rows.sort(key=lambda r: r["class"] != "supplier")  # suppliers first; contracts keep their place after
+    target = rows[0]["properties"]["tax_id"]
     assert target["status"] == "gold"
     target["generated_by"] = {"backend": "jev", "model": "jev-entity-match", "at": "2026-09-26T19:00:00Z"}
     for r in rows:  # make the rest live so the banner logic is exercised too
-        for f in r["fields"].values():
+        for f in r["properties"].values():
             if f is not target:
                 f["generated_by"] = {"backend": "vultr", "model": "m", "at": "2026-09-26T19:00:00Z"}
     path.write_text("".join(json.dumps(r) + "\n" for r in rows))

@@ -12,24 +12,24 @@ def test_index_filters(client):
 
 
 def test_dossier_shows_every_field_with_evidence_links(client, store):
-    s = store.run().suppliers[4]
+    s = store.run().primary[4]
     r = client.get(f"/suppliers/{s['id']}")
     assert r.status_code == 200
-    for f in s["fields"].values():
+    for f in s["properties"].values():
         if f["evidence"]:
             assert f'data-evidence="{f["value_id"]}"' in r.text
 
 
 def test_dossier_server_renders_selected_evidence(client, store):
-    s = store.run().suppliers[0]
-    f = s["fields"]["tax_id"]
+    s = store.run().primary[0]
+    f = s["properties"]["tax_id"]
     r = client.get(f"/suppliers/{s['id']}", params={"ev": f["value_id"]})
     assert f["evidence"][0]["url"] in r.text
     assert f'/bronze/{f["evidence"][0]["screenshot_key"]}' in r.text.replace("%3A", ":")
 
 
 def test_evidence_fragment_and_bronze(client, store):
-    f = store.run().suppliers[0]["fields"]["address"]
+    f = store.run().primary[0]["properties"]["address"]
     r = client.get(f"/fragments/evidence/{f['value_id']}")
     assert r.status_code == 200 and "source-link" in r.text
     img = client.get(f"/bronze/{f['evidence'][0]['screenshot_key']}")

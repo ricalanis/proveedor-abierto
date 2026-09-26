@@ -14,35 +14,13 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from . import CORE_FIELDS, dod, investigate, live
+from . import dod, investigate, live
+from .domain import LEGACY_ONTOLOGY, Domain
 from .gold import GoldStore, Run, UnavailableStore, backend_of, load_store, sniff_media_type
 
 HERE = Path(__file__).parent
 REPO_ROOT = HERE.parent.parent
 ROLES = ("investigator", "approver")
-
-FIELD_LABELS = {
-    "legal_name": "Legal name",
-    "tax_id": "Tax ID (RFC)",
-    "address": "Address",
-    "founding_date": "Founding date",
-    "tax_list_status": "Tax-list status",
-    "sanction_status": "Sanction status",
-    "legal_representative": "Legal representative",
-}
-SOURCE_TYPE_LABELS = {
-    "procurement_portal": "Procurement portal",
-    "tax_authority_list": "Tax authority list",
-    "sanctions_registry": "Sanctions registry",
-    "company_registry": "Company registry",
-    "official_gazette": "Official gazette",
-}
-LINK_LABELS = {
-    "shared_address": "Shared address",
-    "shared_representative": "Shared legal representative",
-    "same_procedure": "Same procedure",
-}
-
 
 @dataclass
 class Settings:
@@ -71,13 +49,6 @@ def settings_from_env() -> Settings:
 
 class NoGold(Exception):
     """No gold export can be read yet."""
-
-
-def supplier_name(supplier: dict | None) -> str:
-    if not supplier:
-        return "Unknown supplier"
-    f = (supplier.get("fields") or {}).get("legal_name") or {}
-    return f.get("value") or supplier["id"]
 
 
 def brief(value, limit: int = 240) -> str:
@@ -113,11 +84,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     templates = Jinja2Templates(directory=HERE / "templates")
     env = templates.env
     env.globals.update(
-        CORE_FIELDS=CORE_FIELDS,
-        FIELD_LABELS=FIELD_LABELS,
-        SOURCE_TYPE_LABELS=SOURCE_TYPE_LABELS,
-        LINK_LABELS=LINK_LABELS,
-        supplier_name=supplier_name,
         host_of=host_of,
         safe_url=safe_url,
         role=settings.role,
@@ -125,7 +91,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     env.filters["pct"] = lambda x: f"{round((x or 0) * 100)}%"
     env.filters["money"] = lambda x: f"{x:,.2f}" if isinstance(x, (int, float)) else (x or "—")
     env.filters["brief"] = brief
-    env.filters["field_label"] = lambda name: FIELD_LABELS.get(name, name.replace("_", " ").capitalize())
 
     def run(request: Request) -> Run:
         try:
@@ -133,9 +98,27 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except LookupError as exc:
             raise NoGold(str(exc)) from exc
 
+    if isinstance(settings.store, GoldStore):
+        settings.store.case_dir = settings.case_dir  # the case's approved ontology describes the entities
+
+    def current_domain() -> Domain:
+        """Domain for pages without a gold run in hand: latest run's, else the case ontology, else legacy."""
+        try:
+            return settings.store.run(None).domain
+        except LookupError:
+            text = investigate.CaseDir(settings.case_dir).read("02-ontology/ontology.json", limit=10**7)
+            try:
+                onto = json.loads(text) if text else {}
+            except ValueError:
+                onto = {}
+            if onto.get("primary_class"):
+                return Domain.from_ontology(onto)
+            return Domain.from_ontology(LEGACY_ONTOLOGY, legacy=True)
+
     def render(request: Request, name: str, **ctx) -> HTMLResponse:
         ctx.setdefault("nav", "")
         r = ctx.get("run")
+        ctx.setdefault("domain", r.domain if r else current_domain())
         ctx.setdefault("backend", r.inference_backend if r else None)
         ctx.setdefault("synthetic", bool(r and r.case_id.startswith("fixture")))
         ctx.setdefault("preview", bool(r and r.metrics.get("preview")))
@@ -158,42 +141,54 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/", response_class=HTMLResponse)
     def index(request: Request, q: str = "", show: str = "all"):
         r = run(request)
+        d = r.domain
+        searchable = [p for p in (d.title_property(), d.identifier_property()) if p]
         rows = []
         needle = q.strip().lower()
-        for s in r.suppliers:
-            fields = s.get("fields") or {}
-            if needle and not any(
-                needle in str((fields.get(k) or {}).get("value") or "").lower() for k in ("legal_name", "tax_id")
-            ) and needle not in s["id"].lower():
+        for e in r.primary:
+            props = e.get("properties") or {}
+            if needle and not any(needle in str((props.get(k) or {}).get("value") or "").lower() for k in searchable) \
+                    and needle not in e["id"].lower():
                 continue
-            ratio = dod.core_ratio(s)
-            has_conflict = any(f.get("status") == "conflict" for f in fields.values())
-            if show == "signals" and not s.get("flags"):
+            ratio = dod.dod_ratio(e, d)
+            has_conflict = any(isinstance(v, dict) and v.get("status") == "conflict" for v in props.values())
+            if show == "signals" and not e.get("flags"):
                 continue
-            if show == "incomplete" and ratio >= 0.8:
+            if show == "incomplete" and ratio >= d.dod_threshold:
                 continue
             if show == "conflicts" and not has_conflict:
                 continue
-            rows.append({"s": s, "ratio": ratio, "fields": fields})
-        rows.sort(key=lambda row: (-len(row["s"].get("flags") or []), supplier_name(row["s"])))
-        return render(request, "index.html", nav="suppliers", run=r, rows=rows, q=q, show=show)
+            rows.append({"e": e, "ratio": ratio, "props": props,
+                         "linked": sum(1 for link in e.get("links") or [] if link.get("target") in r.entities_by_id
+                                       and r.entities_by_id[link["target"]].get("class") != d.primary_class)})
+        rows.sort(key=lambda row: (-len(row["e"].get("flags") or []), r.title(row["e"])))
+        return render(request, "index.html", nav="entities", run=r, rows=rows, q=q, show=show)
 
-    @app.get("/suppliers/{supplier_id}", response_class=HTMLResponse)
-    def dossier(request: Request, supplier_id: str, ev: str | None = None):
+    @app.get("/entities/{entity_id}", response_class=HTMLResponse)
+    @app.get("/suppliers/{entity_id}", response_class=HTMLResponse, include_in_schema=False)
+    def dossier(request: Request, entity_id: str, ev: str | None = None):
         r = run(request)
-        s = r.suppliers_by_id.get(supplier_id)
-        if not s:
-            raise HTTPException(404, f"no supplier {supplier_id} in run {r.run_id}")
-        fields = s.get("fields") or {}
-        order = [f for f in CORE_FIELDS] + sorted(k for k in fields if k not in CORE_FIELDS)
-        contracts = [r.contracts_by_id[c] for c in s.get("contract_ids") or [] if c in r.contracts_by_id]
+        e = r.entities_by_id.get(entity_id)
+        if not e:
+            raise HTTPException(404, f"no entity {entity_id} in run {r.run_id}")
+        d = r.domain
+        props = e.get("properties") or {}
+        declared = [p.id for p in d.props(e.get("class"))]
+        order = declared + sorted(k for k in props if k not in declared)
+        peers, related = [], {}
+        for link in e.get("links") or []:
+            target = r.entities_by_id.get(link.get("target"))
+            if not target:
+                continue
+            if target.get("class") == e.get("class"):
+                peers.append({"link": link, "target": target})
+            else:  # other classes (e.g. contracts) are listed as tables, grouped by relation
+                related.setdefault(link.get("property"), {"cls": target.get("class"), "rows": []})["rows"].append(target)
         selected = r.values.get(ev) if ev else None
-        if selected and selected.supplier_id != supplier_id:
+        if selected and selected.entity_id != entity_id:
             selected = None
-        return render(
-            request, "dossier.html", nav="suppliers", run=r, s=s, fields=fields, order=order,
-            contracts=contracts, ratio=dod.core_ratio(s), selected=selected,
-        )
+        return render(request, "dossier.html", nav="entities", run=r, e=e, props=props, order=order,
+                      peers=peers, related=related, ratio=dod.dod_ratio(e, d), selected=selected)
 
     @app.get("/fragments/evidence/{value_id}", response_class=HTMLResponse)
     def evidence_fragment(request: Request, value_id: str):
@@ -204,27 +199,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return render(request, "_evidence.html", run=r, selected=ref)
 
     def completeness_model(r: Run) -> dict:
-        recomputed = dod.compute(r.suppliers)
+        d = r.domain
+        recomputed = dod.compute(r.entities, d)
         engine = r.metrics or {}
         runs = settings.store.run_ids()
         prev_id = runs[runs.index(r.run_id) - 1] if r.run_id in runs and runs.index(r.run_id) > 0 else None
-        prev = settings.store.run(prev_id).metrics if prev_id else {}
-        total = recomputed["suppliers_total"]
+        prev_run = settings.store.run(prev_id) if prev_id else None
+        prev = dod.compute(prev_run.entities, prev_run.domain) if prev_run else None
+        total = recomputed["entities_total"].get(d.primary_class, 0)
         fields = []
-        for name in CORE_FIELDS:
-            ratio = recomputed["per_field_completeness"][name]
-            before = (prev.get("per_field_completeness") or {}).get(name)
-            fields.append({
-                "name": name, "label": FIELD_LABELS.get(name, name), "ratio": ratio,
-                "count": round(ratio * total), "delta": None if before is None else ratio - before,
-            })
+        for p in d.dod_props():
+            ratio = recomputed["per_property_completeness"][d.primary_class][p.id]
+            before = (prev["per_property_completeness"].get(d.primary_class) or {}).get(p.id) if prev else None
+            fields.append({"name": p.id, "label": p.label, "ratio": ratio, "count": round(ratio * total),
+                           "delta": None if before is None else ratio - before})
         return {
             "run_id": r.run_id, "prev_run_id": prev_id, "total": total, "fields": fields,
-            "recomputed": recomputed, "engine": engine, "mismatches": dod.cross_check(recomputed, engine) if engine else
-            ["engine metrics.json not found for this run"], "met": dod.dod_met(recomputed, r.inference_backend),
-            "targets": dod.TARGETS, "backend": r.inference_backend,
-            "coverage": engine.get("level_ratio_coverage") or {}, "modes": engine.get("mode_counts") or {},
-            "jobs": engine.get("jobs") or {},
+            "primary_label": d.class_label(plural=True), "threshold": d.dod_threshold,
+            "threshold_stated": d.threshold_stated, "recomputed": recomputed,
+            "criteria": dod.criteria(recomputed, engine, d, r.inference_backend, r.dod_queries, r.entities),
+            "mismatches": dod.cross_check(recomputed, engine, d) if engine else ["engine metrics.json not found"],
+            "backend": r.inference_backend, "coverage": engine.get("level_ratio_coverage") or {},
+            "modes": engine.get("mode_counts") or {}, "jobs": engine.get("jobs") or {},
         }
 
     @app.get("/completeness", response_class=HTMLResponse)
@@ -240,37 +236,39 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     case = investigate.CaseDir(settings.case_dir)
 
     def selected_ids(r: Run, ids: str) -> list[str]:
-        return [i for i in dict.fromkeys(x.strip() for x in ids.split(",")) if i in r.suppliers_by_id]
+        primary = {e["id"] for e in r.primary}
+        return [i for i in dict.fromkeys(x.strip() for x in ids.split(",")) if i in primary]
 
     @app.get("/signals", response_class=HTMLResponse)
     def signals(request: Request):
         r = run(request)
         return render(request, "signals.html", nav="signals", run=r, groups=investigate.signals_by_rule(r))
 
-    @app.get("/signals/{supplier_id}/{index}", response_class=HTMLResponse)
-    def signal_detail(request: Request, supplier_id: str, index: int):
+    @app.get("/signals/{entity_id}/{index}", response_class=HTMLResponse)
+    def signal_detail(request: Request, entity_id: str, index: int):
         r = run(request)
-        s = r.suppliers_by_id.get(supplier_id)
-        flags = (s or {}).get("flags") or []
-        if not s or not 0 <= index < len(flags):
+        e = r.entities_by_id.get(entity_id)
+        flags = (e or {}).get("flags") or []
+        if not e or not 0 <= index < len(flags):
             raise HTTPException(404, "no such signal")
         flag = flags[index]
         refs = [r.values[v] for v in flag.get("evidence_value_ids") or [] if v in r.values]
-        dispute = json.dumps(investigate.dispute_record(r, s, flag), indent=2, ensure_ascii=False)
-        return render(request, "signal.html", nav="signals", run=r, s=s, flag=flag, refs=refs,
-                      info=investigate.rule_info(flag["rule_id"], flag["label"]), dispute=dispute)
+        dispute = json.dumps(investigate.dispute_record(r, e, flag), indent=2, ensure_ascii=False)
+        return render(request, "signal.html", nav="signals", run=r, e=e, flag=flag, refs=refs,
+                      info=r.domain.rule(flag["rule_id"], flag["label"]), dispute=dispute)
 
     @app.get("/relationships", response_class=HTMLResponse)
-    def relationships(request: Request, focus: str = "", types: str = "shared_address,shared_representative"):
+    def relationships(request: Request, focus: str = "", types: str = ""):
         r = run(request)
-        wanted = request.query_params.getlist("t") or types.split(",")
-        chosen = tuple(t for t in investigate.LINK_TYPES if t in wanted) or ("shared_address",)
+        available = r.domain.peer_relations()
+        wanted = request.query_params.getlist("t") or [x for x in types.split(",") if x]
+        default = [rel for rel in available if not r.domain.relations.get(rel, {}).get("dense")][:2] or available[:1]
+        chosen = tuple(x for x in available if x in (wanted or default))
         found = investigate.clusters(r, chosen)
         if focus:
             found.sort(key=lambda c: focus not in c.members)
         return render(request, "relationships.html", nav="relationships", run=r, clusters=found, focus=focus,
-                      chosen=chosen, LINK_TYPES=investigate.LINK_TYPES,
-                      summarize=lambda c: investigate.cluster_summary(r, c))
+                      chosen=chosen, LINK_TYPES=available, summarize=lambda c: investigate.cluster_summary(r, c))
 
     @app.get("/journal", response_class=HTMLResponse)
     def journal_index(request: Request):
@@ -295,7 +293,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         for a in anchors:
             a["text"] = case.read(a["path"], limit=1500) if a["exists"] else None
         return render(request, "journal.html", nav="journal", run=r, ref=ref,
-                      s=r.suppliers_by_id.get(ref.supplier_id), replays=investigate.journal_chain(r, case, value_id),
+                      e=r.entities_by_id.get(ref.entity_id), replays=investigate.journal_chain(r, case, value_id),
                       anchors=anchors)
 
     @app.get("/engine", response_class=HTMLResponse)
@@ -304,8 +302,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
         r = run(request)
         card = report.build(settings.store, r, case)
-        return render(request, "engine.html", nav="engine", run=r, card=card, MODE_NAMES=live.MODE_NAMES,
-                      FIELD_ORDER=CORE_FIELDS)
+        return render(request, "engine.html", nav="engine", run=r, card=card, MODE_NAMES=live.MODE_NAMES)
 
     @app.get("/case-file", response_class=HTMLResponse)
     def case_file(request: Request, path: str):
@@ -321,11 +318,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         runs = settings.store.run_ids()
         prev_id = runs[runs.index(r.run_id) - 1] if r.run_id in runs and runs.index(r.run_id) > 0 else None
         prev = settings.store.run(prev_id) if prev_id else None
-        items = [{"s": r.suppliers_by_id[i],
-                  "changes": investigate.diff_supplier(prev.suppliers_by_id.get(i), r.suppliers_by_id[i]) if prev else []}
+        items = [{"e": r.entities_by_id[i],
+                  "changes": investigate.diff_entity(prev.entities_by_id.get(i), r.entities_by_id[i]) if prev else []}
                  for i in chosen]
+        from . import export as ex
+
         return render(request, "watchlist.html", nav="watchlist", run=r, items=items, ids=",".join(chosen),
-                      prev_id=prev_id)
+                      prev_id=prev_id, ocds=ex.ocds_available(r))
 
     @app.get("/export/{name}")
     def export(request: Request, name: str, ids: str = ""):
@@ -334,9 +333,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         r = run(request)
         subset = selected_ids(r, ids) if ids else None
         stem = f"{r.case_id}-{r.run_id}" + ("-watchlist" if subset else "")
-        if name == "suppliers.csv":
+        if name in ("entities.csv", "suppliers.csv"):
             body, media = ex.to_csv(r, subset), "text/csv; charset=utf-8"
         elif name == "ocds.json":
+            if not ex.ocds_available(r):
+                raise HTTPException(404, "OCDS export needs an ontology class aligned to OCDS contracts")
             body, media = json.dumps(ex.to_ocds(r, subset), ensure_ascii=False, indent=2), "application/json"
         elif name == "gold.ttl":
             body, media = ex.to_turtle(r, subset), "text/turtle; charset=utf-8"
@@ -373,7 +374,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         per_supplier = None
         eng = (latest or {}).get("engine") or {}
         if r and eng.get("reported") and r.run_id in (eng.get("runs") or {}):
-            complete = sum(dod.core_ratio(s) >= 0.8 for s in r.suppliers)
+            complete = sum(dod.dod_ratio(e, r.domain) >= r.domain.dod_threshold for e in r.primary)
             gold_values = sum(1 for v in r.values.values() if dod.is_filled(v.data))
             usd = eng["runs"][r.run_id]
             per_supplier = {"run_id": r.run_id, "usd": usd, "per_complete_supplier": usd / complete if complete else None,
@@ -433,7 +434,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(404, f"no live feed for run {run_id}")
         jobs = settings.store.live_jobs(run_id)
         backend = backend_of((status or {}).get("metrics"), [*steps, status or {}])
-        panel = live.summarize(steps, status)
+        panel = live.summarize(steps, status, current_domain())
         known = case.sources()
         for src in panel["sources"]:
             src.setdefault("discovered_by", investigate.discovered_by(src)
@@ -462,9 +463,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def run_api(request: Request, run_id: str, after: int = 0) -> dict:
         m = run_view_model(run_id, max(after, 0))
         env = templates.env
+        d = current_domain()
         steps_html = env.get_template("_steps.html").render(steps=m["new"][:150], MODE_NAMES=live.MODE_NAMES)
         panel_html = env.get_template("_run_panel.html").render(
-            m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE, MODE_NAMES=live.MODE_NAMES)
+            m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE, MODE_NAMES=live.MODE_NAMES, domain=d)
         proof_html = env.get_template("_proof.html").render(m=m)
         timeline_html = env.get_template("_timeline.html").render(
             m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE)

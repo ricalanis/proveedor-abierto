@@ -44,6 +44,14 @@ PRD = {
         {"id": "dod_sources", "metric": "distinct_source_types", "operator": ">=", "target": 4},
         {"id": "dod_evidence", "metric": "gold_values_without_evidence", "operator": "=", "target": 0},
     ],
+    "authority_policy": {
+        "jurisdiction": "MX (synthetic fixture)",
+        "trusted_publishers": [
+            {"kind": "procurement portal", "domains": ["compras.example"], "rationale": "Synthetic stand-in"},
+            {"kind": "tax authority", "domains": ["lista-fiscal.example"], "rationale": "Synthetic stand-in"},
+        ],
+        "unknown_source_action": "review",
+    },
     "generated_by": GEN,
 }
 
@@ -153,11 +161,11 @@ def pending_md(phase: int, checkpoint: str, reason: str, paths: list[str]) -> st
     return f"---\n{yaml.safe_dump(meta, sort_keys=False)}---\n# Approval pending: {checkpoint} (synthetic fixture)\n\n{reason}.\n"
 
 
-def write(case: Path) -> None:
+def write(case: Path, ontology: dict | None = None) -> None:
     files = {
         "01-scope/prd.json": json.dumps(PRD, indent=2),
         "02-ontology/factors/factors.json": json.dumps(FACTORS, indent=2),
-        "02-ontology/ontology.json": json.dumps(ONTOLOGY, indent=2),
+        "02-ontology/ontology.json": json.dumps(ontology or ONTOLOGY, indent=2),
         "02-ontology/schema/shapes.ttl": SHAPES,
     }
     for phase_dir, phase, checkpoint, reason, paths in PENDING:

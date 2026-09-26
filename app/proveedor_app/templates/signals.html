@@ -11,14 +11,14 @@
   <section class="rule" aria-labelledby="rule-{{ g.rule_id }}">
     <header class="rule__head">
       <h2 id="rule-{{ g.rule_id }}">{{ g.label }}</h2>
-      <p class="rule__meta"><span class="mono">{{ g.rule_id }}</span> · {{ g.hits|length }} {{ "supplier" if g.hits|length == 1 else "suppliers" }}</p>
+      <p class="rule__meta"><span class="mono">{{ g.rule_id }}</span> · {{ g.hits|length }} {{ domain.class_label()|lower if g.hits|length == 1 else domain.class_label(plural=True)|lower }}</p>
       <p class="rule__checks">{{ g.info.checks }}</p>
     </header>
     <ul class="hits">
       {% for s, i, f in g.hits %}
       <li>
-        <a href="/signals/{{ s.id }}/{{ i }}">{{ supplier_name(s) }}</a>
-        <span class="mono muted">{{ ((s.fields or {}).tax_id or {}).value or s.id }}</span>
+        <a href="/signals/{{ s.id }}/{{ i }}">{{ run.title(s) }}</a>
+        <span class="mono muted">{{ run.identifier(s) or s.id }}</span>
       </li>
       {% endfor %}
     </ul>

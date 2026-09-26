@@ -10,7 +10,7 @@ from proveedor_app.web import Settings, create_app
 
 def test_every_page_renders(client, store):
     run = store.run()
-    for s in run.suppliers:
+    for s in run.primary:
         assert client.get(f"/suppliers/{s['id']}").status_code == 200, s["id"]
         for i in range(len(s["flags"])):
             assert client.get(f"/signals/{s['id']}/{i}").status_code == 200
@@ -29,8 +29,9 @@ def test_messy_rows(fixture_root, tmp_path):
     run_dir = lake / "gold" / "fixture-case" / "run-fixture-0001"
     messy = {
         "id": "sup:messy-1",
+        "class": "supplier",
         "classified_as": [],
-        "fields": {
+        "properties": {
             "legal_name": {"value_id": "val:m-1", "value": "Proveedor Ejemplo <b>Raro</b> & \"Cía\"",
                            "confidence": None, "status": "gold",
                            "evidence": [{"url": "javascript:alert(1)", "source_type": "unknown_type"}]},
@@ -41,10 +42,11 @@ def test_messy_rows(fixture_root, tmp_path):
         },
         "flags": [{"rule_id": "rule_from_the_future", "label": "Unknown rule", "explanation": "e",
                    "evidence_value_ids": ["val:m-1", "val:does-not-exist"]}],
-        "links": [{"type": "shared_address", "target": "sup:not-in-run", "via_value_id": "val:nope"}],
-        "contract_ids": ["con:not-in-run"],
+        "links": [{"property": "shared_address", "target": "sup:not-in-run", "via_value_id": "val:nope"},
+                  {"property": "awarded", "target": "con:not-in-run", "via_value_id": "val:nope"},
+                  {"property": "undeclared_relation", "target": "sup:fixture-001", "via_value_id": "val:nope"}],
     }
-    with (run_dir / "suppliers.jsonl").open("a") as fh:
+    with (run_dir / "entities.jsonl").open("a") as fh:
         fh.write(json.dumps(messy) + "\n")
     (run_dir / "trace.jsonl").open("a").write(json.dumps(
         {"step_id": "step:loop", "run_id": "run-fixture-0001", "phase": 5, "parent_step_id": "step:loop",
@@ -55,6 +57,6 @@ def test_messy_rows(fixture_root, tmp_path):
     assert "<b>Raro</b>" not in page.text and "&lt;b&gt;Raro&lt;/b&gt;" in page.text
     assert 'href="javascript:' not in page.text
     for path in ("/signals/sup:messy-1/0", "/journal/val:m-1", "/journal/val:m-2", "/relationships", "/",
-                 "/completeness", "/journal", "/export/gold.ttl", "/export/ocds.json", "/export/suppliers.csv",
+                 "/completeness", "/journal", "/export/gold.ttl", "/export/ocds.json", "/export/entities.csv",
                  "/watchlist?ids=sup:messy-1"):
         assert c.get(path).status_code == 200, path
