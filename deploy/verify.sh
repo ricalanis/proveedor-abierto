@@ -23,6 +23,12 @@ fails=0
 
 pass() { printf '  PASS  %s\n' "$1"; }
 fail() { printf '  FAIL  %s\n' "$1"; fails=$((fails + 1)); }
+# port_open HOST PORT SECONDS: TCP connect check with a bounded connect time. macOS (BSD) nc treats -w as an idle
+# timeout only, so a filtered port would hang ~75 s; -G bounds the connect there. Linux (OpenBSD) nc bounds it with -w.
+port_open() {
+  if [ "$(uname -s)" = Darwin ]; then nc -z -G "$3" -w "$3" "$1" "$2" 2>/dev/null
+  else nc -z -w "$3" "$1" "$2" 2>/dev/null; fi
+}
 warn() { printf '  WARN  %s\n' "$1"; }
 code() { curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$@"; }
 
@@ -74,7 +80,7 @@ local_mode() {
   ip=$(host_ip)
   if [[ -n "$ip" && "$ip" != "$BIND_IP" ]]; then
     for port in "$INV_PORT" "$APP_PORT"; do
-      if nc -z -w 2 "$ip" "$port" 2>/dev/null; then fail "reachable on non-loopback ${ip}:${port}"
+      if port_open "$ip" "$port" 2; then fail "reachable on non-loopback ${ip}:${port}"
       else pass "not reachable on non-loopback ${ip}:${port}"; fi
     done
   else
@@ -100,10 +106,10 @@ remote_mode() {
   local vm=$1 inv=$2 app=$3
   echo "Remote gate checks (VM ${vm})"
   for port in 80 443 3000 5000 5432 7878 8000 8080 8400 8401 8443 9000; do
-    if nc -z -w 3 "$vm" "$port" 2>/dev/null; then fail "VM port $port is open"; else pass "VM port $port closed"; fi
+    if port_open "$vm" "$port" 3; then fail "VM port $port is open"; else pass "VM port $port closed"; fi
   done
   # Zero public inbound ports, SSH included: administration goes over NetBird.
-  if nc -z -w 3 "$vm" 22 2>/dev/null; then fail "VM port 22 (ssh) is open publicly; admin must go over NetBird"
+  if port_open "$vm" 22 3; then fail "VM port 22 (ssh) is open publicly; admin must go over NetBird"
   else pass "VM port 22 closed"; fi
 
   for url in "$inv" "$inv/approvals" "$app" "$app/approvals" "$app/api/run/x"; do
