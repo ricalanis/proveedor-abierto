@@ -1,0 +1,122 @@
+# Evaluation reference. Judges the engine; never passed to the engine or placed in case/.
+name: SCIAN México 2023, sectores (2 dígitos)
+factor_hint: economic sector / industry
+publisher: Instituto Nacional de Estadística y Geografía (INEGI)
+source_url: https://www.inegi.org.mx/scian/
+source_locator: INEGI, Sistema de Clasificación Industrial de América del Norte, México SCIAN 2023, 'Estructura
+  del SCIAN México 2023' (https://www.inegi.org.mx/contenidos/productos/prod_serv/contenidos/espanol/bvinegi/productos/nueva_estruc/889463909675.pdf)
+license: 'INEGI ''Términos de libre uso de la información del INEGI'' (https://www.inegi.org.mx/inegi/terminos.html):
+  copy, adapt and redistribute, including commercially, crediting ''Fuente: INEGI, <producto>''.'
+retrieved_at: '2026-09-26'
+verified: true
+notes: Codes and Spanish titles read from the SCIAN 2023 publication on retrieval date. Only the 20 sectors (level
+  1) are included; subsectors, branches and classes are omitted. English aliases are the parallel NAICS sector titles
+  given from memory for matching only, not taken from the INEGI source (unverified).
+nodes:
+- id: s11
+  code: '11'
+  label: Agricultura, cría y explotación de animales, aprovechamiento forestal, pesca y caza
+  aliases:
+  - agriculture, forestry, fishing and hunting
+- id: s21
+  code: '21'
+  label: Minería
+  aliases:
+  - mining
+  - mining, quarrying, and oil and gas extraction
+- id: s22
+  code: '22'
+  label: Generación, transmisión, distribución y comercialización de energía eléctrica, suministro de agua y de
+    gas natural por ductos al consumidor final
+  aliases:
+  - utilities
+  - electricity, water and gas supply
+- id: s23
+  code: '23'
+  label: Construcción
+  aliases:
+  - construction
+- id: s31_33
+  code: 31-33
+  label: Industrias manufactureras
+  aliases:
+  - manufacturing
+- id: s43
+  code: '43'
+  label: Comercio al por mayor
+  aliases:
+  - wholesale trade
+- id: s46
+  code: '46'
+  label: Comercio al por menor
+  aliases:
+  - retail trade
+- id: s48_49
+  code: 48-49
+  label: Transportes, correos y almacenamiento
+  aliases:
+  - transportation and warehousing
+- id: s51
+  code: '51'
+  label: Información en medios masivos
+  aliases:
+  - information
+  - mass media information
+- id: s52
+  code: '52'
+  label: Servicios financieros y de seguros
+  aliases:
+  - finance and insurance
+- id: s53
+  code: '53'
+  label: Servicios inmobiliarios y de alquiler de bienes muebles e intangibles
+  aliases:
+  - real estate and rental and leasing
+- id: s54
+  code: '54'
+  label: Servicios profesionales, científicos y técnicos
+  aliases:
+  - professional, scientific, and technical services
+- id: s55
+  code: '55'
+  label: Dirección y administración de grupos empresariales o corporativos
+  aliases:
+  - management of companies and enterprises
+- id: s56
+  code: '56'
+  label: Servicios de apoyo a los negocios y manejo de residuos, y servicios de remediación
+  aliases:
+  - administrative and support and waste management and remediation services
+- id: s61
+  code: '61'
+  label: Servicios educativos
+  aliases:
+  - educational services
+  - education
+- id: s62
+  code: '62'
+  label: Servicios de salud y de asistencia social
+  aliases:
+  - health care and social assistance
+  - health
+- id: s71
+  code: '71'
+  label: Servicios de esparcimiento culturales y deportivos, y otros servicios recreativos
+  aliases:
+  - arts, entertainment, and recreation
+- id: s72
+  code: '72'
+  label: Servicios de alojamiento temporal y de preparación de alimentos y bebidas
+  aliases:
+  - accommodation and food services
+- id: s81
+  code: '81'
+  label: Otros servicios excepto actividades gubernamentales
+  aliases:
+  - other services (except public administration)
+- id: s93
+  code: '93'
+  label: Actividades legislativas, gubernamentales, de impartición de justicia y de organismos internacionales y
+    extraterritoriales
+  aliases:
+  - public administration

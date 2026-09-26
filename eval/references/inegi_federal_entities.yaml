@@ -1,0 +1,178 @@
+# Evaluation reference. Judges the engine; never passed to the engine or placed in case/.
+name: Entidades federativas (Marco Geoestadístico)
+factor_hint: geography / state of the buyer or supplier
+publisher: Instituto Nacional de Estadística y Geografía (INEGI)
+source_url: https://gaia.inegi.org.mx/wscatgeo/mgee/
+source_locator: INEGI Catálogo Único de Claves de Áreas Geoestadísticas, web service wscatgeo, entidades (cve_agee,
+  nom_agee)
+license: 'INEGI ''Términos de libre uso de la información del INEGI'' (https://www.inegi.org.mx/inegi/terminos.html):
+  copy, adapt and redistribute, including commercially, crediting ''Fuente: INEGI, <producto>''.'
+retrieved_at: '2026-09-26'
+verified: true
+notes: Fetched from the INEGI catalogue web service on retrieval date; population fields dropped. Flat list of 32
+  entities.
+nodes:
+- id: aguascalientes
+  code: '01'
+  label: Aguascalientes
+  aliases:
+  - Ags.
+- id: baja_california
+  code: '02'
+  label: Baja California
+  aliases:
+  - BC
+- id: baja_california_sur
+  code: '03'
+  label: Baja California Sur
+  aliases:
+  - BCS
+- id: campeche
+  code: '04'
+  label: Campeche
+  aliases:
+  - Camp.
+- id: coahuila_de_zaragoza
+  code: '05'
+  label: Coahuila de Zaragoza
+  aliases:
+  - Coah.
+- id: colima
+  code: '06'
+  label: Colima
+  aliases:
+  - Col.
+- id: chiapas
+  code: '07'
+  label: Chiapas
+  aliases:
+  - Chis.
+- id: chihuahua
+  code: 08
+  label: Chihuahua
+  aliases:
+  - Chih.
+- id: ciudad_de_mexico
+  code: 09
+  label: Ciudad de México
+  aliases:
+  - CDMX
+  - CDMX
+  - Mexico City
+- id: durango
+  code: '10'
+  label: Durango
+  aliases:
+  - Dgo.
+- id: guanajuato
+  code: '11'
+  label: Guanajuato
+  aliases:
+  - Gto.
+- id: guerrero
+  code: '12'
+  label: Guerrero
+  aliases:
+  - Gro.
+- id: hidalgo
+  code: '13'
+  label: Hidalgo
+  aliases:
+  - Hgo.
+- id: jalisco
+  code: '14'
+  label: Jalisco
+  aliases:
+  - Jal.
+- id: mexico
+  code: '15'
+  label: México
+  aliases:
+  - Mex.
+  - Estado de México
+  - Edomex
+- id: michoacan_de_ocampo
+  code: '16'
+  label: Michoacán de Ocampo
+  aliases:
+  - Mich.
+- id: morelos
+  code: '17'
+  label: Morelos
+  aliases:
+  - Mor.
+- id: nayarit
+  code: '18'
+  label: Nayarit
+  aliases:
+  - Nay.
+- id: nuevo_leon
+  code: '19'
+  label: Nuevo León
+  aliases:
+  - NL
+- id: oaxaca
+  code: '20'
+  label: Oaxaca
+  aliases:
+  - Oax.
+- id: puebla
+  code: '21'
+  label: Puebla
+  aliases:
+  - Pue.
+- id: queretaro
+  code: '22'
+  label: Querétaro
+  aliases:
+  - Qro.
+- id: quintana_roo
+  code: '23'
+  label: Quintana Roo
+  aliases:
+  - Q. Roo
+- id: san_luis_potosi
+  code: '24'
+  label: San Luis Potosí
+  aliases:
+  - SLP
+- id: sinaloa
+  code: '25'
+  label: Sinaloa
+  aliases:
+  - Sin.
+- id: sonora
+  code: '26'
+  label: Sonora
+  aliases:
+  - Son.
+- id: tabasco
+  code: '27'
+  label: Tabasco
+  aliases:
+  - Tab.
+- id: tamaulipas
+  code: '28'
+  label: Tamaulipas
+  aliases:
+  - Tamps.
+- id: tlaxcala
+  code: '29'
+  label: Tlaxcala
+  aliases:
+  - Tlax.
+- id: veracruz_de_ignacio_de_la_llave
+  code: '30'
+  label: Veracruz de Ignacio de la Llave
+  aliases:
+  - Ver.
+- id: yucatan
+  code: '31'
+  label: Yucatán
+  aliases:
+  - Yuc.
+- id: zacatecas
+  code: '32'
+  label: Zacatecas
+  aliases:
+  - Zac.

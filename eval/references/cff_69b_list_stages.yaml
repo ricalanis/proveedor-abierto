@@ -1,0 +1,44 @@
+# Evaluation reference. Judges the engine; never passed to the engine or placed in case/.
+name: Situación en el listado del artículo 69-B CFF (operaciones inexistentes)
+factor_hint: tax-authority listing stage (legitimacy signal)
+publisher: Cámara de Diputados (law text); Servicio de Administración Tributaria (published list categories)
+source_url: https://www.diputados.gob.mx/LeyesBiblio/pdf/CFF.pdf
+source_locator: Código Fiscal de la Federación, artículo 69-B (texto vigente, última reforma DOF 09-04-2026); SAT
+  open data page https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html
+license: 'Law text: official public document (see laassp_procedures.yaml note, unverified legal reading). SAT list
+  categories: SAT open-data terms not verified.'
+retrieved_at: '2026-09-26'
+verified: true
+notes: 'presunto, desvirtuado and definitivo are read from the art. 69-B text (fetched). ''sentencia_favorable''
+  is a category in SAT''s published lists (taxpayers who obtained a favorable legal defense); confirmed from SAT
+  search results, the SAT page itself was not fetched, so that node is marked verified: false. Covers only the tax-list
+  part of a legitimacy factor; sanctions registries are not included.'
+nodes:
+- id: presunto
+  code: presunto
+  label: Presunto
+  aliases:
+  - presumed
+  - presumption
+  - presunción
+- id: desvirtuado
+  code: desvirtuado
+  label: Desvirtuado
+  aliases:
+  - rebutted
+  - dismissed
+  - desvirtuó
+- id: definitivo
+  code: definitivo
+  label: Definitivo
+  aliases:
+  - definitive
+  - final
+  - confirmed
+- id: sentencia_favorable
+  code: sentencia_favorable
+  label: Sentencia favorable
+  aliases:
+  - favorable ruling
+  - favorable court decision
+  verified: false

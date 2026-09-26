@@ -1,0 +1,14 @@
+# factor_id (from the engine's factors.json / ontology.json) -> reference file in this folder.
+# Only grounded factors with an official public classification are mapped; conceptual factors are judged on
+# soundness and novelty alone (01-engine-definition, Phase 2 method, 2c).
+procedure_type: laassp_procedures.yaml
+procurement_procedure: laassp_procedures.yaml
+economic_sector: scian_2023_sectors.yaml
+industry: scian_2023_sectors.yaml
+sector: scian_2023_sectors.yaml
+region: inegi_federal_entities.yaml
+state: inegi_federal_entities.yaml
+federal_entity: inegi_federal_entities.yaml
+geography: inegi_federal_entities.yaml
+legitimacy_signal: cff_69b_list_stages.yaml
+tax_list_status: cff_69b_list_stages.yaml

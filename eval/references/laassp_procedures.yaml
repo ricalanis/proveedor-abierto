@@ -1,0 +1,60 @@
+# Evaluation reference. Judges the engine; never passed to the engine or placed in case/.
+name: Procedimientos de contratación (LAASSP, art. 35)
+factor_hint: procurement procedure type
+publisher: Cámara de Diputados del H. Congreso de la Unión (official consolidated text)
+source_url: https://www.diputados.gob.mx/LeyesBiblio/pdf/LAASSP.pdf
+source_locator: Ley de Adquisiciones, Arrendamientos y Servicios del Sector Público, nueva ley DOF 16-04-2025, artículo
+  35, fracciones I-VII
+license: 'Mexican federal law text: official public document; legal texts are not subject to copyright under Ley
+  Federal del Derecho de Autor art. 14 fr. VIII (unverified legal reading, flag if it matters)'
+retrieved_at: '2026-09-26'
+verified: true
+notes: Fetched and read on retrieval date. The 2025 law replaced the 2000 LAASSP, whose art. 26 listed only the
+  first three procedures; the current art. 35 lists seven. Flat list (one level). Fractions IV and V are reserved
+  to Hacienda for consolidated purchases.
+nodes:
+- id: licitacion_publica
+  code: I
+  label: Licitación pública
+  aliases:
+  - open tender
+  - public tender
+  - public bidding
+  - licitacion
+- id: invitacion_tres
+  code: II
+  label: Invitación a cuando menos tres personas
+  aliases:
+  - invitation to at least three
+  - invitation to at least three persons
+  - restricted invitation
+  - invitacion restringida
+- id: adjudicacion_directa
+  code: III
+  label: Adjudicación directa
+  aliases:
+  - direct award
+  - direct contracting
+- id: dialogo_competitivo
+  code: IV
+  label: Diálogo competitivo
+  aliases:
+  - competitive dialogue
+- id: adjudicacion_directa_negociacion
+  code: V
+  label: Adjudicación directa con estrategia de negociación
+  aliases:
+  - direct award with negotiation strategy
+  - negotiated direct award
+- id: contrato_especifico_acuerdo_marco
+  code: VI
+  label: Asignación de un contrato específico derivado de un acuerdo marco
+  aliases:
+  - framework agreement call-off
+  - framework agreement contract
+- id: orden_tienda_digital
+  code: VII
+  label: Asignación de órdenes de suministro de la Tienda Digital del Gobierno Federal o catálogos electrónicos
+  aliases:
+  - digital store order
+  - electronic catalogue order
