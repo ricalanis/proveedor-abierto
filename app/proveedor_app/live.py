@@ -144,13 +144,14 @@ class Replayer:
 
     def __init__(self, root: Path, source_run_id: str | None = None, *, target_root: Path | None = None,
                  case_id: str | None = None, new_run_id: str | None = None, duration: float = 45.0,
-                 publish_gold: bool = True):
+                 speed: float | None = None, publish_gold: bool = True):
         self.source = GoldStore(LocalSource(root), case_id)
         self.run = self.source.run(source_run_id)
         self.case_id = self.source.case_id
         self.target = Path(target_root or root)
         self.new_run_id = new_run_id or f"{self.run.run_id}-replay-{datetime.now(UTC):%H%M%S}"
         self.duration = duration
+        self.speed = speed  # when set, replay at N x the recorded pace (long gaps still capped) instead of a duration
         self.publish_gold = publish_gold
         recorded = self.source.live_steps(self.run.run_id)  # prefer the live record: it has screenshot keys
         steps = recorded or list(self.run.trace)
@@ -225,7 +226,7 @@ class Replayer:
         open_jobs: list[dict] = []  # shown as in-progress for one step, then completed
         _write_atomic(self.target / "runs" / self.case_id / "latest.json", json.dumps({"run_id": self.new_run_id}))
         span = max(_ts(self.steps[-1]) - _ts(self.steps[0]), 1e-9) if self.steps else 1.0
-        scale = self.duration / span
+        scale = 1.0 / self.speed if self.speed else self.duration / span
         emitted: set[str] = set()
         health: dict[str, dict] = {}
         last_status = 0.0

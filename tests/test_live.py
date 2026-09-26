@@ -143,3 +143,23 @@ def test_replay_output_matches_engine_schemas(lake, validator_for):
     step_validator = validator_for("trace-step.schema.json")
     for line in (run_dir / "trace.live.jsonl").read_text().splitlines()[:50]:
         assert not list(step_validator.iter_errors(json.loads(line)))
+
+
+def test_snapshot_then_replay_offline(lake, tmp_path, fixture_root):
+    from proveedor_app.snapshot import snapshot
+
+    out = tmp_path / "snap"
+    report = snapshot(GoldStore(LocalSource(lake)), "run-fixture-0001", out)
+    assert report["missing_bronze"] == 0 and report["bronze"] > 100
+    snap = GoldStore(LocalSource(out))
+    run = snap.run()
+    ev = run.suppliers[0]["fields"]["address"]["evidence"][0]
+    assert snap.bronze(ev["screenshot_key"]) and snap.bronze_meta(ev["screenshot_key"])
+    assert snap.live_jobs("run-fixture-0001")
+    rep = live.Replayer(out, "run-fixture-0001", speed=1000.0, new_run_id="offline-1")
+    slept = []
+    rep.play(sleep=slept.append)
+    assert max(slept) <= 5.0 and sum(slept) < 5.0  # 1000x of a ~35 min recording
+    c = _client(out, fixture_root / "case")
+    assert c.get("/run/offline-1").status_code == 200
+    assert c.get(f"/bronze/{ev['screenshot_key']}").status_code == 200

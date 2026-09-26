@@ -19,7 +19,8 @@ uv run pa-app serve --role approver       # approver instance (phase sign-off); 
 uv run pa-app fixtures [OUT]              # write synthetic lake/ + case/ (default .cache/fixtures)
 uv run pa-app serve --fixtures --replay   # rehearsal: replay the fixture run as a live run at /run (45 s)
 uv run pa-app serve --gold-dir DIR --replay RUN_ID --duration 60   # demo insurance: replay a recorded real run
-uv run pa-app replay [LAKE] [--run-id ID] [--duration S]           # replay into a lake's live feed (runs/...)
+uv run pa-app replay [LAKE] [--run-id ID] [--duration S | --speed N] # replay into a lake's live feed (runs/...)
+uv run pa-app snapshot OUT [--run-id ID]  # cache a run (gold + live feed + jobs + referenced bronze) for offline replay
 uv run pa-app dod [--gold-dir DIR]        # recompute DoD keys from gold, cross-check the engine's metrics.json
 ```
 

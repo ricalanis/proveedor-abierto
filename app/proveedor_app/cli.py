@@ -36,8 +36,9 @@ def _serve(args: argparse.Namespace) -> int:
         root = os.environ.get("PA_GOLD_DIR")
         if not root:
             raise SystemExit("--replay needs a local lake: --fixtures, --gold-dir or PA_GOLD_DIR")
-        replayer = Replayer(Path(root), args.replay or None, duration=args.duration)
-        print(f"replaying {replayer.run.run_id} as live run {replayer.new_run_id} over {args.duration:.0f}s")
+        replayer = Replayer(Path(root), args.replay or None, duration=args.duration, speed=args.speed)
+        pace = f"at {args.speed:g}x" if args.speed else f"over {args.duration:.0f}s"
+        print(f"replaying {replayer.run.run_id} as live run {replayer.new_run_id} {pace}")
         threading.Timer(args.delay, replayer.start).start()
     uvicorn.run(app, host=args.host, port=args.port)
     return 0
@@ -57,11 +58,22 @@ def _replay(args: argparse.Namespace) -> int:
     if args.fixtures:
         root = fixtures.generate(FIXTURE_DIR)
     replayer = Replayer(root, args.run_id, target_root=Path(args.to) if args.to else None, duration=args.duration,
-                        new_run_id=args.new_run_id)
+                        speed=args.speed, new_run_id=args.new_run_id)
     print(f"replaying {replayer.run.run_id} -> {replayer.new_run_id} in {replayer.target} over {args.duration:.0f}s")
     replayer.play()
     print(f"done: runs/{replayer.case_id}/{replayer.new_run_id}")
     return 0
+
+
+def _snapshot(args: argparse.Namespace) -> int:
+    from .snapshot import snapshot
+
+    store = GoldStore(LocalSource(args.gold_dir)) if args.gold_dir else load_store(REPO_ROOT)
+    report = snapshot(store, args.run_id, Path(args.out))
+    print(json.dumps(report))
+    print(f"serve it: uv run pa-app serve --gold-dir {args.out}")
+    print(f"replay it: uv run pa-app serve --gold-dir {args.out} --replay {report['run_id']} --duration 60")
+    return 1 if report["missing_bronze"] else 0
 
 
 def _dod(args: argparse.Namespace) -> int:
@@ -104,6 +116,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--replay", nargs="?", const="", metavar="RUN_ID",
                    help="also replay a finished run (default: latest gold run) as a live run in the same local lake")
     p.add_argument("--duration", type=float, default=45.0, help="replay length in seconds (default 45)")
+    p.add_argument("--speed", type=float, help="replay at N x the recorded pace instead of --duration")
     p.add_argument("--delay", type=float, default=2.0, help="seconds before the replay starts")
     p.set_defaults(fn=_serve)
 
@@ -114,7 +127,14 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--to", help="target lake root (default: the same lake)")
     p.add_argument("--new-run-id")
     p.add_argument("--duration", type=float, default=45.0)
+    p.add_argument("--speed", type=float, help="replay at N x the recorded pace instead of --duration")
     p.set_defaults(fn=_replay)
+
+    p = sub.add_parser("snapshot", help="cache one run (gold, live feed, referenced bronze) into a local folder")
+    p.add_argument("out", help="target folder (bucket layout)")
+    p.add_argument("--gold-dir", help="source local lake (default: PA_GOLD_DIR or lake.yaml, S3 included)")
+    p.add_argument("--run-id", help="run to cache (default: latest gold run)")
+    p.set_defaults(fn=_snapshot)
 
     p = sub.add_parser("fixtures", help="write a synthetic gold export + case package")
     p.add_argument("out", nargs="?", default=str(FIXTURE_DIR))
