@@ -76,6 +76,19 @@
   </table>
 </section>
 
+<section class="block card-sec" aria-labelledby="backends-h">
+  <h2 id="backends-h">Decisions by backend</h2>
+  <p class="muted note">Vultr Serverless Inference makes the decisions that count. Jev backs typed pre-checks (for example an injection pre-filter or a first-pass entity match); a Jev decision alone never makes a value gold.</p>
+  {% if card.backends %}
+  <table class="ledger"><thead><tr><th scope="col">Backend</th><th scope="col" class="num">Decisions</th></tr></thead><tbody>
+  {% for b, n in card.backends.items() %}<tr><th scope="row"><span class="backend backend--{{ b }}">{{ {"vultr": "Vultr inference", "jev": "Jev (supporting)", "recorded": "recorded responses"}.get(b, b) }}</span></th><td class="num mono">{{ n }}</td></tr>{% endfor %}
+  </tbody></table>
+  {% else %}<p class="muted">No decision provenance in this run.</p>{% endif %}
+  {% if card.jev_only_gold %}
+  <p class="note crosscheck--bad">{{ card.jev_only_gold|length }} gold {{ "value rests" if card.jev_only_gold|length == 1 else "values rest" }} on a Jev decision alone and {{ "is" if card.jev_only_gold|length == 1 else "are" }} not counted: {% for sid, field, vid in card.jev_only_gold[:10] %}<a href="/suppliers/{{ sid }}?ev={{ vid|urlencode }}#evidence">{{ field|field_label }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% if card.jev_only_gold|length > 10 %} …{% endif %}</p>
+  {% else %}<p class="note">No gold value rests on a Jev decision alone.</p>{% endif %}
+</section>
+
 <section class="block card-sec" aria-labelledby="proof-h">
   <h2 id="proof-h">Sandbox proof</h2>
   {% set p = card.proof %}

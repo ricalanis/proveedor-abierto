@@ -341,6 +341,12 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .rub--missing { color: var(--color-ink-3); }
 .ledger td.failed { color: var(--color-signal); font-weight: 700; }
 
+.backend { display: inline-block; font-size: var(--text-xs); font-weight: 600; padding: 0 var(--space-2xs); border: 1px solid var(--color-ink); border-radius: var(--radius-sm); white-space: nowrap; }
+.backend--vultr { background: var(--color-ink); color: var(--color-paper); }
+.backend--jev { background: var(--color-paper); border-style: dotted; }
+.backend--recorded { border-color: var(--color-signal); color: var(--color-signal); border-style: dashed; }
+.provenance { font-size: var(--text-sm); }
+
 /* Sandbox proof */
 .proof { margin-top: var(--space-2xl); padding-top: var(--space-md); border-top: var(--rule-strong); display: grid; gap: var(--space-md); }
 .proof__head { display: grid; gap: var(--space-2xs); max-width: 80ch; }

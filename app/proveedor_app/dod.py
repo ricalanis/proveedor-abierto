@@ -13,9 +13,14 @@ TARGETS = {"suppliers_at_80pct_core": 50, "distinct_source_types": 4, "gold_valu
 DOD_KEYS = ("suppliers_total", "suppliers_at_80pct_core", "distinct_source_types", "gold_values_without_evidence")
 
 
+def jev_only(field: dict | None) -> bool:
+    """A value whose only decision came from Jev (CONTRACT section 10): never enough for gold on its own."""
+    return bool(field) and (field.get("generated_by") or {}).get("backend") == "jev"
+
+
 def is_filled(field: dict | None) -> bool:
-    """A core field counts as complete when it is gold and backed by at least one piece of evidence."""
-    return bool(field) and field.get("status") == "gold" and bool(field.get("evidence"))
+    """A core field counts as complete when it is gold, backed by evidence, and not decided by Jev alone."""
+    return bool(field) and field.get("status") == "gold" and bool(field.get("evidence")) and not jev_only(field)
 
 
 def core_ratio(supplier: dict) -> float:

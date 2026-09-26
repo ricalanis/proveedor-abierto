@@ -98,6 +98,15 @@ def build(store: GoldStore, run: Run, case: CaseDir) -> dict:
 
     steps = store.live_steps(run.run_id) or list(run.trace)
     card["honesty"] = honesty(steps)
+    by_backend = dict((run.metrics or {}).get("decisions_by_backend") or {})
+    if not by_backend:  # derive from step provenance when metrics.json does not carry it
+        for s in steps:
+            b = (s.get("generated_by") or {}).get("backend")
+            if b:
+                by_backend[b] = by_backend.get(b, 0) + 1
+    card["backends"] = by_backend
+    card["jev_only_gold"] = [(ref.supplier_id, ref.field, ref.value_id) for ref in run.values.values()
+                             if ref.data.get("status") == "gold" and dod.jev_only(ref.data)]
     card["macros"] = macro_replays(case)
     proof = live.proof(store.live_jobs(run.run_id))
     card["proof"] = {"jobs": proof["jobs"], "counts": proof["counts"], "checkpoints": proof["checkpoints"],

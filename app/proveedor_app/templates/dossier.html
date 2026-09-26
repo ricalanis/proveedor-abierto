@@ -50,7 +50,7 @@
             <th scope="row">{{ name|field_label }}{% if name in CORE_FIELDS %}<span class="core" title="Core field (counts toward the definition of done)">core</span>{% endif %}</th>
             <td class="value">{% if f and f.value is not none %}{{ f.value }}{% else %}<span class="muted">not found</span>{% endif %}</td>
             <td class="num mono">{% if f and f.status != "missing" %}{% if f.confidence is number %}{{ "%.2f"|format(f.confidence) }}<span class="conf" style="--w: {{ (f.confidence * 100)|round }}%"></span>{% else %}—{% endif %}{% else %}—{% endif %}</td>
-            <td><span class="status status--{{ (f or {}).status or 'missing' }}">{{ (f or {}).status or "missing" }}</span></td>
+            <td><span class="status status--{{ (f or {}).status or 'missing' }}">{{ (f or {}).status or "missing" }}</span>{% if ((f or {}).generated_by or {}).backend == "jev" %} <span class="backend backend--jev" title="Decided by Jev alone; needs Vultr confirmation">Jev</span>{% endif %}</td>
             <td>
               {% if f and f.evidence %}
                 <a class="ev-link" href="/suppliers/{{ s.id }}?ev={{ f.value_id|urlencode }}#evidence" data-evidence="{{ f.value_id }}">

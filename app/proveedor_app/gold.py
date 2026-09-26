@@ -159,9 +159,10 @@ def backend_of(metrics: dict | None, steps: Iterable[dict] = (), values: Iterabl
         data = v.data if hasattr(v, "data") else v
         seen.add((data.get("generated_by") or {}).get("backend"))
     seen.discard(None)
-    if "recorded" in seen:
-        return "recorded"
-    return "vultr" if "vultr" in seen else None
+    for backend in ("recorded", "vultr", "jev"):  # recorded taints everything; jev alone is a supporting backend
+        if backend in seen:
+            return backend
+    return None
 
 
 class GoldStore:

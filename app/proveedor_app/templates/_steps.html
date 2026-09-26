@@ -4,7 +4,7 @@
   <span class="step__time mono">{{ (s.ts or "")[11:19] }}</span>
   <span class="mode-badge mode-badge--{{ s.mode }}" title="{{ MODE_NAMES.get(s.mode, s.mode) }}">{{ s.mode }}</span>
   <div class="step__body">
-    <p class="step__what"><span class="step__phase">Phase {{ s.phase }}</span>{% if s.source_id %} · <span class="mono">{{ s.source_id }}</span>{% endif %} · {{ s.requested|brief }}</p>
+    <p class="step__what">{% if (s.generated_by or {}).backend == "jev" %}<span class="backend backend--jev">Jev</span> {% endif %}<span class="step__phase">Phase {{ s.phase }}</span>{% if s.source_id %} · <span class="mono">{{ s.source_id }}</span>{% endif %} · {{ s.requested|brief }}</p>
     <p class="step__did">{{ s.executed|brief }}</p>
     <p class="step__eval">{{ s.evaluated|brief }}{% if s.value_ids %} <span class="step__values mono">+{{ s.value_ids|length }} {{ "value" if s.value_ids|length == 1 else "values" }}</span>{% endif %}</p>
     {% if s.event %}<p class="event event--{{ s.event }}">{{ EVENT_LABELS.get(s.event, s.event|replace("_", " ")) }}</p>{% endif %}

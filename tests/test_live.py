@@ -222,3 +222,25 @@ def test_engine_report_card_on_fixtures(lake, fixture_root):
 def test_engine_report_card_without_phase_artifacts(lake, tmp_path):
     page = _client(lake, tmp_path / "empty-case").get("/engine")
     assert page.status_code == 200 and "has not written" in page.text
+
+
+def test_jev_only_gold_is_flagged_and_not_counted(lake, fixture_root):
+    from proveedor_app import dod
+
+    path = lake / "gold" / "fixture-case" / "run-fixture-0001" / "suppliers.jsonl"
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    target = rows[0]["fields"]["tax_id"]
+    assert target["status"] == "gold"
+    target["generated_by"] = {"backend": "jev", "model": "jev-entity-match", "at": "2026-09-26T19:00:00Z"}
+    for r in rows:  # make the rest live so the banner logic is exercised too
+        for f in r["fields"].values():
+            if f is not target:
+                f["generated_by"] = {"backend": "vultr", "model": "m", "at": "2026-09-26T19:00:00Z"}
+    path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    assert not dod.is_filled(target) and dod.jev_only(target)
+    c = _client(lake, fixture_root / "case")
+    frag = c.get(f"/fragments/evidence/{target['value_id']}").text
+    assert "Jev (supporting)" in frag and "does not count as gold" in frag
+    assert "backend--jev" in c.get(f"/suppliers/{rows[0]['id']}").text
+    card = c.get("/engine").text
+    assert "rests on a Jev decision alone" in card
