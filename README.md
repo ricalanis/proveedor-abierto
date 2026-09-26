@@ -1,13 +1,18 @@
 # Proveedor Abierto
 
-**One open question in, evidence-backed supplier profiles out.** The input is a single sentence: *"Who receives
-public money in Mexico through government contracts, and are they legitimate companies?"*. There is no dataset
-and no list of sources. From that sentence, the [Ontofill](../ontofill) engine researches the problem, writes a
-PRD with a testable definition of done, and derives an ontology that a person approves. It then finds the public
+**The reference case for [Ontofill](https://github.com/ricalanis/ontofill).** Ontofill is the engine: give it an
+open question and it plans on Vultr models, dispatches disposable sandboxes, and returns a dataset where every value
+has a receipt. It is generic by construction; a different brief gives a different PRD, ontology and sources with
+zero code changes. Proveedor Abierto is its hard, real test case, and this repo holds that case package (`case/`)
+and the investigation app that reads the engine's gold export.
+
+**The question:** *"Who receives public money in Mexico through government contracts, and are they legitimate
+companies?"*. There is no dataset and no list of sources. From that sentence, Ontofill researches the problem, writes
+a PRD with a testable definition of done, and derives an ontology that a person approves. It then finds the public
 sources on its own and sends sandboxed computer-use agents on Vultr to fill every field. Each value keeps its
-capture: the source link, a screenshot and the selector. This repo holds the case package the engine writes
-(`case/`) and the investigation app that turns the result into dossiers, explained red flags, relationships and
-a journal that traces any value back to the brief. Flags are signals to verify, never accusations.
+capture: the source link, a screenshot and the selector. The app turns the result into dossiers, explained red
+flags, relationships and a journal that traces any value back to the brief. Flags are signals to verify, never
+accusations.
 
 This is the track's own **"Research with Receipts"** example: every claim in the app links to a screenshot of its
 source.

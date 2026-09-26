@@ -88,6 +88,10 @@ probes BLOCKED and teardown verified.
 
 ## Likely follow-ups
 
+- **"Is this only for procurement?"** "No. Ontofill is the product; Proveedor Abierto is its test case. A second,
+  non-procurement brief ran on the same engine commit to its own ontology." Show the two ontologies side by side
+  (demo setup), and mention the guard test that keeps domain words out of the engine.
+
 - **"Why gVisor and not a platform like OpenSandbox or E2B?"** "We think in Docker. gVisor is the wall; we wrote
   the orchestration and the egress proxy ourselves, and the proof checkpoints show that they hold."
 - **"How do people reach the app?"** "Only through NetBird: two URLs, one per role, each with its own credential,

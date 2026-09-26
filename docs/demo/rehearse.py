@@ -25,14 +25,16 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "app"))
 
-from proveedor_app import fixtures  # noqa: E402
-from proveedor_app.gold import GoldStore, LocalSource  # noqa: E402
-from proveedor_app.live import Replayer  # noqa: E402
-from proveedor_app.web import Settings, create_app  # noqa: E402
+from proveedor_app import fixtures
+from proveedor_app.gold import GoldStore, LocalSource
+from proveedor_app.live import Replayer
+from proveedor_app.web import Settings, create_app
 
 # (beat, budget seconds) from demo-script.md
-BUDGET = [("Brief -> PRD", 20), ("Ontology", 20), ("Sources + TDD", 25), ("Execution, bars climb", 45),
-          ("Dossier + signal", 30), ("Replay to the brief", 20), ("Blast radius zero + export", 20)]
+# Brief 08 order: the engine first (terminal beats, narration only here), then Proveedor Abierto as its test case.
+BUDGET = [("The engine + generic by construction (terminal)", 35), ("Test case: brief -> PRD", 15),
+          ("Ontology + gate", 15), ("Discovery", 15), ("Execution: Pattern B + A", 35), ("Containment", 30),
+          ("The output: dossier, signal, trace", 20), ("Close: zero ports + repos", 15)]
 
 
 def serve(app, port: int) -> uvicorn.Server:
@@ -85,13 +87,16 @@ def main() -> int:
             ok, note = True, ""
             try:
                 actions()
-            except Exception as exc:  # a failed beat is reported, the rehearsal continues
+            except Exception as exc:  # noqa: BLE001 - a failed beat is reported, the rehearsal continues
                 ok, note = False, f"{type(exc).__name__}: {exc}"[:160]
             spent = time.monotonic() - t0
             if not args.no_pauses and spent < budget:
                 page.wait_for_timeout(int((budget - spent) * 1000))  # narration time
             rows.append({"beat": name, "budget_s": budget, "app_s": round(spent, 1),
                          "total_s": round(time.monotonic() - t0, 1), "ok": ok, "note": note})
+
+        def engine_intro():  # architecture frame and two briefs / two ontologies live in the terminal
+            page.goto(f"{inv}/engine")
 
         def prd():
             page.goto(f"{apr}/approvals")
@@ -125,35 +130,37 @@ def main() -> int:
             page.wait_for_timeout(1500)
             page.goto(f"{inv}/run/rehearsal-live")
             page.wait_for_function("document.querySelectorAll('#steps li').length > 20", timeout=20_000)
+
+        def containment():
             page.wait_for_function("document.getElementById('run-state').textContent.trim() === 'done'",
                                    timeout=int(args.replay_seconds * 1000) + 20_000)
+            page.goto(f"{inv}/run/rehearsal-live?limit=2000")  # the whole trail, not the latest 150 steps
+            if not page.locator("#steps li.step--quarantine").count():
+                raise AssertionError("no quarantined hostile page in the step stream")
             page.locator("#proof-h").scroll_into_view_if_needed()
             if "BLOCKED" not in page.locator("#proof").inner_text():
                 raise AssertionError("sandbox proof shows no BLOCKED probe")
 
-        def dossier():
+        def output():
             page.goto(f"{inv}/suppliers/sup:fixture-005")
             page.click("a.ev-link[data-evidence$='founding_date']")
             page.wait_for_selector("#evidence-panel a.source-link")
             page.click(".signal a.signal__label >> nth=0")
             page.wait_for_selector("text=Dispute this signal")
-
-        def journal():
             page.goto(f"{inv}/suppliers/sup:fixture-005?ev=val:0001-005-founding_date#evidence")
             page.click("text=Trace this value to the brief")
             page.wait_for_selector(".stop--anchor")
             page.locator(".stop--anchor").last.scroll_into_view_if_needed()
 
-        def blast():
-            page.goto(f"{inv}/run/rehearsal-live#proof-h")
-            page.locator("#proof-h").scroll_into_view_if_needed()
+        def close():
             with page.expect_download() as dl:
                 page.goto(f"{inv}/watchlist?ids=sup:fixture-005")
                 page.click("a:has-text('OCDS JSON') >> nth=0")
             if not dl.value.suggested_filename.endswith(".json"):
                 raise AssertionError("OCDS export did not download")
 
-        for (name, budget), fn in zip(BUDGET, (prd, ontology, sources, execution, dossier, journal, blast)):
+        beats = (engine_intro, prd, ontology, sources, execution, containment, output, close)
+        for (name, budget), fn in zip(BUDGET, beats, strict=True):
             beat(name, budget, fn)
         video = page.video.path() if page.video else None
         ctx.close()
