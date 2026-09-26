@@ -65,7 +65,10 @@ def cross_check(recomputed: dict, engine: dict, tol: float = 1e-6) -> list[str]:
     return problems
 
 
-def dod_met(metrics: dict) -> dict[str, bool]:
+def dod_met(metrics: dict, inference_backend: str | None = None) -> dict[str, bool]:
+    """Targets met. Anything produced by recorded (mocked) inference never counts as done (CONTRACT section 7)."""
+    if (inference_backend or metrics.get("inference_backend")) == "recorded":
+        return {key: False for key in TARGETS}
     return {
         "suppliers_at_80pct_core": metrics.get("suppliers_at_80pct_core", 0) >= TARGETS["suppliers_at_80pct_core"],
         "distinct_source_types": metrics.get("distinct_source_types", 0) >= TARGETS["distinct_source_types"],

@@ -30,7 +30,7 @@ TAXONOMY = {
 SOURCES = {
     # source_id: (host, source_type, objective_id, mode)
     "compras-example": ("compras.example", "procurement_portal", "supplier-identity", "S1"),
-    "registro-example": ("registro-empresas.example", "company_registry", "company-profile", "S2"),
+    "registro-example": ("registro-empresas.example", "company_registry", "company-profile", "S1"),
     "gaceta-example": ("gaceta.example", "official_gazette", "company-profile", "S2"),
     "lista-fiscal-example": ("lista-fiscal.example", "tax_authority_list", "tax-list-status", "D0"),
     "sanciones-example": ("sanciones.example", "sanctions_registry", "sanction-status", "D1"),
@@ -207,6 +207,34 @@ def _render_run(
     for s in trace:
         mode_counts[s["mode"]] += 1
     suppliers = []
+    shared: dict[str, dict] = {}  # run-level steps: the bulk tax-list download and the crystallized macro
+
+    def bulk_step() -> dict:
+        if "bulk" not in shared:
+            host, _st, objective, _m = SOURCES["lista-fiscal-example"]
+            shared["bulk"] = step(5, tdd_steps["lista-fiscal-example"]["step_id"],
+                                  f"https://{host}/listado-completo.csv (published file)",
+                                  "download the full list once, match every supplier on RFC",
+                                  "file.download + parse CSV; emit.observation per matched RFC",
+                                  "row count matches the published total; promoted to gold",
+                                  source_id="lista-fiscal-example", objective_id=objective,
+                                  tdd_path=tdd_steps["lista-fiscal-example"]["tdd_path"], mode="D0", value_ids=[])
+            mode_counts["D0"] += 1
+        return shared["bulk"]
+
+    def macro_step() -> dict:
+        if "macro" not in shared:
+            host, _st, objective, _m = SOURCES["compras-example"]
+            shared["macro"] = step(5, tdd_steps["compras-example"]["step_id"],
+                                   f"15 successful agentic traces on {host}",
+                                   "code.promote the search-and-extract trace",
+                                   "macro compras-example/search@v1 written to case/05-macros/compras-example/",
+                                   "macro replayed 3/3 recorded traces; crystallized, next runs at D1",
+                                   source_id="compras-example", objective_id=objective,
+                                   tdd_path=tdd_steps["compras-example"]["tdd_path"], mode="D1")
+            mode_counts["D1"] += 1
+        return shared["macro"]
+
     for row in base:
         nn = row["i"] + 1
         captured = (ts0 + timedelta(minutes=5 + row["i"])).isoformat()
@@ -215,12 +243,26 @@ def _render_run(
 
         def step_for(source_id: str, steps: dict = steps, row: dict = row) -> str:
             """The phase-5 step that captures this supplier on one source (created on first use)."""
+            if source_id == "lista-fiscal-example":
+                steps[source_id] = bulk_step()
             if source_id not in steps:
                 host, _st, objective, mode = SOURCES[source_id]
-                steps[source_id] = step(5, tdd_steps[source_id]["step_id"], f"page for {row['tax_id']} on {host}",
-                                        "extract fields", "emit.observation", "passed SHACL, promoted to gold",
-                                        source_id=source_id, objective_id=objective,
-                                        tdd_path=tdd_steps[source_id]["tdd_path"], mode=mode, value_ids=[])
+                tdd_path = tdd_steps[source_id]["tdd_path"]
+                parent = tdd_steps[source_id]["step_id"]
+                evaluated = "passed SHACL, promoted to gold"
+                if source_id == "compras-example" and row["i"] >= 15:  # crystallized: the macro runs at D1
+                    parent, mode = macro_step()["step_id"], "D1"
+                if source_id == "registro-example" and row["i"] % 8 == 5:  # the agentic loop fails its check
+                    failed = step(5, parent, f"page for {row['tax_id']} on {host}", "extract fields",
+                                  "S1 loop: 'fecha de constitucion' not in the accessibility tree after 2 reflections",
+                                  "failed check; escalate to S2 (vision)", source_id=source_id,
+                                  objective_id=objective, tdd_path=tdd_path, mode="S1")
+                    mode_counts["S1"] += 1
+                    parent, mode = failed["step_id"], "S2"
+                    evaluated = "escalated to S2; passed SHACL, promoted to gold"
+                steps[source_id] = step(5, parent, f"page for {row['tax_id']} on {host}", "extract fields",
+                                        "emit.observation", evaluated, source_id=source_id, objective_id=objective,
+                                        tdd_path=tdd_path, mode=mode, value_ids=[])
                 mode_counts[mode] += 1
             return steps[source_id]["step_id"]
 
@@ -248,6 +290,8 @@ def _render_run(
                 if vid not in st["value_ids"]:
                     st["value_ids"].append(vid)
         for st in steps.values():
+            if st is shared.get("bulk"):
+                continue
             fields_done = sorted(v.split("-", 2)[-1] for v in st["value_ids"])
             st["requested"] = f"extract {', '.join(fields_done)}"
             st["executed"] = f"emit.observation x{len(fields_done)}"
@@ -373,6 +417,52 @@ CASE_FILES = {
 }
 
 
+def fixture_job(step: dict, n: int) -> dict:
+    """Synthetic sandbox proof checkpoints (CONTRACT section 8) for one step. Labelled as fixtures throughout."""
+    failed = "fail" in str(step.get("evaluated") or "").lower()
+    return {
+        "job_id": f"job:{step['step_id'].split(':', 1)[1]}", "run_id": step["run_id"], "step_id": step["step_id"],
+        "source_id": step.get("source_id"), "started_at": step.get("ts"),
+        "checkpoints": {
+            "host": {"ok": True, "sandbox_host": "sandbox-fixture.example", "runtime": "runsc (synthetic fixture)",
+                     "virt": "n/a (fixture)"},
+            "task": {"ok": not failed, "requested": step.get("requested"), "result": step.get("executed"),
+                     "value_ids": step.get("value_ids") or []},
+            "where": {"ok": True, "hostname": f"fixture-pod-{n:04d}", "uname": "Linux 4.4.0 gVisor (synthetic fixture)"},
+            "isolation": {"ok": True, "probes": [{"probe": "GET https://blocked.invalid", "result": "BLOCKED"},
+                                                 {"probe": "write /host/escape-test", "result": "BLOCKED"}]},
+            "teardown": {"ok": True, "detail": "pod removed; 0 sandboxes running (synthetic fixture)"},
+        },
+    }
+
+
+def _write_live_record(lake: Path, run_id: str, suppliers: list[dict], trace: list[dict], metrics: dict) -> None:
+    """A recorded live feed (CONTRACT section 4b) for a finished fixture run, as the engine would leave it."""
+    evidence = {}
+    for s in suppliers:
+        for f in s["fields"].values():
+            evidence[f["value_id"]] = f["evidence"]
+    live, jobs = [], []
+    for step in trace:
+        rec = dict(step)
+        for vid in step.get("value_ids") or []:
+            shot = next((e["screenshot_key"] for e in evidence.get(vid, []) if e["source_id"] == step["source_id"]), None)
+            if shot:
+                rec["screenshot_key"] = shot
+                break
+        live.append(rec)
+        if step["phase"] == 5 and step.get("source_id"):
+            jobs.append(fixture_job(step, len(jobs) + 1))
+    run_dir = lake / "runs" / CASE_ID / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "trace.live.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in live))
+    (run_dir / "jobs.jsonl").write_text("".join(json.dumps(j, ensure_ascii=False) + "\n" for j in jobs))
+    status = {"run_id": run_id, "state": "done", "phase": 5, "checkpoint_pending": None,
+              "updated_at": trace[-1]["ts"], "sources": [], "metrics": metrics}
+    (run_dir / "status.json").write_text(json.dumps(status, indent=2))
+    (lake / "runs" / CASE_ID / "latest.json").write_text(json.dumps({"run_id": run_id}))
+
+
 def generate(out: Path, n_suppliers: int = 60, seed: int = 7) -> Path:
     """Write OUT/lake and OUT/case. Returns the lake root (use as PA_GOLD_DIR)."""
     lake, case = out / "lake", out / "case"
@@ -388,6 +478,8 @@ def generate(out: Path, n_suppliers: int = 60, seed: int = 7) -> Path:
         for name, rows in (("suppliers", suppliers), ("contracts", run_contracts), ("trace", trace)):
             (run_dir / f"{name}.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
         (run_dir / "metrics.json").write_text(json.dumps(metrics, indent=2))
+        if run_id == RUNS[1]:
+            _write_live_record(lake, run_id, suppliers, trace, metrics)
         metrics_copy = case / "runs" / run_id / "metrics.json"
         metrics_copy.parent.mkdir(parents=True, exist_ok=True)
         metrics_copy.write_text(json.dumps(metrics, indent=2))

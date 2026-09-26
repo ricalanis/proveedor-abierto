@@ -13,8 +13,8 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from . import CORE_FIELDS, dod, investigate
-from .gold import GoldStore, Run, UnavailableStore, load_store, sniff_media_type
+from . import CORE_FIELDS, dod, investigate, live
+from .gold import GoldStore, Run, UnavailableStore, backend_of, load_store, sniff_media_type
 
 HERE = Path(__file__).parent
 REPO_ROOT = HERE.parent.parent
@@ -117,6 +117,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     def render(request: Request, name: str, **ctx) -> HTMLResponse:
         ctx.setdefault("nav", "")
+        r = ctx.get("run")
+        ctx.setdefault("backend", r.inference_backend if r else None)
+        ctx.setdefault("synthetic", bool(r and r.case_id.startswith("fixture")))
         return templates.TemplateResponse(request, name, ctx)
 
     @app.exception_handler(NoGold)
@@ -199,7 +202,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {
             "run_id": r.run_id, "prev_run_id": prev_id, "total": total, "fields": fields,
             "recomputed": recomputed, "engine": engine, "mismatches": dod.cross_check(recomputed, engine) if engine else
-            ["engine metrics.json not found for this run"], "met": dod.dod_met(recomputed), "targets": dod.TARGETS,
+            ["engine metrics.json not found for this run"], "met": dod.dod_met(recomputed, r.inference_backend),
+            "targets": dod.TARGETS, "backend": r.inference_backend,
             "coverage": engine.get("level_ratio_coverage") or {}, "modes": engine.get("mode_counts") or {},
             "jobs": engine.get("jobs") or {},
         }
@@ -347,6 +351,45 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except ValueError as exc:
             return RedirectResponse(f"/approvals?error={exc}", status_code=303)
         return RedirectResponse(f"/approvals?done={form.get('phase_dir', '')}", status_code=303)
+
+    def run_view_model(run_id: str, after: int = 0) -> dict:
+        steps = live.annotate(settings.store.live_steps(run_id))
+        status = settings.store.live_status(run_id)
+        if not steps and status is None:
+            raise HTTPException(404, f"no live feed for run {run_id}")
+        jobs = settings.store.live_jobs(run_id)
+        backend = (status or {}).get("inference_backend") or backend_of((status or {}).get("metrics"), steps)
+        return {"run_id": run_id, "steps": steps, "new": steps[after:][::-1], "panel": live.summarize(steps, status),
+                "proof": live.proof(jobs), "backend": backend}
+
+    @app.get("/run")
+    def run_latest():
+        run_id = settings.store.live_run_id()
+        if not run_id:
+            raise NoGold("No live run feed yet: the engine writes runs/<case_id>/latest.json when a run starts.")
+        return RedirectResponse(f"/run/{run_id}", status_code=307)
+
+    @app.get("/run/{run_id}", response_class=HTMLResponse)
+    def run_view(request: Request, run_id: str):
+        m = run_view_model(run_id)
+        return render(request, "run.html", nav="run", run=None, live_run_id=run_id, m=m, recent=m["new"][:150],
+                      backend=m["backend"], synthetic=settings.store.case_id.startswith("fixture"),
+                      PHASES=live.PHASES, MODE_NAMES=live.MODE_NAMES,
+                      CHECKPOINT_PHASE=live.CHECKPOINT_PHASE, others=settings.store.live_run_ids())
+
+    @app.get("/api/run/{run_id}")
+    def run_api(request: Request, run_id: str, after: int = 0) -> dict:
+        m = run_view_model(run_id, max(after, 0))
+        env = templates.env
+        steps_html = env.get_template("_steps.html").render(steps=m["new"][:150], MODE_NAMES=live.MODE_NAMES)
+        panel_html = env.get_template("_run_panel.html").render(
+            m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE, MODE_NAMES=live.MODE_NAMES)
+        proof_html = env.get_template("_proof.html").render(m=m)
+        timeline_html = env.get_template("_timeline.html").render(
+            m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE)
+        return {"count": len(m["steps"]), "state": m["panel"]["state"], "steps_html": steps_html,
+                "panel_html": panel_html, "timeline_html": timeline_html,
+                "proof_html": proof_html}
 
     @app.get("/bronze/{key}")
     def bronze(key: str):

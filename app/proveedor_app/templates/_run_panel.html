@@ -1,0 +1,61 @@
+{% set p = m.panel %}{% set mt = p.metrics %}
+<section class="panel-block" aria-labelledby="dod-live-h">
+  <h2 id="dod-live-h" class="visually-hidden">Progress</h2>
+  <dl class="live-stats">
+    <div><dt>Suppliers found</dt><dd class="mono" data-k="sup-total">{{ mt.suppliers_total if mt.suppliers_total is not none else "—" }}</dd></div>
+    <div><dt>At ≥ 80% of core fields</dt><dd class="mono" data-k="sup-80">{{ mt.suppliers_at_80pct_core if mt.suppliers_at_80pct_core is not none else "—" }}<span class="of"> / 50</span></dd></div>
+    <div><dt>Values captured</dt><dd class="mono" data-k="values">{{ p.value_count }}</dd></div>
+    <div><dt>Steps</dt><dd class="mono" data-k="steps">{{ p.step_count }}</dd></div>
+  </dl>
+</section>
+<section class="panel-block" aria-labelledby="fields-live-h">
+  <h2 id="fields-live-h">Core fields in gold</h2>
+  <table class="bars bars--compact">
+    <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
+    <tbody>
+    {% for f in p.fields %}
+      <tr>
+        <th scope="row">{{ f.name|field_label }}</th>
+        <td class="bars__track"><span class="bar" data-k="bar-{{ f.name }}" style="--v: {{ ((f.ratio or 0) * 100)|round(1) }}%"></span><span class="bars__target" aria-hidden="true"></span></td>
+        <td class="num mono" data-k="pct-{{ f.name }}">{{ f.ratio|pct if f.ratio is not none else "—" }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+<section class="panel-block" aria-labelledby="modes-live-h">
+  <h2 id="modes-live-h">Where inference is spent</h2>
+  <table class="bars bars--compact">
+    <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
+    <tbody>
+    {% for mode, n in p.modes.items() %}
+      <tr>
+        <th scope="row"><span class="mode-badge mode-badge--{{ mode }}">{{ mode }}</span> {{ MODE_NAMES[mode] }}</th>
+        <td class="bars__track"><span class="bar bar--quiet" data-k="mode-{{ mode }}" style="--v: {{ ((n / p.mode_total * 100) if p.mode_total else 0)|round(1) }}%"></span></td>
+        <td class="num mono" data-k="mode-n-{{ mode }}">{{ n }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="events">
+    <span class="event event--escalation">Escalations <span class="mono" data-k="ev-esc">{{ p.events.escalation }}</span></span>
+    <span class="event event--crystallization">Crystallized <span class="mono" data-k="ev-cry">{{ p.events.crystallization }}</span></span>
+    <span class="event event--failure">Failed checks <span class="mono" data-k="ev-fail">{{ p.events.failure }}</span></span>
+  </p>
+</section>
+<section class="panel-block" aria-labelledby="sources-live-h">
+  <h2 id="sources-live-h">Sources</h2>
+  {% if p.sources %}
+  <table class="ledger ledger--sources">
+    <thead><tr><th scope="col">Source</th><th scope="col" class="num">OK</th><th scope="col" class="num">Failed</th><th scope="col" class="num">Values</th></tr></thead>
+    <tbody>
+    {% for src in p.sources %}{% set h = src.health or {} %}
+      <tr><th scope="row"><span class="mono">{{ src.source_id }}</span><span class="sub">{{ SOURCE_TYPE_LABELS.get(src.source_type, src.source_type or "") }}</span></th>
+        <td class="num mono" data-k="ok-{{ src.source_id }}">{{ h.ok or 0 }}</td>
+        <td class="num mono{% if h.failed %} failed{% endif %}" data-k="failed-{{ src.source_id }}">{{ h.failed or 0 }}</td>
+        <td class="num mono" data-k="yield-{{ src.source_id }}">{{ h.yield or 0 }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="muted note">No source has run yet.</p>{% endif %}
+</section>

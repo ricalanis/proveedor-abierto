@@ -18,6 +18,7 @@ import json
 import os
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from functools import cached_property
 from pathlib import Path
 from typing import Protocol
 
@@ -129,6 +130,11 @@ class Run:
             for vid in step.get("value_ids") or []:
                 self.steps_by_value.setdefault(vid, []).append(step)
 
+    @cached_property
+    def inference_backend(self) -> str | None:
+        """'recorded' if anything in the run came from the recorded inference double (CONTRACT section 7)."""
+        return backend_of(self.metrics, self.trace, self.values.values())
+
     def lineage(self, value_id: str) -> list[list[dict]]:
         """One chain per step that produced the value: that step, then its parent_step_id ancestors."""
         chains = []
@@ -140,6 +146,22 @@ class Run:
                 cur = self.steps_by_id.get(cur.get("parent_step_id") or "")
             chains.append(chain)
         return chains
+
+
+def backend_of(metrics: dict | None, steps: Iterable[dict] = (), values: Iterable = ()) -> str | None:
+    """Worst-case inference backend: any recorded artifact makes the whole thing 'recorded'."""
+    seen = set()
+    if (metrics or {}).get("inference_backend"):
+        seen.add(metrics["inference_backend"])
+    for s in steps:
+        seen.add((s.get("generated_by") or {}).get("backend"))
+    for v in values:
+        data = v.data if hasattr(v, "data") else v
+        seen.add((data.get("generated_by") or {}).get("backend"))
+    seen.discard(None)
+    if "recorded" in seen:
+        return "recorded"
+    return "vultr" if "vultr" in seen else None
 
 
 class GoldStore:
@@ -204,6 +226,45 @@ class GoldStore:
         if algo != "sha256" or not hexdigest or not all(c in "0123456789abcdef" for c in hexdigest):
             return None
         return self.bronze_key_template.format(hex=hexdigest)
+
+    # Live run feed (CONTRACT section 4b): runs/<case_id>/latest.json, <run_id>/status.json, trace.live.jsonl
+
+    def live_run_id(self) -> str | None:
+        raw = self.source.read(f"runs/{self.case_id}/latest.json")
+        return json.loads(raw)["run_id"] if raw else None
+
+    def live_run_ids(self) -> list[str]:
+        return self.source.list_dirs(f"runs/{self.case_id}")
+
+    def live_status(self, run_id: str) -> dict | None:
+        raw = self.source.read(f"runs/{self.case_id}/{run_id}/status.json")
+        try:
+            return json.loads(raw) if raw else None
+        except ValueError:  # caught mid-rewrite; the next poll gets it
+            return None
+
+    def live_steps(self, run_id: str) -> list[dict]:
+        raw = self.source.read(f"runs/{self.case_id}/{run_id}/trace.live.jsonl")
+        steps = []
+        for line in (raw or b"").decode("utf-8", "replace").splitlines():
+            try:
+                steps.append(json.loads(line))
+            except ValueError:  # a line still being appended
+                break
+        return steps
+
+    def live_jobs(self, run_id: str) -> list[dict]:
+        """Sandbox jobs with their proof checkpoints (section 8); the last record per job_id wins."""
+        raw = self.source.read(f"runs/{self.case_id}/{run_id}/jobs.jsonl")
+        jobs: dict[str, dict] = {}
+        for line in (raw or b"").decode("utf-8", "replace").splitlines():
+            try:
+                rec = json.loads(line)
+            except ValueError:
+                break
+            if rec.get("job_id"):
+                jobs[rec["job_id"]] = {**jobs.get(rec["job_id"], {}), **rec}
+        return list(jobs.values())
 
     def bronze(self, key: str) -> bytes | None:
         path = self._bronze_path(key)
@@ -287,6 +348,21 @@ class UnavailableStore:
 
     def bronze(self, key: str) -> bytes | None:
         return None
+
+    def live_run_id(self) -> str | None:
+        return None
+
+    def live_run_ids(self) -> list[str]:
+        return []
+
+    def live_status(self, run_id: str) -> dict | None:
+        return None
+
+    def live_steps(self, run_id: str) -> list[dict]:
+        return []
+
+    def live_jobs(self, run_id: str) -> list[dict]:
+        return []
 
     def bronze_meta(self, key: str) -> dict:
         return {}

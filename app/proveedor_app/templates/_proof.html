@@ -1,0 +1,43 @@
+{% set pr = m.proof %}
+<section class="proof" aria-labelledby="proof-h">
+  <header class="proof__head">
+    <h2 id="proof-h">Sandbox proof</h2>
+    <p class="note">Every page the agents touch is opened in a throwaway sandbox pod, never in this app. Each job records five checkpoints. If an agent were told to run <span class="mono">rm -rf /</span>, only its pod would be affected, and the pod is deleted when the job ends.</p>
+  </header>
+  {% if pr.jobs %}
+  <table class="proof__table">
+    <thead><tr><th scope="col">Checkpoint</th><th scope="col" class="num">Passed</th><th scope="col" class="num">Failed</th><th scope="col" class="num">Pending</th></tr></thead>
+    <tbody>
+    {% for key, label, what in pr.checkpoints %}{% set c = pr.counts[key] %}
+      <tr><th scope="row">{{ label }}<span class="sub">{{ what }}</span></th>
+        <td class="num mono" data-k="cp-pass-{{ key }}">{{ c.pass }}</td>
+        <td class="num mono{% if c.fail %} failed{% endif %}" data-k="cp-fail-{{ key }}">{{ c.fail }}</td>
+        <td class="num mono muted" data-k="cp-pend-{{ key }}">{{ c.pending }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% set j = pr.featured %}
+  {% if j %}{% set cps = j.checkpoints or {} %}
+  <div class="proof__job">
+    <p class="proof__jobid">Latest job <span class="mono">{{ j.job_id }}</span>{% if j.source_id %} · <span class="mono">{{ j.source_id }}</span>{% endif %}</p>
+    <ol class="proof__steps">
+      {% for key, label, what in pr.checkpoints %}{% set st = pr.state(j, key) %}{% set cp = cps.get(key) or {} %}
+      <li class="cp cp--{{ st }}">
+        <span class="cp__mark" aria-hidden="true">{{ {"pass": "✓", "fail": "✕", "pending": "…"}[st] }}</span>
+        <span class="cp__label">{{ label }}</span>
+        <span class="cp__detail mono">
+          {% if key == "host" %}{{ cp.sandbox_host or "—" }} · runtime {{ cp.runtime or "—" }}{% if cp.virt %} · {{ cp.virt }}{% endif %}
+          {% elif key == "task" %}{{ cp.requested or "—" }} → {{ cp.result or "—" }}
+          {% elif key == "where" %}{{ cp.hostname or "—" }} · {{ cp.uname or "—" }}
+          {% elif key == "isolation" %}{% for pb in cp.probes or [] %}{{ pb.probe }}: <strong>{{ pb.result }}</strong>{% if not loop.last %} · {% endif %}{% else %}—{% endfor %}
+          {% elif key == "teardown" %}{{ cp.detail or "—" }}{% endif %}
+        </span>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+  {% else %}
+  <p class="muted note">No sandbox job has reported yet.</p>
+  {% endif %}
+</section>

@@ -23,7 +23,8 @@ def test_every_value_is_traceable_to_phase_1(store):
         chains = run.lineage(vid)
         assert chains, vid
         for chain in chains:
-            assert [step["phase"] for step in chain] == [5, 4, 3, 2, 1], vid
+            phases = [step["phase"] for step in chain]
+            assert phases[0] == 5 and phases[-4:] == [4, 3, 2, 1] and set(phases[:-4]) == {5}, vid
 
 
 def test_bronze_lookup_and_key_validation(store):
