@@ -107,11 +107,17 @@ def test_rubric_alternative_personas_are_not_failures():
 
 
 def test_harness_is_out_of_the_engines_reach():
+    """case/ (what the engine reads and writes) never references the harness. In app/, only the read-only
+    report card module may import it: the app is the judge's view, not the engine."""
+    allowed = {"app/proveedor_app/report.py"}
     offenders = []
     for base in ("app", "case"):
         for path in (ROOT / base).rglob("*"):
             if path.is_file() and path.suffix in {".py", ".md", ".yaml", ".yml", ".json", ".html", ".js", ".toml"}:
                 text = path.read_text(errors="ignore")
-                if re.search(r"\bpa_eval\b|eval/references", text):
-                    offenders.append(str(path.relative_to(ROOT)))
+                rel = str(path.relative_to(ROOT))
+                if re.search(r"\bpa_eval\b|eval/references", text) and rel not in allowed:
+                    offenders.append(rel)
     assert not offenders, offenders
+    report = (ROOT / "app/proveedor_app/report.py").read_text()
+    assert "write_text" not in report and "open(" not in report  # read-only use

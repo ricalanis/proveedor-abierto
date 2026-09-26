@@ -208,3 +208,17 @@ def test_evidence_format_is_shown(lake, fixture_root):
     path.write_text("".join(json.dumps(r) + "\n" for r in rows))
     frag = _client(lake, fixture_root / "case").get(f"/fragments/evidence/{rows[0]['fields']['tax_id']['value_id']}")
     assert "Procurement portal" in frag.text and "xlsx" in frag.text
+
+
+def test_engine_report_card_on_fixtures(lake, fixture_root):
+    page = _client(lake, fixture_root / "case").get("/engine")
+    assert page.status_code == 200
+    for needle in ("Engine report card", "Investigative journalist", "SCIAN", "LAASSP", "Completeness",
+                   "Extraction honesty", "sandbox jobs passed all five checkpoints", "mock-tag"):
+        assert needle in page.text, needle
+    assert "matches this recomputation" in page.text
+
+
+def test_engine_report_card_without_phase_artifacts(lake, tmp_path):
+    page = _client(lake, tmp_path / "empty-case").get("/engine")
+    assert page.status_code == 200 and "has not written" in page.text

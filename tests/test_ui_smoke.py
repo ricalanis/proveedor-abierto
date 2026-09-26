@@ -125,3 +125,10 @@ def test_watch_toggle_feeds_watchlist(page, base_url):
     page.locator("[data-unwatch]").click()
     page.wait_for_url("**/watchlist?ids=")
     assert page.locator(".watch__item").count() == 0
+
+
+def test_engine_report_card_renders(page, base_url):
+    page.goto(base_url + "/engine")
+    assert page.locator("h1").inner_text() == "Engine report card"
+    assert page.locator(".taxonomy").count() >= 2
+    assert page.locator(".mock-tag").count() >= 4  # fixtures declare recorded provenance

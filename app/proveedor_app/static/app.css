@@ -332,6 +332,15 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .signoff { display: grid; gap: var(--space-sm); padding-top: var(--space-md); border-top: var(--rule-strong); }
 .ledger--approvals td, .ledger--approvals th { font-size: var(--text-sm); }
 
+/* Engine report card */
+.card-sec { max-width: 1040px; padding-top: var(--space-md); border-top: var(--rule-strong); }
+.mock-tag { display: inline-block; font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 var(--space-2xs); border: 1px dashed var(--color-signal); color: var(--color-signal); border-radius: var(--radius-sm); vertical-align: 2px; }
+.rub { font-size: var(--text-sm); white-space: nowrap; }
+.rub--found { font-weight: 700; }
+.rub--partial { color: var(--color-ink-2); }
+.rub--missing { color: var(--color-ink-3); }
+.ledger td.failed { color: var(--color-signal); font-weight: 700; }
+
 /* Sandbox proof */
 .proof { margin-top: var(--space-2xl); padding-top: var(--space-md); border-top: var(--rule-strong); display: grid; gap: var(--space-md); }
 .proof__head { display: grid; gap: var(--space-2xs); max-width: 80ch; }

@@ -296,6 +296,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                       s=r.suppliers_by_id.get(ref.supplier_id), replays=investigate.journal_chain(r, case, value_id),
                       anchors=anchors)
 
+    @app.get("/engine", response_class=HTMLResponse)
+    def engine_report(request: Request):
+        from . import report
+
+        r = run(request)
+        card = report.build(settings.store, r, case)
+        return render(request, "engine.html", nav="engine", run=r, card=card, MODE_NAMES=live.MODE_NAMES,
+                      FIELD_ORDER=CORE_FIELDS)
+
     @app.get("/case-file", response_class=HTMLResponse)
     def case_file(request: Request, path: str):
         text = case.read(path, limit=200_000)
