@@ -307,7 +307,53 @@ def approvals(case: CaseDir) -> list[Approval]:
     return out
 
 
-def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = None) -> dict:
+DEFAULT_ARTIFACTS = {"prd": ["01-scope/prd.json"], "factors": ["02-ontology/factors/factors.json"],
+                     "ontology": ["02-ontology/ontology.json"]}
+
+
+def artifact_paths(item: Approval) -> list[str]:
+    return list(item.meta.get("artifact_paths") or DEFAULT_ARTIFACTS.get(item.checkpoint or "", []))
+
+
+def load_artifacts(case: CaseDir, item: Approval) -> dict:
+    """The JSON documents a checkpoint asks the approver to review, keyed by kind (prd | factors | ontology)."""
+    docs: dict = {}
+    for rel in artifact_paths(item):
+        if not rel.endswith(".json"):
+            continue
+        text = case.read(rel, limit=10**7)
+        try:
+            doc = json.loads(text) if text else None
+        except ValueError:
+            doc = None
+        if not isinstance(doc, dict):
+            continue
+        if "definition_of_done" in doc:
+            docs["prd"] = doc
+        elif "taxonomies" in doc:
+            docs["ontology"] = doc
+        elif "factors" in doc:
+            docs["factors"] = doc
+    return docs
+
+
+def taxonomy_stats(tax: dict) -> dict:
+    """Nodes per level and critic-label counts for one taxonomy (the numbers the approver signs off on)."""
+    levels: dict[int, int] = {}
+    critic: dict[str, int] = {}
+
+    def walk(nodes):
+        for n in nodes or []:
+            levels[n.get("level", 0)] = levels.get(n.get("level", 0), 0) + 1
+            critic[n.get("critic_label", "?")] = critic.get(n.get("critic_label", "?"), 0) + 1
+            walk(n.get("children"))
+
+    walk(tax.get("children"))
+    return {"levels": dict(sorted(levels.items())), "critic": critic, "nodes": sum(levels.values())}
+
+
+def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = None,
+            decisions: dict[str, str] | None = None) -> dict:
     """Write the APPROVED marker next to a pending checkpoint. Raises ValueError when the request is invalid."""
     approver = " ".join(approver.split())[:120]
     if not approver:
@@ -319,9 +365,23 @@ def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = N
     if marker.exists():
         raise ValueError(f"{phase_dir} is already approved")
     item = next(a for a in approvals(case) if a.phase_dir == phase_dir)
-    record = {"approver": approver, "date": (today or datetime.now(UTC).date()).isoformat()}
+    record: dict = {"approver": approver, "date": (today or datetime.now(UTC).date()).isoformat()}
     if item.checkpoint:
         record["checkpoint"] = item.checkpoint
+    if decisions:
+        if item.checkpoint != "factors":
+            raise ValueError("per-factor decisions only apply to the factors checkpoint")
+        factors = (load_artifacts(case, item).get("factors") or {}).get("factors") or []
+        known = {f["id"] for f in factors if isinstance(f, dict) and f.get("id")}
+        if set(decisions) != known:
+            raise ValueError("decide every proposed factor, and only those")
+        if any(v not in ("accept", "reject") for v in decisions.values()):
+            raise ValueError("each factor decision must be accept or reject")
+        if "accept" not in decisions.values():
+            raise ValueError("accept at least one factor, or ask the engine to propose new ones")
+        record["decisions"] = dict(sorted(decisions.items()))
+    elif item.checkpoint == "factors" and (load_artifacts(case, item).get("factors") or {}).get("factors"):
+        raise ValueError("decide each factor (accept or reject) before approving")
     with marker.open("x") as fh:  # never overwrite a concurrent approval
         json.dump(record, fh)
         fh.write("\n")

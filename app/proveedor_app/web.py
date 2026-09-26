@@ -6,7 +6,7 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, quote, urlsplit
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
@@ -328,15 +328,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def approvals(request: Request, done: str = "", error: str = ""):
         require_approver(request)
         items = investigate.approvals(case)
-        for a in items:
-            paths = a.meta.get("artifact_paths") or {"prd": ["01-scope/prd.md"]}.get(a.checkpoint or "", [])
-            a.artifacts = [{"path": p, "exists": case.exists(p)} for p in paths]
-        try:
-            r = settings.store.run(None)
-        except LookupError:
-            r = None
-        return render(request, "approvals.html", nav="approvals", run=r, items=items, who=identity(request),
-                      done=done, error=error)
+        return render(request, "approvals.html", nav="approvals", run=None, items=items, done=done, error=error)
+
+    @app.get("/approvals/{phase_dir:path}", response_class=HTMLResponse)
+    def approval_detail(request: Request, phase_dir: str, error: str = ""):
+        require_approver(request)
+        item = next((a for a in investigate.approvals(case) if a.phase_dir == phase_dir), None)
+        if not item:
+            raise HTTPException(404, f"no approval checkpoint in {phase_dir}")
+        docs = investigate.load_artifacts(case, item)
+        paths = [{"path": p, "exists": case.exists(p)} for p in investigate.artifact_paths(item)]
+        gen = item.meta.get("generated_by") or next((d.get("generated_by") for d in docs.values() if d.get("generated_by")), None)
+        return render(request, "approval.html", nav="approvals", run=None, a=item, docs=docs, paths=paths,
+                      who=identity(request), error=error, gen=gen, backend=(gen or {}).get("backend"),
+                      taxonomy_stats=investigate.taxonomy_stats)
 
     @app.post("/approvals")
     async def approve(request: Request):
@@ -345,12 +350,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if origin and urlsplit(origin).netloc != request.headers.get("host"):
             raise HTTPException(403, "cross-origin approval refused")
         form = {k: v[0] for k, v in parse_qs((await request.body()).decode()).items()}
-        who = identity(request) or form.get("approver", "")
+        phase_dir = form.get("phase_dir", "")
+        decisions = {k.removeprefix("decision."): v for k, v in form.items() if k.startswith("decision.")}
         try:
-            investigate.approve(case, form.get("phase_dir", ""), who)
+            investigate.approve(case, phase_dir, form.get("approver", ""), decisions=decisions or None)
         except ValueError as exc:
-            return RedirectResponse(f"/approvals?error={exc}", status_code=303)
-        return RedirectResponse(f"/approvals?done={form.get('phase_dir', '')}", status_code=303)
+            back = f"/approvals/{quote(phase_dir)}" if phase_dir and case.exists(phase_dir) else "/approvals"
+            return RedirectResponse(f"{back}?error={quote(str(exc))}", status_code=303)
+        return RedirectResponse(f"/approvals?done={quote(phase_dir)}", status_code=303)
 
     def run_view_model(run_id: str, after: int = 0) -> dict:
         steps = live.annotate(settings.store.live_steps(run_id))

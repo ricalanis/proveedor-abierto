@@ -36,13 +36,13 @@ def _text(step: dict) -> str:
 
 
 def annotate(steps: list[dict]) -> list[dict]:
-    """Add `event` (escalation | crystallization | failure | None) to each step, honouring an explicit `event`."""
+    """Add `event` to each step. An `event` key from the engine (even null) wins; inference is only a fallback."""
     by_id = {s.get("step_id"): s for s in steps}
     out = []
     for s in steps:
         s = dict(s)
         event = s.get("event")
-        if not event:
+        if "event" not in s:
             parent = by_id.get(s.get("parent_step_id"))
             text = _text(s)
             evaluated = str(s.get("evaluated") or "").lower()
@@ -62,7 +62,7 @@ def summarize(steps: list[dict], status: dict | None) -> dict:
     """Everything the side panel shows, from the step stream plus status.json."""
     status = status or {}
     modes = {m: 0 for m in MODE_RANK}
-    events = {"escalation": 0, "crystallization": 0, "failure": 0}
+    events = {"escalation": 0, "crystallization": 0, "repair": 0, "hard_stop": 0, "failure": 0}
     values = 0
     for s in steps:
         if s.get("mode") in modes:

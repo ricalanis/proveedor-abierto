@@ -33,7 +33,7 @@
     <span class="role role--{{ role }}" title="Access role for this URL">{{ "Approver" if role == "approver" else "Investigator · read-only" }}</span>
   </header>
   {% if backend == "recorded" %}
-  <p class="banner banner--sim" role="note"><strong>Simulated inference.</strong> This run used recorded model responses, not live calls to Vultr Serverless Inference. Its values are placeholders for a real run and do not count toward the definition of done.</p>
+  <p class="banner banner--sim" role="note"><strong>Simulated inference.</strong> What this page shows came from recorded model responses, not live calls to Vultr Serverless Inference. It is a placeholder for a real run and does not count toward the definition of done.</p>
   {% endif %}
   {% if synthetic %}
   <p class="banner" role="note"><strong>Synthetic fixture data.</strong> Every company, tax ID and source here is invented ("Proveedor Ejemplo", RFCs starting with ZZZ, <span class="mono">.example</span> sites) for rehearsal and tests.</p>

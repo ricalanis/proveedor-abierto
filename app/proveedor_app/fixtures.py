@@ -17,7 +17,7 @@ from pathlib import Path
 
 import yaml
 
-from . import CORE_FIELDS, dod
+from . import CORE_FIELDS, dod, fixture_case
 
 CASE_ID = "fixture-case"
 RUNS = ("run-fixture-0000", "run-fixture-0001")
@@ -419,8 +419,6 @@ CASE_FILES = {
     "02-ontology/versions/v1.md": "# Ontology v1 (synthetic fixture)\n\nClasses: Supplier, Contract, "
                                   "Procedure, BuyingUnit, Address, LegalRepresentative, TaxListing, Sanction.\n",
     "02-ontology/taxonomies/sector.yaml": json.dumps({"sector": TAXONOMY}, indent=2) + "\n",
-    "01-scope/APPROVAL_PENDING.md": "# Approval pending: global PRD (synthetic fixture)\n\nReview "
-                                    "`01-scope/prd.md`, then approve to resume the run.\n",
 }
 
 
@@ -494,6 +492,9 @@ def generate(out: Path, n_suppliers: int = 60, seed: int = 7) -> Path:
     for rel, text in CASE_FILES.items():
         (case / rel).parent.mkdir(parents=True, exist_ok=True)
         (case / rel).write_text(text)
+    for stale in case.glob("**/APPROVED"):  # regenerated fixtures start with every checkpoint pending
+        stale.unlink()
+    fixture_case.write(case)
     objectives = {"ontology_version": "v1", "prd_path": "01-scope/prd.md", "generated_by": GEN, "objectives": [
         {"id": objective, "source_id": source_id, "source_url": f"https://{host}/",
          "target_fields": sorted(f for f, s in FIELD_SOURCE.items() if s == source_id) or ["founding_date"],

@@ -1,47 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Approvals{% endblock %}
+{% set CP_NAMES = {"prd": "Global PRD", "factors": "Factors of variation", "ontology": "Ontology"} %}
 {% block main %}
 <section class="page-head">
   <h1>Approvals</h1>
-  <p class="lede">The engine pauses at three checkpoints (the PRD, the factors of variation and the ontology) until a person signs off. Approving writes the <span class="mono">APPROVED</span> marker, and the next <span class="mono">ontofill run</span> resumes from there.</p>
+  <p class="lede">The engine pauses at three checkpoints until a person signs off: the PRD, the factors of variation, and the ontology. Review each one here. Approving writes the <span class="mono">APPROVED</span> marker, and the next <span class="mono">ontofill run</span> resumes from it.</p>
 </section>
-
 {% if done %}<p class="notice" role="status">Approved <span class="mono">{{ done }}</span>. The run resumes on the next <span class="mono">ontofill run</span>.</p>{% endif %}
 {% if error %}<p class="notice notice--error" role="alert">{{ error }}</p>{% endif %}
-
 {% if items %}
-<div class="approvals">
-{% for a in items %}
-  <section class="approval {% if a.approved %}approval--done{% endif %}" aria-labelledby="ap-{{ loop.index }}">
-    <header>
-      <h2 id="ap-{{ loop.index }}">{{ {"prd": "Global PRD", "factors": "Factors of variation", "ontology": "Ontology"}.get(a.checkpoint, "Checkpoint") }} <span class="mono muted">{{ a.phase_dir }}</span></h2>
-      {% if a.approved %}<p class="approval__state">Approved by {{ a.approved.approver }}{% if a.approved.date %} on <span class="mono">{{ a.approved.date }}</span>{% endif %}</p>
-      {% else %}<p class="approval__state approval__state--pending">Waiting for sign-off</p>{% endif %}
-    </header>
-    <details open>
-      <summary>What the engine is asking</summary>
-      <pre class="record">{{ a.pending_text }}</pre>
-    </details>
-    {% if a.artifacts %}
-    <p class="note">Review before approving:
-      {% for f in a.artifacts %}{% if f.exists %}<a class="mono" href="/case-file?path={{ f.path|urlencode }}" target="_blank" rel="noopener">{{ f.path }}</a>{% else %}<span class="mono muted">{{ f.path }} (missing)</span>{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
-    </p>
-    {% endif %}
-    {% if not a.approved %}
-    <form method="post" action="/approvals" class="approve-form">
-      <input type="hidden" name="phase_dir" value="{{ a.phase_dir }}">
-      {% if who %}
-        <p class="note">Signing as <strong>{{ who }}</strong> (from the access gateway).</p>
-      {% else %}
-        <label for="approver-{{ loop.index }}">Your name</label>
-        <input id="approver-{{ loop.index }}" name="approver" type="text" required maxlength="120" autocomplete="name">
-      {% endif %}
-      <button type="submit">Approve {{ {"prd": "the PRD", "factors": "the factors", "ontology": "the ontology"}.get(a.checkpoint, "this checkpoint") }}</button>
-    </form>
-    {% endif %}
-  </section>
-{% endfor %}
-</div>
+<table class="ledger ledger--approvals">
+  <thead><tr><th scope="col">Checkpoint</th><th scope="col">Phase directory</th><th scope="col">Reason</th><th scope="col">State</th></tr></thead>
+  <tbody>
+  {% for a in items %}
+    <tr>
+      <th scope="row"><a href="/approvals/{{ a.phase_dir }}">{{ CP_NAMES.get(a.checkpoint, "Checkpoint") }}</a></th>
+      <td class="mono">{{ a.phase_dir }}</td>
+      <td>{{ a.meta.reason or "—" }}</td>
+      <td>{% if a.approved %}<span class="approval__state">Approved by {{ a.approved.approver }}{% if a.approved.date %} · <span class="mono">{{ a.approved.date }}</span>{% endif %}</span>{% else %}<a class="approval__state approval__state--pending" href="/approvals/{{ a.phase_dir }}">Review and sign off</a>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
 {% else %}
 <p class="empty">Nothing is waiting for approval in <span class="mono">case/</span>.</p>
 {% endif %}

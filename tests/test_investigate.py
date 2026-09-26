@@ -100,7 +100,9 @@ def test_investigator_cannot_approve(make_client, case_copy):
 def test_approver_flow_writes_marker_once(make_client, case_copy):
     c = make_client(role="approver", case_dir=case_copy)
     page = c.get("/approvals")
-    assert page.status_code == 200 and "Waiting for sign-off" in page.text and "01-scope/prd.md" in page.text
+    assert page.status_code == 200 and page.text.count("Review and sign off") == 3
+    review = c.get("/approvals/01-scope")
+    assert review.status_code == 200 and "Definition of done" in review.text and "suppliers_at_80pct_core" in review.text
     r = c.post("/approvals", data={"phase_dir": "01-scope", "approver": "  Ana   Revisora "}, follow_redirects=False)
     assert r.status_code == 303 and "done=01-scope" in r.headers["location"]
     marker = json.loads((case_copy / "01-scope" / "APPROVED").read_text())
@@ -110,9 +112,54 @@ def test_approver_flow_writes_marker_once(make_client, case_copy):
     assert "Approved by Ana Revisora" in c.get("/approvals").text
 
 
+def test_factor_decisions(make_client, case_copy, validator_for):
+    c = make_client(role="approver", case_dir=case_copy)
+    review = c.get("/approvals/02-ontology/factors")
+    assert review.status_code == 200 and 'name="decision.economic_sector"' in review.text
+    base = {"phase_dir": "02-ontology/factors", "approver": "Ana"}
+    ids = ["legitimacy_signal", "procedure_type", "economic_sector", "company_age", "buyer_level"]
+    for bad in ({}, {"decision.legitimacy_signal": "accept"}, {f"decision.{i}": "reject" for i in ids},
+                {**{f"decision.{i}": "accept" for i in ids}, "decision.invented": "accept"},
+                {**{f"decision.{i}": "accept" for i in ids}, "decision.company_age": "maybe"}):
+        r = c.post("/approvals", data={**base, **bad}, follow_redirects=False)
+        assert "error=" in r.headers["location"], bad
+    assert not (case_copy / "02-ontology/factors/APPROVED").exists()
+    good = {f"decision.{i}": "accept" for i in ids} | {"decision.buyer_level": "reject"}
+    r = c.post("/approvals", data={**base, **good}, follow_redirects=False)
+    assert "done=" in r.headers["location"]
+    marker = json.loads((case_copy / "02-ontology/factors/APPROVED").read_text())
+    assert marker["checkpoint"] == "factors" and marker["decisions"]["buyer_level"] == "reject"
+    assert not list(validator_for("approved.schema.json").iter_errors(marker))
+    assert "no decision recorded" not in c.get("/approvals/02-ontology/factors").text
+
+
+def test_ontology_review_shows_numbers(make_client, case_copy):
+    c = make_client(role="approver", case_dir=case_copy)
+    page = c.get("/approvals/02-ontology").text
+    for needle in ("Soundness", "0.86", "Coverage", "critic--Bad", "https://schema.org/Organization", "shapes.ttl"):
+        assert needle in page, needle
+    r = c.post("/approvals", data={"phase_dir": "02-ontology", "approver": "Ana", "decision.x": "accept"},
+               follow_redirects=False)
+    assert "error=" in r.headers["location"]  # decisions only belong to the factors checkpoint
+
+
+def test_fixture_case_artifacts_match_engine_schemas(fixture_root, validator_for):
+    import yaml
+
+    case = fixture_root / "case"
+    for rel, schema in (("01-scope/prd.json", "global-prd.schema.json"),
+                        ("02-ontology/factors/factors.json", "factors.schema.json"),
+                        ("02-ontology/ontology.json", "ontology.schema.json")):
+        errors = list(validator_for(schema).iter_errors(json.loads((case / rel).read_text())))
+        assert not errors, (rel, [e.message for e in errors][:3])
+    for pending in case.glob("**/APPROVAL_PENDING.md"):
+        meta = yaml.safe_load(pending.read_text().split("---")[1])
+        assert not list(validator_for("approval-pending.schema.json").iter_errors(meta)), pending
+
+
 def test_approver_guards(make_client, case_copy):
     c = make_client(role="approver", case_dir=case_copy)
-    for phase_dir in ("..", "../..", "", "02-ontology", "01-scope/../.."):
+    for phase_dir in ("..", "../..", "", "03-fanout", "01-scope/../.."):
         r = c.post("/approvals", data={"phase_dir": phase_dir, "approver": "X"}, follow_redirects=False)
         assert "error=" in r.headers["location"], phase_dir
     r = c.post("/approvals", data={"phase_dir": "01-scope", "approver": ""}, follow_redirects=False)

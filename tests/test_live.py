@@ -30,9 +30,11 @@ def test_annotate_events():
         {"step_id": "a", "phase": 5, "mode": "S1", "evaluated": "failed check; escalate", "value_ids": []},
         {"step_id": "b", "phase": 5, "mode": "S2", "parent_step_id": "a", "evaluated": "ok", "value_ids": ["v"]},
         {"step_id": "c", "phase": 5, "mode": "D1", "executed": "code.promote macro", "evaluated": "crystallized"},
-        {"step_id": "d", "phase": 5, "mode": "S1", "evaluated": "ok", "event": "custom"},
+        {"step_id": "d", "phase": 5, "mode": "S1", "evaluated": "ok", "event": "hard_stop"},
+        {"step_id": "e", "phase": 5, "mode": "S2", "parent_step_id": "a", "evaluated": "ok", "event": None},
     ]
-    assert [s["event"] for s in live.annotate(steps)] == ["failure", "escalation", "crystallization", "custom"]
+    events = [s["event"] for s in live.annotate(steps)]
+    assert events == ["failure", "escalation", "crystallization", "hard_stop", None]  # explicit null wins
 
 
 def test_proof_states():
