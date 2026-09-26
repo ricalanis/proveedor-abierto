@@ -27,6 +27,8 @@ def _serve(args: argparse.Namespace) -> int:
         os.environ["PA_ROLE"] = args.role
     if args.gold_dir:
         os.environ["PA_GOLD_DIR"] = args.gold_dir
+    if args.run_id:
+        os.environ["PA_RUN_ID"] = args.run_id
     from .web import create_app
 
     app = create_app()
@@ -93,7 +95,14 @@ def _dod(args: argparse.Namespace) -> int:
             print("  NOT DONE: this run used recorded (simulated) inference; it cannot satisfy the DoD")
         for key in dod.DOD_KEYS:
             target = dod.TARGETS.get(key)
-            mark = "" if target is None else ("  ok" if met[key] else f"  below target {target}")
+            if target is None:
+                mark = ""
+            elif backend == "recorded":
+                mark = "  not counted (recorded inference)"
+            elif met[key]:
+                mark = "  ok"
+            else:
+                mark = f"  target {target} not met"
             print(f"  {key:30} {recomputed[key]}{mark}")
         for name, ratio in recomputed["per_field_completeness"].items():
             print(f"  completeness.{name:19} {ratio:.1%}")
@@ -113,6 +122,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8400)
     p.add_argument("--gold-dir", help="local lake root (bucket layout); same as PA_GOLD_DIR")
+    p.add_argument("--run-id", help="serve this run even if latest.json points elsewhere or is absent (PA_RUN_ID)")
     p.add_argument("--replay", nargs="?", const="", metavar="RUN_ID",
                    help="also replay a finished run (default: latest gold run) as a live run in the same local lake")
     p.add_argument("--duration", type=float, default=45.0, help="replay length in seconds (default 45)")

@@ -26,11 +26,11 @@
         <span class="cp__mark" aria-hidden="true">{{ {"pass": "✓", "fail": "✕", "pending": "…"}[st] }}</span>
         <span class="cp__label">{{ label }}</span>
         <span class="cp__detail mono">
-          {% if key == "host" %}{{ cp.sandbox_host or "—" }} · runtime {{ cp.runtime or "—" }}{% if cp.virt %} · {{ cp.virt }}{% endif %}
-          {% elif key == "task" %}{{ cp.requested or "—" }} → {{ cp.result or "—" }}
-          {% elif key == "where" %}{{ cp.hostname or "—" }} · {{ cp.uname or "—" }}
+          {% if key == "host" %}{{ cp.sandbox_host or "—" }} · runtime {{ cp.runtime or "—" }}{% if cp.virt %} · {{ cp.virt|brief }}{% endif %}
+          {% elif key == "task" %}{{ cp.requested|brief or "—" }} → {{ cp.result|brief or "—" }}
+          {% elif key == "where" %}{{ cp.hostname or "—" }} · {{ cp.uname|brief or "—" }}
           {% elif key == "isolation" %}{% for pb in cp.probes or [] %}{{ pb.probe }}: <strong>{{ pb.result }}</strong>{% if not loop.last %} · {% endif %}{% else %}—{% endfor %}
-          {% elif key == "teardown" %}{{ cp.detail or "—" }}{% endif %}
+          {% elif key == "teardown" %}{{ cp.detail|brief or "—" }}{% endif %}
         </span>
       </li>
       {% endfor %}

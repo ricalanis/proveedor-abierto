@@ -28,11 +28,24 @@ MODE_NAMES = {
 }
 PHASES = [(1, "Scope"), (2, "Ontology"), (3, "Fan out"), (4, "Local scoping"), (5, "Execute")]
 CHECKPOINT_PHASE = {"prd": 1, "factors": 2, "ontology": 2}
-_FAIL_WORDS = ("fail", "blocked", "captcha", "timeout", "error", "refused")
+# "blocked" is deliberately absent: an isolation probe that is BLOCKED is the success case.
+_FAIL_WORDS = ("fail", "captcha", "timeout", "error", "refused")
 
 
 def _text(step: dict) -> str:
-    return " ".join(str(step.get(k) or "") for k in ("requested", "executed", "evaluated")).lower()
+    return " ".join(json.dumps(step.get(k)) if isinstance(step.get(k), (dict, list)) else str(step.get(k) or "")
+                    for k in ("requested", "executed", "evaluated")).lower()
+
+
+def _evaluated(step: dict) -> str:
+    ev = step.get("evaluated")
+    if isinstance(ev, dict):  # structured: judge by its status, not by words that merely appear in details
+        return str(ev.get("status") or ev.get("result") or "").lower()
+    return str(ev or "").lower()
+
+
+def _failed(step: dict) -> bool:
+    return any(w in _evaluated(step) for w in _FAIL_WORDS)
 
 
 def annotate(steps: list[dict]) -> list[dict]:
@@ -45,13 +58,12 @@ def annotate(steps: list[dict]) -> list[dict]:
         if "event" not in s:
             parent = by_id.get(s.get("parent_step_id"))
             text = _text(s)
-            evaluated = str(s.get("evaluated") or "").lower()
-            if parent and parent.get("phase") == 5 and \
+            if parent and parent.get("phase") == 5 and _failed(parent) and \
                     MODE_RANK.get(s.get("mode"), 0) > MODE_RANK.get(parent.get("mode"), 0):
-                event = "escalation"
+                event = "escalation"  # a costlier mode after the cheaper one failed its check
             elif "crystalliz" in text or "code.promote" in text:
                 event = "crystallization"
-            elif any(w in evaluated for w in _FAIL_WORDS) and not s.get("value_ids"):
+            elif _failed(s) and not s.get("value_ids"):
                 event = "failure"
         s["event"] = event
         out.append(s)

@@ -163,3 +163,14 @@ def test_snapshot_then_replay_offline(lake, tmp_path, fixture_root):
     c = _client(out, fixture_root / "case")
     assert c.get("/run/offline-1").status_code == 200
     assert c.get(f"/bronze/{ev['screenshot_key']}").status_code == 200
+
+
+def test_structured_engine_steps_are_not_misread():
+    steps = [
+        {"step_id": "d", "phase": 5, "mode": "D0", "evaluated": {"status": "captured"}, "value_ids": []},
+        {"step_id": "p", "phase": 5, "mode": "D0", "evaluated": {"proof_checkpoint": "isolation_probe", "status": "blocked"}},
+        {"step_id": "x", "phase": 5, "mode": "S1", "parent_step_id": "d", "evaluated": {"status": "ok"}, "value_ids": ["v"]},
+        {"step_id": "f", "phase": 5, "mode": "S1", "evaluated": {"status": "failed", "reason": "selector"}},
+        {"step_id": "e", "phase": 5, "mode": "S2", "parent_step_id": "f", "evaluated": {"status": "ok"}, "value_ids": ["w"]},
+    ]
+    assert [s["event"] for s in live.annotate(steps)] == [None, None, None, "failure", "escalation"]

@@ -177,6 +177,7 @@ class GoldStore:
         self.bronze_key_template = bronze_key_template
         self._case_id = case_id
         self._cache: dict[str, Run] = {}
+        self.pinned_run_id: str | None = None  # PA_RUN_ID: serve this run even without latest.json (mock runs)
 
     @property
     def case_id(self) -> str:
@@ -195,6 +196,8 @@ class GoldStore:
         return f"gold/{self.case_id}"
 
     def latest_run_id(self) -> str | None:
+        if self.pinned_run_id:
+            return self.pinned_run_id
         raw = self.source.read(f"{self.prefix}/latest.json")
         return json.loads(raw)["run_id"] if raw else None
 
@@ -230,6 +233,8 @@ class GoldStore:
     # Live run feed (CONTRACT section 4b): runs/<case_id>/latest.json, <run_id>/status.json, trace.live.jsonl
 
     def live_run_id(self) -> str | None:
+        if self.pinned_run_id:
+            return self.pinned_run_id
         raw = self.source.read(f"runs/{self.case_id}/latest.json")
         return json.loads(raw)["run_id"] if raw else None
 
@@ -302,6 +307,12 @@ def sniff_media_type(data: bytes) -> str:
 def load_store(repo_root: Path, env: dict[str, str] | None = None) -> GoldStore:
     """Pick the gold source: PA_GOLD_DIR (local layout) wins, else lake.yaml's bronze bucket over S3."""
     env = dict(os.environ if env is None else env)
+    store = _load_store(repo_root, env)
+    store.pinned_run_id = env.get("PA_RUN_ID") or None
+    return store
+
+
+def _load_store(repo_root: Path, env: dict[str, str]) -> GoldStore:
     template = env.get("PA_BRONZE_KEY_TEMPLATE", DEFAULT_BRONZE_TEMPLATE)
     case_id = env.get("PA_CASE_ID") or None
     if env.get("PA_GOLD_DIR"):

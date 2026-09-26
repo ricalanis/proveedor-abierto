@@ -79,6 +79,22 @@ def supplier_name(supplier: dict | None) -> str:
     return f.get("value") or supplier["id"]
 
 
+def brief(value, limit: int = 240) -> str:
+    """Readable one-liner for trace/proof fields, which the engine may write as strings or objects."""
+    def fmt(v):
+        if isinstance(v, dict):
+            return ", ".join(f"{k}: {fmt(x)}" for k, x in v.items() if x not in (None, "", [], {}))
+        if isinstance(v, list):
+            shown = [fmt(x) for x in v[:4]]
+            return "[" + ", ".join(shown) + (f", +{len(v) - 4}" if len(v) > 4 else "") + "]"
+        if isinstance(v, str) and v.startswith("sha256:") and len(v) > 20:
+            return v[:15] + "…"
+        return str(v)
+
+    text = "" if value is None else fmt(value)
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
 def host_of(url: str) -> str:
     return urlsplit(url).hostname or url
 
@@ -107,6 +123,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     env.filters["pct"] = lambda x: f"{round((x or 0) * 100)}%"
     env.filters["money"] = lambda x: f"{x:,.2f}" if isinstance(x, (int, float)) else (x or "—")
+    env.filters["brief"] = brief
     env.filters["field_label"] = lambda name: FIELD_LABELS.get(name, name.replace("_", " ").capitalize())
 
     def run(request: Request) -> Run:

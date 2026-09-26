@@ -24,10 +24,10 @@
     <li class="stop">
       <p class="stop__phase">Phase {{ st.phase }} · {{ stop.phase_name }} <span class="mode mono" title="Execution mode">{{ st.mode }}</span></p>
       <dl class="stop__olde">
-        <div><dt>Observed</dt><dd>{{ st.observed }}</dd></div>
-        <div><dt>Requested</dt><dd>{{ st.requested }}</dd></div>
-        <div><dt>Executed</dt><dd>{{ st.executed }}</dd></div>
-        <div><dt>Evaluated</dt><dd>{{ st.evaluated }}</dd></div>
+        <div><dt>Observed</dt><dd>{{ st.observed|brief(600) }}</dd></div>
+        <div><dt>Requested</dt><dd>{{ st.requested|brief(600) }}</dd></div>
+        <div><dt>Executed</dt><dd>{{ st.executed|brief(600) }}</dd></div>
+        <div><dt>Evaluated</dt><dd>{{ st.evaluated|brief(600) }}</dd></div>
       </dl>
       <p class="stop__meta mono muted">{{ st.step_id }} · {{ st.ts }}{% if st.source_id %} · {{ st.source_id }}{% endif %}{% if st.objective_id %} · objective {{ st.objective_id }}{% endif %}</p>
       {% if stop.objective %}<pre class="record record--short">{{ stop.objective|tojson(indent=2) }}</pre>{% endif %}
