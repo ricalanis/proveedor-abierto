@@ -150,7 +150,11 @@ def test_fixture_case_artifacts_match_engine_schemas(fixture_root, validator_for
     for rel, schema in (("01-scope/prd.json", "global-prd.schema.json"),
                         ("02-ontology/factors/factors.json", "factors.schema.json"),
                         ("02-ontology/ontology.json", "ontology.schema.json")):
-        errors = list(validator_for(schema).iter_errors(json.loads((case / rel).read_text())))
+        from conftest import v095_compat
+
+        v = validator_for(schema)
+        doc = json.loads((case / rel).read_text())
+        errors = list(v.iter_errors(v095_compat(doc, v.schema) if schema == "global-prd.schema.json" else doc))
         assert not errors, (rel, [e.message for e in errors][:3])
     for pending in case.glob("**/APPROVAL_PENDING.md"):
         meta = yaml.safe_load(pending.read_text().split("---")[1])

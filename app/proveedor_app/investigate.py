@@ -253,6 +253,12 @@ def journal_chain(run: Run, case: CaseDir, value_id: str) -> list[dict]:
 # Approvals -------------------------------------------------------------------------------------------------------
 
 CHECKPOINTS = ("prd", "factors", "ontology", "action")
+DENIABLE = ("prd", "factors", "ontology", "action")  # CONTRACT v0.9.5 (phase checkpoints) and §12 (actions)
+DENY_REASON_MAX = 2000
+
+
+class ReasonRequired(ValueError):
+    """A deny without a usable reason; the web layer answers 400 instead of redirecting."""
 RISK_TIERS = ("SAFE", "LOW", "HIGH")
 _JSON_BLOCK = re.compile(r"```json\s*(\{.*?\})\s*```", re.DOTALL)
 
@@ -310,6 +316,8 @@ def approvals(case: CaseDir) -> list[Approval]:
         return out
     for pending in sorted(case.root.glob("*/APPROVAL_PENDING.md")) + sorted(case.root.glob("*/*/APPROVAL_PENDING.md")):
         rel_dir = str(pending.parent.relative_to(case.root))
+        if "revisions" in pending.parent.relative_to(case.root).parts:
+            continue  # an archived draft's request (v0.9.5), not a live checkpoint
         text = pending.read_text(errors="replace")
         approved_path = pending.parent / "APPROVED"
         approved = None
@@ -352,6 +360,32 @@ def load_artifacts(case: CaseDir, item: Approval) -> dict:
     return docs
 
 
+def revision_history(docs: dict) -> list[dict]:
+    """`revisions: [{n, decision, reason, approver, date}]` recorded in the reviewed artifact (v0.9.5), newest first."""
+    rows = []
+    for doc in docs.values():
+        for r in (doc or {}).get("revisions") or []:
+            if isinstance(r, dict):
+                rows.append({k: r.get(k) for k in ("n", "decision", "reason", "approver", "date")})
+    return sorted(rows, key=lambda r: r["n"] if isinstance(r["n"], int) else -1, reverse=True)
+
+
+def archived_drafts(case: CaseDir, item: Approval) -> list[dict]:
+    """Rejected drafts the engine archived under `<phase_dir>/revisions/<n>/` (v0.9.5), newest first.
+    Paths are relative to the case dir and only ever read through CaseDir (path-safe)."""
+    base = case.path(f"{item.phase_dir}/revisions")
+    if not base or not base.is_dir():
+        return []
+    out = []
+    for d in base.iterdir():
+        if not (d.is_dir() and d.name.isdigit()):
+            continue
+        files = sorted(str(f.relative_to(case.root)) for f in d.iterdir()
+                       if f.is_file() and not f.is_symlink() and case.path(str(f.relative_to(case.root))))
+        out.append({"n": int(d.name), "files": files})
+    return sorted(out, key=lambda r: r["n"], reverse=True)
+
+
 def taxonomy_stats(tax: dict) -> dict:
     """Nodes per level and critic-label counts for one taxonomy (the numbers the approver signs off on)."""
     levels: dict[int, int] = {}
@@ -372,8 +406,10 @@ def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = N
             reason: str | None = None) -> dict:
     """Write the APPROVED marker next to a pending checkpoint. Raises ValueError when the request is invalid.
 
-    An action checkpoint (approve-before-submit, CONTRACT §12) needs `decision` approve|deny; a deny needs a reason.
-    The answer is always one APPROVED file; a deny is recorded there as `decision: deny`."""
+    An action checkpoint (approve-before-submit, CONTRACT §12) needs `decision` approve|deny. The prd, factors and
+    ontology checkpoints may be denied too (CONTRACT v0.9.5); approving them keeps the original shape (no `decision`).
+    A deny always needs a reason (ReasonRequired otherwise). The answer is always one APPROVED file; a deny is
+    recorded there as `decision: deny` + `reason`, and the engine regenerates the artifact with it."""
     approver = " ".join(approver.split())[:120]
     if not approver:
         raise ValueError("approver name is required")
@@ -387,18 +423,29 @@ def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = N
     record: dict = {"approver": approver, "date": (today or datetime.now(UTC).date()).isoformat()}
     if item.checkpoint:
         record["checkpoint"] = item.checkpoint
-    if item.checkpoint == "action":
-        if decision not in ("approve", "deny"):
-            raise ValueError("choose approve or deny for this action")
-        record["decision"] = decision
-        if decision == "deny":
-            reason = " ".join((reason or "").split())[:500]
-            if not reason:
-                raise ValueError("say why you deny this action")
-            record["reason"] = reason
-    elif decision is not None:
-        raise ValueError("approve/deny decisions only apply to action checkpoints")
-    if decisions:
+    if decision is not None and decision not in ("approve", "deny"):
+        raise ValueError("the decision must be approve or deny")
+    if item.checkpoint == "action" and decision is None:
+        raise ValueError("choose approve or deny for this action")
+    if decision is not None and item.checkpoint not in DENIABLE:
+        raise ValueError("this checkpoint can only be approved")
+    if decision == "deny":
+        reason = " ".join((reason or "").split())
+        if not reason:
+            raise ReasonRequired("Say why you deny it: the engine uses your reason to regenerate the artifact.")
+        if len(reason) > DENY_REASON_MAX:
+            raise ReasonRequired(f"Keep the reason under {DENY_REASON_MAX} characters.")
+        record["decision"] = "deny"
+        record["reason"] = reason
+    elif item.checkpoint == "action":
+        record["decision"] = "approve"
+    if decision == "deny" and decisions and item.checkpoint == "factors":
+        # a deny may carry the per-factor view the approver had formed, but only when it is complete and valid
+        factors = (load_artifacts(case, item).get("factors") or {}).get("factors") or []
+        known = {f["id"] for f in factors if isinstance(f, dict) and f.get("id")}
+        if set(decisions) == known and all(v in ("accept", "reject") for v in decisions.values()):
+            record["decisions"] = dict(sorted(decisions.items()))
+    elif decisions:
         if item.checkpoint != "factors":
             raise ValueError("per-factor decisions only apply to the factors checkpoint")
         factors = (load_artifacts(case, item).get("factors") or {}).get("factors") or []
@@ -410,7 +457,8 @@ def approve(case: CaseDir, phase_dir: str, approver: str, today: date | None = N
         if "accept" not in decisions.values():
             raise ValueError("accept at least one factor, or ask the engine to propose new ones")
         record["decisions"] = dict(sorted(decisions.items()))
-    elif item.checkpoint == "factors" and (load_artifacts(case, item).get("factors") or {}).get("factors"):
+    elif (decision != "deny" and item.checkpoint == "factors"
+          and (load_artifacts(case, item).get("factors") or {}).get("factors")):
         raise ValueError("decide each factor (accept or reject) before approving")
     with marker.open("x") as fh:  # never overwrite a concurrent approval
         json.dump(record, fh)

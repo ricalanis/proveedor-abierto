@@ -27,7 +27,7 @@
     <label for="approver">Your name</label>
     <input id="approver" name="approver" type="text" required maxlength="120" autocomplete="name" value="{{ who }}">
     <label for="reason">Reason (required to deny)</label>
-    <textarea id="reason" name="reason" rows="3" maxlength="500"></textarea>
+    <textarea id="reason" name="reason" rows="3" maxlength="{{ reason_max }}">{{ reason }}</textarea>
     <div class="action-gate__buttons">
       <button type="submit" name="decision" value="approve">Approve this action</button>
       <button type="submit" name="decision" value="deny" class="btn--deny">Deny</button>

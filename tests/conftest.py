@@ -89,3 +89,20 @@ def s12_compat(doc: dict, schema: dict, kind: str) -> dict:
         allowed = schema["$defs"]["query"]["properties"]["aggregate"]["enum"]
         doc["queries"] = [q for q in doc.get("queries") or [] if q.get("aggregate") in allowed]
     return doc
+
+
+def v095_compat(doc: dict, schema: dict) -> dict:
+    """CONTRACT v0.9.5 fields the fixture PRD emits ahead of the engine schema (`revisions`, and `basis` /
+    `rationale` / `feasibility` per DoD criterion): stripped only while the schema lacks them."""
+    import copy
+
+    doc = copy.deepcopy(doc)
+    if "revisions" not in (schema.get("properties") or {}):
+        doc.pop("revisions", None)
+    crit = ((schema.get("$defs") or {}).get("criterion") or {}).get("properties")
+    if crit is not None and isinstance(doc.get("definition_of_done"), list):
+        for c in doc["definition_of_done"]:
+            for key in ("basis", "rationale", "feasibility"):
+                if key not in crit:
+                    c.pop(key, None)
+    return doc

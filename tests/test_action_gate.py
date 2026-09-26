@@ -40,8 +40,9 @@ def test_approver_sees_the_action_review(make_client, case_copy):
 
 def test_deny_needs_a_reason(make_client, case_copy):
     c = make_client(role="approver", case_dir=case_copy)
-    r = _answer(c, decision="deny")
-    assert "error=" in r.headers["location"] and not (case_copy / ACTION_DIR / "APPROVED").exists()
+    r = _answer(c, decision="deny")  # v0.9.5: a deny without a reason is a bad request, re-rendered with the error
+    assert r.status_code == 400 and "Say why you deny it" in r.text
+    assert not (case_copy / ACTION_DIR / "APPROVED").exists()
     r = _answer(c)  # no decision at all
     assert "error=" in r.headers["location"] and not (case_copy / ACTION_DIR / "APPROVED").exists()
 
@@ -69,11 +70,14 @@ def test_approve_writes_decision(make_client, case_copy):
     assert "Approved by Ana" in listing
 
 
-def test_decision_refused_on_other_checkpoints(make_client, case_copy):
+def test_unknown_decision_refused(make_client, case_copy):
+    """v0.9.5 lets the prd/factors/ontology checkpoints be denied too (tests/test_approval_deny.py); a decision other
+    than approve|deny is still refused everywhere."""
     c = make_client(role="approver", case_dir=case_copy)
-    r = c.post("/approvals", data={"phase_dir": "01-scope", "approver": "Ana", "decision": "deny", "reason": "x"},
-               follow_redirects=False)
-    assert "error=" in r.headers["location"] and not (case_copy / "01-scope" / "APPROVED").exists()
+    for phase_dir in ("01-scope", ACTION_DIR):
+        r = c.post("/approvals", data={"phase_dir": phase_dir, "approver": "Ana", "decision": "maybe"},
+                   follow_redirects=False)
+        assert "error=" in r.headers["location"] and not (case_copy / phase_dir / "APPROVED").exists()
 
 
 def test_cross_origin_answer_refused(make_client, case_copy):

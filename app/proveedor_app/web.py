@@ -398,12 +398,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         items = investigate.approvals(case)
         return render(request, "approvals.html", nav="approvals", run=None, items=items, done=done, error=error)
 
-    @app.get("/approvals/{phase_dir:path}", response_class=HTMLResponse)
-    def approval_detail(request: Request, phase_dir: str, error: str = ""):
-        require_approver(request)
-        item = next((a for a in investigate.approvals(case) if a.phase_dir == phase_dir), None)
-        if not item:
-            raise HTTPException(404, f"no approval checkpoint in {phase_dir}")
+    def review_page(request: Request, item, error: str = "", reason: str = "") -> HTMLResponse:
         docs = investigate.load_artifacts(case, item)
         paths = [{"path": p, "exists": case.exists(p)} for p in investigate.artifact_paths(item)]
         gen = item.meta.get("generated_by") or next((d.get("generated_by") for d in docs.values() if d.get("generated_by")), None)
@@ -411,7 +406,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         has_screenshot = bool(shot) and settings.store.bronze(str(shot)) is not None
         return render(request, "approval.html", nav="approvals", run=None, a=item, docs=docs, paths=paths,
                       who=identity(request), error=error, gen=gen, backend=(gen or {}).get("backend"),
-                      taxonomy_stats=investigate.taxonomy_stats, has_screenshot=has_screenshot)
+                      taxonomy_stats=investigate.taxonomy_stats, has_screenshot=has_screenshot,
+                      history=investigate.revision_history(docs), drafts=investigate.archived_drafts(case, item),
+                      reason=reason, reason_max=investigate.DENY_REASON_MAX)
+
+    @app.get("/approvals/{phase_dir:path}", response_class=HTMLResponse)
+    def approval_detail(request: Request, phase_dir: str, error: str = ""):
+        require_approver(request)
+        item = next((a for a in investigate.approvals(case) if a.phase_dir == phase_dir), None)
+        if not item:
+            raise HTTPException(404, f"no approval checkpoint in {phase_dir}")
+        return review_page(request, item, error)
 
     @app.post("/approvals")
     async def approve(request: Request):
@@ -425,6 +430,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         try:
             investigate.approve(case, phase_dir, form.get("approver", ""), decisions=decisions or None,
                                 decision=form.get("decision"), reason=form.get("reason"))
+        except investigate.ReasonRequired as exc:  # v0.9.5: a deny without a reason is a bad request, nothing written
+            item = next(a for a in investigate.approvals(case) if a.phase_dir == phase_dir)
+            response = review_page(request, item, str(exc), reason=form.get("reason", "")[:5000])
+            response.status_code = 400
+            return response
         except ValueError as exc:
             back = f"/approvals/{quote(phase_dir)}" if phase_dir and case.exists(phase_dir) else "/approvals"
             return RedirectResponse(f"{back}?error={quote(str(exc))}", status_code=303)

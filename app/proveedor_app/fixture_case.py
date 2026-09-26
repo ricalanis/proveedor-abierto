@@ -40,10 +40,17 @@ PRD = {
     ],
     "constraints": ["Public sources only; no logins, no captcha bypass", "Polite crawl rates; budget capped in the run"],
     "non_goals": ["Accusing anyone or scoring corruption probability", "Profiling private individuals"],
+    # CONTRACT v0.9.5: where each number comes from (brief | human | proposed); proposed ones explain themselves
     "definition_of_done": [
-        {"id": "dod_suppliers", "metric": "suppliers_at_80pct_core", "operator": ">=", "target": 50},
-        {"id": "dod_sources", "metric": "distinct_source_types", "operator": ">=", "target": 4},
-        {"id": "dod_evidence", "metric": "gold_values_without_evidence", "operator": "=", "target": 0},
+        {"id": "dod_suppliers", "metric": "suppliers_at_80pct_core", "operator": ">=", "target": 50, "basis": "human"},
+        {"id": "dod_sources", "metric": "distinct_source_types", "operator": ">=", "target": 4, "basis": "proposed",
+         "rationale": "Four independent publisher kinds let every core field be cross-checked at least once",
+         "feasibility": "About 1.20 USD and 40 minutes of the 2.00 USD run budget at the fixture's crawl rate"},
+        {"id": "dod_evidence", "metric": "gold_values_without_evidence", "operator": "=", "target": 0, "basis": "brief"},
+    ],
+    "revisions": [
+        {"n": 1, "decision": "deny", "reason": "DoD must follow the case definition", "approver": "Fixture Approver",
+         "date": "2026-09-26"},
     ],
     "authority_policy": {
         "jurisdiction": "MX (synthetic fixture)",
@@ -54,6 +61,15 @@ PRD = {
         "unknown_source_action": "review",
     },
     "generated_by": GEN,
+}
+
+# The draft the fixture approver denied (archived by the engine under 01-scope/revisions/1/, CONTRACT v0.9.5).
+PRD_DRAFT_1 = {k: v for k, v in PRD.items() if k != "revisions"} | {
+    "version": "v0",
+    "definition_of_done": [
+        {"id": "dod_entities", "metric": "entities_with_canonical_record", "operator": ">=", "target": 1000,
+         "basis": "proposed"},
+    ],
 }
 
 FACTORS = {
@@ -183,6 +199,7 @@ def action_md(meta: dict) -> str:
 def write(case: Path, ontology: dict | None = None) -> None:
     files = {
         "01-scope/prd.json": json.dumps(PRD, indent=2),
+        "01-scope/revisions/1/prd.json": json.dumps(PRD_DRAFT_1, indent=2),
         "02-ontology/factors/factors.json": json.dumps(FACTORS, indent=2),
         "02-ontology/ontology.json": json.dumps(ontology or ONTOLOGY, indent=2),
         "02-ontology/schema/shapes.ttl": SHAPES,
