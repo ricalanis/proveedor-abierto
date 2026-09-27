@@ -1,11 +1,11 @@
 # Presentation (3-minute live demo)
 
-Fifteen 16:9 slides that frame the live demo in [`../video-plan.md`](../video-plan.md). Each slide is one
+Seventeen 16:9 slides that frame the live demo in [`../video-plan.md`](../video-plan.md). Each slide is one
 `project/slides/<id>.html` fragment (inline styles only, 1920×1080 canvas) and `project/deck.json` holds the order
 and fonts (Public Sans, IBM Plex Mono: the product's own type and palette). Speaker notes are the `<aside>` in each
 slide.
 
-Order: cover · the question · five phases · two VMs, one boundary · the track's four judge questions, answered · six proof checks · the recorded containment run · Pattern A
+Order: cover · the question · five phases · three diagrams (global architecture, the council that decides, extraction to gold) · the track's four judge questions, answered · six proof checks · the recorded containment run · Pattern A
 and B · honest status (engine, harness-assisted, SF library) · receipts on real data (harness-assisted, labelled) · the DoD recounted from gold ·
 zero open ports · a second brief · the five bugs the easy case found · close.
 

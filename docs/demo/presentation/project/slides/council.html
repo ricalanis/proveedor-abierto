@@ -1,0 +1,50 @@
+<section id="council" data-transition="fade" style="background:#f3f5f8; color:#1b2233; font-family:'Public Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:40px">
+<h2 style="font-size:64px; font-weight:600; line-height:1.1">The council: how the engine decides</h2>
+<!-- G 0,0,380,150 · P 428,0,380,150 · C 856,0,380,150 · R 1284,0,380,150 · GATE 856,290,380,170 · CHECK 1284,290,380,170 · E 0,530,520,170 · S 572,530,520,170 · T 1144,530,520,170 -->
+<div style="position:relative; width:1664px; height:700px">
+<div style="position:absolute; left:0px; top:0px; width:380px; height:150px; display:flex; flex-direction:column; gap:8px; background:#fcfdfe; border:2px solid #d3d8e0; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#4a5263">1 · GATHER</p>
+<p style="font-size:24px; line-height:1.3">Research ledger, leads, sandbox captures</p>
+</div>
+<div style="position:absolute; left:428px; top:0px; width:380px; height:150px; display:flex; flex-direction:column; gap:8px; background:#e3e9f7; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">2 · PROPOSE</p>
+<p style="font-size:24px; line-height:1.3">Planner (glm-5.3) drafts, best of N</p>
+</div>
+<div style="position:absolute; left:856px; top:0px; width:380px; height:150px; display:flex; flex-direction:column; gap:8px; background:#e3e9f7; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">3 · CRITIQUE</p>
+<p style="font-size:24px; line-height:1.3">A critic from another model family objects</p>
+</div>
+<div style="position:absolute; left:1284px; top:0px; width:380px; height:150px; display:flex; flex-direction:column; gap:8px; background:#e3e9f7; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">4 · REVISE</p>
+<p style="font-size:24px; line-height:1.3">The draft answers each objection</p>
+</div>
+<div style="position:absolute; left:1284px; top:290px; width:380px; height:170px; display:flex; flex-direction:column; gap:8px; background:#fcfdfe; border:2px solid #1b2233; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#1b2233">5 · CHECK IN CODE</p>
+<p style="font-size:24px; line-height:1.3">Exit criteria compiled to code; loop until they pass, within budget</p>
+</div>
+<div style="position:absolute; left:856px; top:290px; width:380px; height:170px; display:flex; flex-direction:column; gap:8px; background:#fbf0de; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">6 · HUMAN GATE</p>
+<p style="font-size:24px; line-height:1.3">Approve → next phase. Bound to the file's sha256.</p>
+</div>
+<div style="position:absolute; left:0px; top:530px; width:520px; height:170px; display:flex; flex-direction:column; gap:8px; background:#fcfdfe; border:2px solid #d3d8e0; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#4a5263">SAME LOOP, EVERY PHASE</p>
+<p style="font-size:24px; line-height:1.3">PRD · ontology · source critic · per-source plan · the gap loop after gold</p>
+</div>
+<div style="position:absolute; left:572px; top:530px; width:520px; height:170px; display:flex; flex-direction:column; gap:8px; background:#1b2233; color:#eceff3; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#e9b04a">SAFETY SCREEN</p>
+<p style="font-size:24px; line-height:1.3">Page text is screened before any model sees it; flagged pages are quarantined</p>
+</div>
+<div style="position:absolute; left:1144px; top:530px; width:520px; height:170px; display:flex; flex-direction:column; gap:8px; background:#fcfdfe; border:2px solid #d3d8e0; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#4a5263">TYPED DECISIONS</p>
+<p style="font-size:24px; line-height:1.3">Models choose within typed options; code owns order, budgets and stops</p>
+</div>
+<x-connector x1="380" y1="75" x2="428" y2="75" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="808" y1="75" x2="856" y2="75" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="1236" y1="75" x2="1284" y2="75" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="1474" y1="150" x2="1474" y2="290" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="1284" y1="375" x2="1236" y2="375" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="856" y1="375" x2="618" y2="150" route="hv" style="color:#8a5410; border-width:3px; border-style:dashed"></x-connector>
+<p style="position:absolute; left:630px; top:392px; width:216px; font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">deny + reason → redraft</p>
+</div>
+<aside>Every phase runs the same bounded loop. The planner (glm-5.3) proposes; a critic from a different model family (minimax-m3 or qwen3.8-27b) raises objections such as invented targets, infeasible budgets or missing coverage; the draft is revised; code checks the phase's exit criteria. It stops when the checks pass and the critic has no blocking objection, or when the budget runs out, and then shows the open issues. A person's deny with a reason becomes a human revision the loop can never override. All of it runs on Vultr Serverless Inference, and every iteration is a trace event on the console.</aside>
+</section>

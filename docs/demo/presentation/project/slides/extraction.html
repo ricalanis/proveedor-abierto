@@ -1,0 +1,48 @@
+<section id="extraction" data-transition="fade" style="background:#f3f5f8; color:#1b2233; font-family:'Public Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:40px">
+<h2 style="font-size:64px; font-weight:600; line-height:1.1">Extraction: from a plan to gold with receipts</h2>
+<!-- PLAN 0,0,380,170 · CELL 428,0,808,170 · BRONZE 1284,0,380,170 · PA 428,290,808,170 · SILVER 1284,290,380,170 · GAP 0,530,380,170 · GOLD 428,530,380,170 · REFINE 856,530,380,170 -->
+<div style="position:relative; width:1664px; height:700px">
+<div style="position:absolute; left:0px; top:0px; width:380px; height:170px; display:flex; flex-direction:column; gap:8px; background:#fcfdfe; border:2px solid #d3d8e0; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#4a5263">PLAN PER SOURCE</p>
+<p style="font-size:24px; line-height:1.3">Properties, path, allowed domains, mode range</p>
+</div>
+<div style="position:absolute; left:428px; top:0px; width:808px; height:170px; display:flex; flex-direction:column; gap:8px; background:#1b2233; color:#eceff3; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#e9b04a">EXECUTE IN A GVISOR CELL · ZERO SECRETS</p>
+<p style="font-size:24px; line-height:1.3">D0 download + parse · D1 macro · S1 agent loop with vision verify · S2 Skyvern. It climbs only when a check fails.</p>
+</div>
+<div style="position:absolute; left:1284px; top:0px; width:380px; height:170px; display:flex; flex-direction:column; gap:8px; background:#e3e9f7; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">BRONZE</p>
+<p style="font-size:24px; line-height:1.3">Raw captures in Object Storage, content-addressed and kept</p>
+</div>
+<div style="position:absolute; left:428px; top:290px; width:808px; height:170px; display:flex; flex-direction:column; gap:8px; background:#fcfdfe; border:2px solid #1b2233; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#1b2233">PATTERN A · SELF-HEALING EXTRACTOR</p>
+<p style="font-size:24px; line-height:1.3">Write an extractor → test it in a networkless cell → stderr fed back → patch → promote to a versioned macro</p>
+</div>
+<div style="position:absolute; left:1284px; top:290px; width:380px; height:170px; display:flex; flex-direction:column; gap:8px; background:#e3e9f7; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">SILVER</p>
+<p style="font-size:24px; line-height:1.3">Typed observations, each with its evidence; conflicts kept</p>
+</div>
+<div style="position:absolute; left:856px; top:530px; width:380px; height:170px; display:flex; flex-direction:column; gap:8px; background:#e3e9f7; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">REFINE</p>
+<p style="font-size:24px; line-height:1.3">Reconcile values, then validate with SHACL</p>
+</div>
+<div style="position:absolute; left:428px; top:530px; width:380px; height:170px; display:flex; flex-direction:column; gap:8px; background:#fcfdfe; border:2px solid #2a4fc0; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">GOLD</p>
+<p style="font-size:24px; line-height:1.3">Valid values with receipts; the DoD is measured here</p>
+</div>
+<div style="position:absolute; left:0px; top:530px; width:380px; height:170px; display:flex; flex-direction:column; gap:8px; background:#fbf0de; border-radius:8px; padding:16px 24px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">GAP LOOP</p>
+<p style="font-size:24px; line-height:1.3">A DoD gap reopens discovery, the plan or the ontology</p>
+</div>
+<x-connector x1="380" y1="85" x2="428" y2="85" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="1236" y1="85" x2="1284" y2="85" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="832" y1="170" x2="832" y2="290" head="both" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="1474" y1="170" x2="1474" y2="290" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="1474" y1="460" x2="1236" y2="615" route="vh" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="856" y1="615" x2="808" y2="615" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="428" y1="615" x2="380" y2="615" style="color:#4a5263; border-width:3px"></x-connector>
+<x-connector x1="190" y1="530" x2="190" y2="170" style="color:#8a5410; border-width:3px; border-style:dashed"></x-connector>
+<p style="position:absolute; left:206px; top:330px; width:200px; font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">reopen P3 · P4 · P2</p>
+</div>
+<aside>Each (source, objective) gets a technical plan: target properties, path, allowed domains, budget and the range of execution modes. Execution starts at the cheapest mode and climbs only when a check fails. Every capture lands in bronze and is never overwritten, so a changed ontology re-refines gold from bronze without browsing again. Failing extractors repair themselves in a networkless cell and become macros, so the next run is cheaper. Gold is what the definition of done is measured on; a gap reopens discovery, the plan or the ontology, and an ontology change always goes back to a person.</aside>
+</section>
