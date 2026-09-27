@@ -1,95 +1,61 @@
 {% extends "base.html" %}
-{% block title %}Completeness{% endblock %}
+{% block title %}{{ _("How complete is this data?") }}{% endblock %}
 {% block main %}
 <section class="page-head">
-  <h1>Completeness</h1>
-  <p class="lede">How much of the definition of done this run meets, measured on gold. Numbers are recomputed here from the export and checked against the engine's own <span class="mono">metrics.json</span>.</p>
+  <h1>{{ _("How complete is this data?") }}</h1>
+  <p class="lede">{{ _("Public records are scattered and often incomplete. This page says plainly how much we found, and what is still missing, so you know how far to trust an empty field.") }}</p>
 </section>
 
-<div class="live" data-live-src="/api/completeness{% if request.query_params.get('run') %}?run={{ request.query_params.get('run')|urlencode }}{% endif %}">
-  <label class="live__toggle"><input type="checkbox" id="live" {% if not request.query_params.get('run') %}checked{% endif %}> Follow the latest run</label>
-  <span class="mono muted" id="live-status">run {{ m.run_id }}{% if m.prev_run_id %} · compared with {{ m.prev_run_id }}{% endif %}</span>
-</div>
-
-<section class="dod" aria-labelledby="dod-h">
-  <h2 id="dod-h" class="visually-hidden">Definition of done</h2>
-  <dl class="dod__grid">
-    {% for c in m.criteria %}
-    <div class="dod__item" data-key="{{ c.criterion_id }}">
-      <dt>{{ c.label }}</dt>
-      <dd><span class="dod__num" data-bind="actual">{{ c.actual if c.recomputed else (c.engine_actual if c.engine_actual is not none else "—") }}</span><span class="dod__of">{{ "must be" if c.lower_is_better and c.target == 0 else "target" }} {{ c.target }}</span></dd>
-      <dd class="dod__state" data-met="{{ c.met|lower }}">{{ "Not counted (mock)" if c.mock else ("Met" if c.met else "Not yet") }}</dd>
-      <dd class="dod__query mono" title="DoD query">{{ c.query }}{% if not c.recomputed %} · reported by the engine, not recomputed{% elif c.agrees is sameas false %} · engine says {{ c.engine_actual }}{% endif %}</dd>
-    </div>
-    {% endfor %}
-  </dl>
-  {% if m.criteria and m.criteria[0].source == "default" %}<p class="note muted">The engine's metrics carry no <span class="mono">dod[]</span>; these are the default criteria.</p>{% endif %}
-  <p class="crosscheck {% if m.mismatches %}crosscheck--bad{% endif %}" id="crosscheck">
-    {% if m.mismatches %}Engine metrics disagree with the export: {{ m.mismatches|join("; ") }}{% else %}Recomputed from gold: matches the engine's metrics.json.{% endif %}
-  </p>
-</section>
+<p class="headline-figure">
+  <span class="headline-figure__num">{{ m.complete }}</span>
+  <span class="headline-figure__text">{{ _("of {total} {plural} have a complete basic profile ({pct}).", total=m.total, plural=m.primary_label|lower, pct=(m.complete_ratio|pct)) }}</span>
+</p>
+<p class="note lede">{{ _("A basic profile counts as complete when at least {pct} of its basic facts are confirmed by a public source with a receipt.", pct=(m.threshold|pct)) }}</p>
 
 <section class="block" aria-labelledby="fields-h">
-  <h2 id="fields-h">Definition-of-done properties in gold</h2>
-  <p class="muted note">Share of {{ m.primary_label|lower }} whose property is gold and backed by at least one capture. The tick marks {{ (m.threshold * 100)|round|int }}%{% if not m.threshold_stated %} (the default share; the ontology does not state one){% endif %}.</p>
+  <h2 id="fields-h">{{ _("Fact by fact") }}</h2>
   <table class="bars" id="field-bars">
     <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
-    <thead class="visually-hidden"><tr><th scope="col">Field</th><th scope="col">Share in gold</th><th scope="col">Count and change</th></tr></thead>
+    <thead class="visually-hidden"><tr><th scope="col">{{ _("Fact") }}</th><th scope="col">{{ _("Share confirmed") }}</th><th scope="col">{{ _("Count") }}</th></tr></thead>
     <tbody>
     {% for f in m.fields %}
       <tr data-field="{{ f.name }}">
         <th scope="row">{{ f.label }}</th>
-        <td class="bars__track" title="{{ f.label }}: {{ f.ratio|pct }} ({{ f.count }} of {{ m.total }})">
-          <span class="bar" style="--v: {{ (f.ratio * 100)|round(1) }}%"></span><span class="bars__target" aria-hidden="true"></span>
+        <td class="bars__track" title="{{ f.label }}: {{ f.ratio|pct }}">
+          <span class="bar" style="--v: {{ (f.ratio * 100)|round(1) }}%"></span>
         </td>
-        <td class="num mono"><span data-bind="ratio">{{ f.ratio|pct }}</span> <span class="muted" data-bind="count">{{ f.count }}/{{ m.total }}</span> <span class="muted delta" data-bind="delta">{% if f.delta is not none %}{{ "%+d"|format((f.delta * 100)|round|int) }} pts{% endif %}</span></td>
+        <td class="num"><span class="mono">{{ f.ratio|pct }}</span> <span class="muted">{{ _("{n} of {m}", n=f.count, m=m.total) }}</span></td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
+  {% if m.gaps %}
+  <p class="note">{{ _("Hardest to find so far:") }} {% for f in m.gaps %}<strong>{{ f.label }}</strong> ({{ f.ratio|pct }}){% if not loop.last %}, {% endif %}{% endfor %}. {{ _("An empty field means no public source we reached published it, not that the fact is false.") }}</p>
+  {% endif %}
 </section>
 
-<section class="block" aria-labelledby="cov-h">
-  <h2 id="cov-h">Taxonomy coverage</h2>
-  <p class="muted note">Level Ratio Coverage: share of each level's taxonomy nodes that at least one gold entity is classified under. Uncovered nodes are where fan-out looks next.</p>
-  {% if m.coverage %}
-  <table class="bars">
-    <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
-    <thead class="visually-hidden"><tr><th scope="col">Taxonomy and level</th><th scope="col">Coverage</th><th scope="col">Share</th></tr></thead>
-    <tbody>
-    {% for tax, levels in m.coverage.items() %}{% for ratio in levels %}
-      <tr>
-        <th scope="row"><span class="mono">{{ tax }}</span> <span class="muted">level {{ loop.index }}</span></th>
-        <td class="bars__track" title="{{ tax }} level {{ loop.index }}: {{ ratio|pct }}"><span class="bar" style="--v: {{ (ratio * 100)|round(1) }}%"></span></td>
-        <td class="num mono">{{ ratio|pct }}</td>
-      </tr>
-    {% endfor %}{% endfor %}
-    </tbody>
-  </table>
-  {% else %}<p class="muted">No taxonomy coverage in this run's metrics.</p>{% endif %}
+<section class="block" aria-labelledby="trust-h">
+  <h2 id="trust-h">{{ _("What you can rely on") }}</h2>
+  <ul class="plain-list">
+    <li>{{ _("Values without a receipt: {n}.", n=m.without_evidence) }} {{ _("Every confirmed value links to the public page it came from.") }}</li>
+    <li>{{ ngettext("{n} value where sources disagree; both versions are shown.", "{n} values where sources disagree; every version is shown.", m.conflicts) }}</li>
+    <li>{{ ngettext("{n} kind of public source consulted.", "{n} kinds of public source consulted.", m.source_classes) }}</li>
+    <li id="crosscheck">{% if m.mismatches %}{{ _("Our recount of these numbers does not match the collector's own report; treat them with care.") }}{% else %}{{ _("We recount these numbers from the published data, and they match the collector's own report.") }}{% endif %}</li>
+  </ul>
 </section>
 
-<section class="block" aria-labelledby="modes-h">
-  <h2 id="modes-h">How values were collected</h2>
-  {% set mode_names = {"D0": "Deterministic: bulk file, API or fixed script", "D1": "Inference-assisted script", "S1": "Agentic loop over the page structure", "S2": "Full computer use with vision"} %}
-  {% set mode_total = m.modes.values()|sum %}
-  {% if mode_total %}
-  <table class="bars">
-    <colgroup><col class="col-label"><col><col class="col-num"></colgroup>
-    <thead class="visually-hidden"><tr><th scope="col">Mode</th><th scope="col">Share of steps</th><th scope="col">Steps</th></tr></thead>
-    <tbody>
-    {% for mode in ["D0", "D1", "S1", "S2"] %}{% set n = m.modes.get(mode, 0) %}
-      <tr>
-        <th scope="row"><span class="mono">{{ mode }}</span> <span class="muted">{{ mode_names[mode] }}</span></th>
-        <td class="bars__track" title="{{ mode }}: {{ n }} steps"><span class="bar bar--quiet" style="--v: {{ (n / mode_total * 100)|round(1) }}%"></span></td>
-        <td class="num mono">{{ n }}</td>
-      </tr>
+<details class="block tech">
+  <summary>{{ _("The case's own definition of done (technical)") }}</summary>
+  <dl class="dod__grid">
+    {% for c in m.criteria %}
+    <div class="dod__item" data-key="{{ c.criterion_id }}">
+      <dt>{{ c.label }}</dt>
+      <dd><span class="dod__num">{{ c.actual if c.recomputed else (c.engine_actual if c.engine_actual is not none else "—") }}</span><span class="dod__of">{{ _("target") }} {{ c.target }}</span></dd>
+      <dd class="dod__state" data-met="{{ c.met|lower }}">{{ _("Not counted (simulated)") if c.mock else (_("Met") if c.met else _("Not yet")) }}</dd>
+      <dd class="dod__query mono">{{ c.query }}</dd>
+    </div>
     {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
-  {% if m.jobs %}
-  <p class="note">Jobs: <span class="mono">{{ m.jobs.ok or 0 }}</span> ok{% for reason, n in (m.jobs.failed_by_reason or {}).items() %}, <span class="mono">{{ n }}</span> stopped ({{ reason|replace("_", " ") }}){% endfor %}.</p>
-  {% endif %}
-</section>
+  </dl>
+  <p class="note muted">{{ _("Data from run") }} <span class="mono">{{ m.run_id }}</span>.</p>
+</details>
 {% endblock %}

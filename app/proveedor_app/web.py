@@ -7,14 +7,15 @@ import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from urllib.parse import parse_qs, quote, urlsplit
+from urllib.parse import parse_qs, quote, urlencode, urlsplit
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from jinja2 import pass_context
 
-from . import dod, investigate, live
+from . import dod, i18n, investigate, live
 from .domain import LEGACY_ONTOLOGY, Domain
 from .gold import GoldStore, Run, UnavailableStore, backend_of, load_store, sniff_media_type
 
@@ -28,6 +29,7 @@ class Settings:
     case_dir: Path
     role: str = "investigator"
     identity_header: str | None = None  # header the NetBird proxy sets with the signed-in user, if any
+    operator_links: bool = True  # footer links to the control pages until they move to the Ontofill Console
 
     def __post_init__(self) -> None:
         if self.role not in ROLES:
@@ -71,6 +73,34 @@ def host_of(url: str) -> str:
     return urlsplit(url).hostname or url
 
 
+STATUS_WORDS = {"gold": "Confirmed", "conflict": "Sources disagree", "missing": "Not found"}
+
+
+def confidence_level(confidence) -> str:
+    """Confidence in words for readers: high (>= 0.9), medium (>= 0.7), low, unknown."""
+    if not isinstance(confidence, (int, float)):
+        return "unknown"
+    return "high" if confidence >= 0.9 else "medium" if confidence >= 0.7 else "low"
+
+
+def dataset_stats(r: Run) -> dict:
+    """Plain numbers for the home page: all recomputed from the gold export in hand."""
+    d = r.domain
+    complete = sum(dod.dod_ratio(e, d) >= d.dod_threshold for e in r.primary)
+    sources, latest = set(), None
+    for ref in r.values.values():
+        for ev in ref.data.get("evidence") or []:
+            if ev.get("source_id"):
+                sources.add(ev["source_id"])
+            ts = i18n.parse_ts(ev.get("captured_at"))
+            if ts and (latest is None or ts > latest[0]):
+                latest = (ts, ev["captured_at"])
+    total = len(r.primary)
+    return {"total": total, "complete": complete, "complete_ratio": complete / total if total else 0.0,
+            "flagged": sum(1 for e in r.primary if e.get("flags")), "sources": len(sources),
+            "latest": latest[1] if latest else None}
+
+
 def safe_url(url: str) -> str | None:
     """Only http(s) evidence links become clickable."""
     return url if urlsplit(url).scheme in ("http", "https") else None
@@ -91,6 +121,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     env.filters["pct"] = lambda x: f"{round((x or 0) * 100)}%"
     env.filters["money"] = lambda x: f"{x:,.2f}" if isinstance(x, (int, float)) else (x or "—")
     env.filters["brief"] = brief
+    env.filters["sentence"] = lambda s: s[:1].upper() + s[1:] if s else s
+    env.filters["date"] = pass_context(lambda ctx, v: i18n.date_label(v, ctx.get("lang", i18n.DEFAULT_LANG)))
+    env.filters["datetime"] = pass_context(
+        lambda ctx, v: i18n.date_label(v, ctx.get("lang", i18n.DEFAULT_LANG), with_time=True))
 
     def run(request: Request) -> Run:
         try:
@@ -116,13 +150,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return Domain.from_ontology(LEGACY_ONTOLOGY, legacy=True)
 
     def render(request: Request, name: str, **ctx) -> HTMLResponse:
+        asked = request.query_params.get("lang")
+        lang = i18n.pick_lang(asked, request.cookies.get(i18n.COOKIE))
+        _ = i18n.translator(lang)
+        other = "en" if lang == "es" else "es"
+        query = [(k, v) for k, v in request.query_params.multi_items() if k != "lang"] + [("lang", other)]
+        ctx.update(lang=lang, other_lang=other, lang_href=f"{request.url.path}?{urlencode(query)}", _=_,
+                   ngettext=i18n.ngettext(lang), status_word=lambda s: _(STATUS_WORDS.get(s or "missing", s or "")),
+                   confidence_word=lambda c: _(confidence_level(c)), lang_param=asked in i18n.LANGS,
+                   operator_links=settings.operator_links)
         ctx.setdefault("nav", "")
         r = ctx.get("run")
-        ctx.setdefault("domain", r.domain if r else current_domain())
+        ctx.setdefault("domain", (r.domain if r else current_domain()).localized(lang))
+        ctx["loc"] = lambda obj, key: (obj or {}).get(f"{key}_{lang}") or (obj or {}).get(key)
         ctx.setdefault("backend", r.inference_backend if r else None)
         ctx.setdefault("synthetic", bool(r and r.case_id.startswith("fixture")))
         ctx.setdefault("preview", bool(r and r.metrics.get("preview")))
-        return templates.TemplateResponse(request, name, ctx)
+        response = templates.TemplateResponse(request, name, ctx)
+        if asked in i18n.LANGS and asked != request.cookies.get(i18n.COOKIE):
+            response.set_cookie(i18n.COOKIE, asked, max_age=365 * 24 * 3600, samesite="lax")
+        return response
 
     @app.exception_handler(NoGold)
     def no_gold(request: Request, exc: NoGold) -> HTMLResponse:
@@ -151,18 +198,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     and needle not in e["id"].lower():
                 continue
             ratio = dod.dod_ratio(e, d)
-            has_conflict = any(isinstance(v, dict) and v.get("status") == "conflict" for v in props.values())
+            conflicts = sum(1 for v in props.values() if isinstance(v, dict) and v.get("status") == "conflict")
+            has_conflict = conflicts > 0
             if show == "signals" and not e.get("flags"):
                 continue
             if show == "incomplete" and ratio >= d.dod_threshold:
                 continue
             if show == "conflicts" and not has_conflict:
                 continue
-            rows.append({"e": e, "ratio": ratio, "props": props,
+            rows.append({"e": e, "ratio": ratio, "props": props, "conflicts": conflicts,
+                         "filled": sum(1 for p in d.dod_props() if dod.is_filled(props.get(p.id))),
                          "linked": sum(1 for link in e.get("links") or [] if link.get("target") in r.entities_by_id
                                        and r.entities_by_id[link["target"]].get("class") != d.primary_class)})
         rows.sort(key=lambda row: (-len(row["e"].get("flags") or []), r.title(row["e"])))
-        return render(request, "index.html", nav="entities", run=r, rows=rows, q=q, show=show)
+        return render(request, "index.html", nav="entities", run=r, rows=rows, q=q, show=show,
+                      stats=dataset_stats(r))
 
     @app.get("/entities/{entity_id}", response_class=HTMLResponse)
     @app.get("/suppliers/{entity_id}", response_class=HTMLResponse, include_in_schema=False)
@@ -187,8 +237,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         selected = r.values.get(ev) if ev else None
         if selected and selected.entity_id != entity_id:
             selected = None
+        filled = sum(1 for p in d.dod_props(e.get("class")) if dod.is_filled(props.get(p.id)))
+        sources = {ev.get("source_id") or ev.get("url") for f in props.values() if isinstance(f, dict)
+                   for ev in f.get("evidence") or []}
         return render(request, "dossier.html", nav="entities", run=r, e=e, props=props, order=order,
-                      peers=peers, related=related, ratio=dod.dod_ratio(e, d), selected=selected)
+                      peers=peers, related=related, ratio=dod.dod_ratio(e, d), selected=selected, filled=filled,
+                      source_count=len(sources - {None}), ptypes={p.id: p.datatype for p in d.props(e.get("class"))})
 
     @app.get("/fragments/evidence/{value_id}", response_class=HTMLResponse)
     def evidence_fragment(request: Request, value_id: str):
@@ -198,8 +252,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(404, f"no value {value_id}")
         return render(request, "_evidence.html", run=r, selected=ref)
 
-    def completeness_model(r: Run) -> dict:
-        d = r.domain
+    def completeness_model(r: Run, lang: str = i18n.DEFAULT_LANG) -> dict:
+        d = r.domain.localized(lang)
         recomputed = dod.compute(r.entities, d)
         engine = r.metrics or {}
         runs = settings.store.run_ids()
@@ -213,7 +267,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             before = (prev["per_property_completeness"].get(d.primary_class) or {}).get(p.id) if prev else None
             fields.append({"name": p.id, "label": p.label, "ratio": ratio, "count": round(ratio * total),
                            "delta": None if before is None else ratio - before})
+        complete = sum(dod.dod_ratio(e, d) >= d.dod_threshold for e in r.primary)
+        conflicts = sum(1 for e in r.primary for v in (e.get("properties") or {}).values()
+                        if isinstance(v, dict) and v.get("status") == "conflict")
         return {
+            "complete": complete, "complete_ratio": complete / total if total else 0.0,
+            "gaps": sorted((f for f in fields if f["ratio"] < d.dod_threshold), key=lambda f: f["ratio"])[:3],
+            "without_evidence": recomputed.get("values_without_evidence", 0), "conflicts": conflicts,
+            "source_classes": recomputed.get("distinct_source_classes", 0),
             "run_id": r.run_id, "prev_run_id": prev_id, "total": total, "fields": fields,
             "primary_label": d.class_label(plural=True), "threshold": d.dod_threshold,
             "threshold_stated": d.threshold_stated, "recomputed": recomputed,
@@ -226,7 +287,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/completeness", response_class=HTMLResponse)
     def completeness(request: Request):
         r = run(request)
-        return render(request, "completeness.html", nav="completeness", run=r, m=completeness_model(r))
+        lang = i18n.pick_lang(request.query_params.get("lang"), request.cookies.get(i18n.COOKIE))
+        return render(request, "completeness.html", nav="completeness", run=r, m=completeness_model(r, lang))
 
     @app.get("/api/completeness")
     def completeness_api(request: Request) -> dict:
@@ -254,8 +316,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         flag = flags[index]
         refs = [r.values[v] for v in flag.get("evidence_value_ids") or [] if v in r.values]
         dispute = json.dumps(investigate.dispute_record(r, e, flag), indent=2, ensure_ascii=False)
+        lang = i18n.pick_lang(request.query_params.get("lang"), request.cookies.get(i18n.COOKIE))
         return render(request, "signal.html", nav="signals", run=r, e=e, flag=flag, refs=refs,
-                      info=r.domain.rule(flag["rule_id"], flag["label"]), dispute=dispute)
+                      info=r.domain.localized(lang).rule(flag["rule_id"], flag["label"]), dispute=dispute)
 
     @app.get("/relationships", response_class=HTMLResponse)
     def relationships(request: Request, focus: str = "", types: str = ""):
@@ -310,6 +373,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if text is None:
             raise HTTPException(404, "not in the case package")
         return render(request, "case_file.html", nav="journal", run=None, path=path, text=text)
+
+    @app.get("/about", response_class=HTMLResponse)
+    def about(request: Request):
+        try:
+            r = settings.store.run(request.query_params.get("run"))
+        except LookupError:
+            r = None
+        return render(request, "about.html", nav="about", run=r, sources=list(case.sources().values()),
+                      latest=dataset_stats(r)["latest"] if r else None)
+
+    @app.get("/data", response_class=HTMLResponse)
+    def open_data(request: Request):
+        from . import export as ex
+
+        r = run(request)
+        return render(request, "data.html", nav="data", run=r, ocds=ex.ocds_available(r))
 
     @app.get("/watchlist", response_class=HTMLResponse)
     def watchlist(request: Request, ids: str = ""):

@@ -1,32 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Case journal{% endblock %}
+{% block title %}{{ _("Case journal") }}{% endblock %}
 {% block main %}
 <section class="page-head">
-  <h1>Case journal</h1>
-  <p class="lede">Every value in this app can be traced back to the brief. Pick any value's captures in a dossier and choose "Trace this value to the brief", or start from the documents below.</p>
-  {% if sample %}<p><a class="btn" href="/journal/{{ sample.value_id|urlencode }}">Replay an example value</a></p>{% endif %}
+  <h1>{{ _("Case journal") }}</h1>
+  <p class="lede">{{ _("Every value on this site can be traced back to the original question. Open any receipt and choose “How we got this value”, or start from the documents below.") }}</p>
+  {% if sample %}<p><a class="btn" href="/journal/{{ sample.value_id|urlencode }}">{{ _("Follow an example value") }}</a></p>{% endif %}
 </section>
 
 <section class="block" aria-labelledby="docs-h">
-  <h2 id="docs-h">The case package</h2>
+  <h2 id="docs-h">{{ _("The case package") }}</h2>
   <table class="ledger">
-    <thead><tr><th scope="col">Document</th><th scope="col">Path</th><th scope="col">State</th></tr></thead>
+    <thead><tr><th scope="col">{{ _("Document") }}</th><th scope="col">{{ _("File") }}</th><th scope="col">{{ _("State") }}</th></tr></thead>
     <tbody>
     {% for a in anchors %}
-      <tr><th scope="row">{{ a.label }}</th><td class="mono">{% if a.exists %}<a href="/case-file?path={{ a.path|urlencode }}">{{ a.path }}</a>{% else %}{{ a.path }}{% endif %}</td><td>{{ "present" if a.exists else "not produced yet" }}</td></tr>
+      <tr><th scope="row">{{ _(a.label) }}</th><td class="mono">{% if a.exists %}<a href="/case-file?path={{ a.path|urlencode }}">{{ a.path }}</a>{% else %}{{ a.path }}{% endif %}</td><td>{{ _("published") if a.exists else _("not produced yet") }}</td></tr>
     {% endfor %}
     {% for t in tdds %}
-      <tr><th scope="row">Technical definition</th><td class="mono">{% if t.exists %}<a href="/case-file?path={{ t.path|urlencode }}">{{ t.path }}</a>{% else %}{{ t.path }}{% endif %}</td><td>{{ "present" if t.exists else "not in this copy" }}</td></tr>
+      <tr><th scope="row">{{ _("Technical definition") }}</th><td class="mono">{% if t.exists %}<a href="/case-file?path={{ t.path|urlencode }}">{{ t.path }}</a>{% else %}{{ t.path }}{% endif %}</td><td>{{ _("published") if t.exists else _("not in this copy") }}</td></tr>
     {% endfor %}
     </tbody>
   </table>
 </section>
 
 <section class="block" aria-labelledby="sources-h">
-  <h2 id="sources-h">Sources the engine found</h2>
+  <h2 id="sources-h">{{ _("Public sources the collectors found") }}</h2>
   {% if sources %}
   <table class="ledger">
-    <thead><tr><th scope="col">Source</th><th scope="col">Class</th><th scope="col">Found by</th><th scope="col">Objectives</th></tr></thead>
+    <thead><tr><th scope="col">{{ _("Source") }}</th><th scope="col">{{ _("Kind") }}</th><th scope="col">{{ _("How it was found") }}</th><th scope="col">{{ _("Objectives") }}</th></tr></thead>
     <tbody>
     {% for s in sources %}
       <tr><th scope="row">{% if s.url and safe_url(s.url) %}<a href="{{ s.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ host_of(s.url) }}</a>{% else %}{{ s.url or "—" }}{% endif %}<span class="mono sub">{{ s.source_id }}</span></th>
@@ -36,16 +36,16 @@
     {% endfor %}
     </tbody>
   </table>
-  {% else %}<p class="muted">No objectives in <span class="mono">03-fanout/objectives.yaml</span> yet.</p>{% endif %}
+  {% else %}<p class="muted">{{ _("No sources published yet.") }}</p>{% endif %}
 </section>
 
 <section class="block" aria-labelledby="steps-h">
-  <h2 id="steps-h">Steps in run <span class="mono">{{ run.run_id }}</span></h2>
+  <h2 id="steps-h">{{ _("Steps in run") }} <span class="mono">{{ run.run_id }}</span></h2>
   <table class="ledger">
-    <thead><tr><th scope="col">Phase</th><th scope="col" class="num">Steps</th></tr></thead>
+    <thead><tr><th scope="col">{{ _("Phase") }}</th><th scope="col" class="num">{{ _("Steps") }}</th></tr></thead>
     <tbody>
     {% for phase, name in PHASE_NAMES.items() %}
-      <tr><th scope="row">{{ phase }} · {{ name }}</th><td class="num mono">{{ by_phase.get(phase, 0) }}</td></tr>
+      <tr><th scope="row">{{ phase }} · {{ _(name) }}</th><td class="num mono">{{ by_phase.get(phase, 0) }}</td></tr>
     {% endfor %}
     </tbody>
   </table>

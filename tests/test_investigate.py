@@ -18,7 +18,7 @@ def test_signals_pages(client, store):
     s = next(s for s in store.run().primary if s["flags"])
     page = client.get(f"/signals/{s['id']}/0")
     assert page.status_code == 200
-    assert "Dispute this signal" in page.text and "In plain language" in page.text
+    assert "Dispute it" in page.text and "Why it appears" in page.text and "not an accusation" in page.text
     ev = store.run().values[s["flags"][0]["evidence_value_ids"][0]].data["evidence"][0]
     assert ev["url"] in page.text
     assert client.get(f"/signals/{s['id']}/99").status_code == 404
@@ -71,7 +71,7 @@ def test_watchlist_diff_against_previous_run(client, store):
                    if investigate.diff_entity(old.entities_by_id[i], new.entities_by_id[i]))
     r = client.get("/watchlist", params={"ids": f"{added},{changed},sup:not-there"})
     assert r.status_code == 200
-    assert "First appears in this run" in r.text
+    assert "New in this collection" in r.text
     assert r.text.count('class="watch__item"') == 2
     assert f"ids={added}" in r.text.replace("%3A", ":").replace("%2C", ",")
 
@@ -198,7 +198,7 @@ def test_approver_works_before_any_gold(fixture_root, case_copy, tmp_path):
     c = TestClient(create_app(Settings(store=UnavailableStore("no lake.yaml"), case_dir=case_copy, role="approver")))
     assert c.get("/approvals").status_code == 200
     r = c.get("/")
-    assert r.status_code == 503 and "No gold export to read yet" in r.text
+    assert r.status_code == 503 and "Aún no hay nada publicado" in r.text  # Spanish by default
     assert c.get("/healthz").json()["run_id"] is None
 
 
@@ -215,11 +215,11 @@ def test_discovered_by_shown_where_sources_appear(case_copy, store, fixture_root
     assert investigate.discovered_by({"discovered_by": {"provider": "model_proposal"}}) == "model_proposal"
     c = TestClient(create_app(Settings(store=store, case_dir=case_copy)))
     index = c.get("/journal").text
-    assert "wikidata_official_website" in index and "ocds_catalog" in index and "Found by" in index
+    assert "wikidata_official_website" in index and "ocds_catalog" in index and "Cómo se encontró" in index
     ref = next(v for v in store.run().values.values()
                if store.run().lineage(v.value_id) and v.data["evidence"]
                and v.data["evidence"][0]["source_id"] == doc["objectives"][0]["source_id"])
-    assert "How this source was found" in c.get(f"/journal/{ref.value_id}").text
+    assert "Cómo se encontró esta fuente" in c.get(f"/journal/{ref.value_id}").text
     assert "Found by" in c.get("/run/run-fixture-0001").text
 
 

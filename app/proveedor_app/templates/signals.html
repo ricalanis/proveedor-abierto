@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Signals{% endblock %}
+{% block title %}{{ _("Signals") }}{% endblock %}
 {% block main %}
 <section class="page-head">
-  <h1>Signals</h1>
-  <p class="lede">Rules from the case ontology that fired on gold values. A signal says where to look first. It is not a finding, and every one links to the captures it rests on.</p>
+  <h1>{{ _("Signals to verify") }}</h1>
+  <p class="lede">{{ _("Patterns in public records that are worth a closer look. Each one follows a written rule and links to the records it rests on. A signal is where to start checking, not a finding: many have an ordinary explanation.") }}</p>
 </section>
 {% if groups %}
 <div class="rules">
 {% for g in groups %}
   <section class="rule" aria-labelledby="rule-{{ g.rule_id }}">
     <header class="rule__head">
-      <h2 id="rule-{{ g.rule_id }}">{{ g.label }}</h2>
-      <p class="rule__meta"><span class="mono">{{ g.rule_id }}</span> · {{ g.hits|length }} {{ domain.class_label()|lower if g.hits|length == 1 else domain.class_label(plural=True)|lower }}</p>
-      <p class="rule__checks">{{ g.info.checks }}</p>
+      <h2 id="rule-{{ g.rule_id }}">{{ loc(g.hits[0][2], "label") }}</h2>
+      <p class="rule__meta"><span class="mono">{{ g.hits|length }}</span> {{ domain.class_label()|lower if g.hits|length == 1 else domain.class_label(plural=True)|lower }}</p>
+      <p class="rule__checks"><span class="rule__kicker">{{ _("The rule:") }}</span> {{ domain.rule(g.rule_id, g.label).checks }}</p>
     </header>
     <ul class="hits">
       {% for s, i, f in g.hits %}
@@ -26,6 +26,6 @@
 {% endfor %}
 </div>
 {% else %}
-<p class="empty">No rule fired in this run.</p>
+<p class="empty">{{ _("No signal in this data.") }}</p>
 {% endif %}
 {% endblock %}

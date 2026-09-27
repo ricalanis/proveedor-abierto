@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Open data") }}{% endblock %}
+{% block main %}
+<section class="page-head">
+  <h1>{{ _("Open data") }}</h1>
+  <p class="lede">{{ _("Download everything on this site. Each file carries the same values you see here, with their sources.") }}</p>
+</section>
+<ul class="downloads">
+  <li class="download">
+    <a class="download__name" href="/export/entities.csv">CSV</a>
+    <p>{{ _("One row per {cls}, one column per fact, plus the source of each value. Opens in any spreadsheet.", cls=domain.class_label()|lower) }}</p>
+  </li>
+  {% if ocds %}
+  <li class="download">
+    <a class="download__name" href="/export/ocds.json">OCDS JSON</a>
+    <p>{{ _("Contracts in the Open Contracting Data Standard, the format governments use to publish procurement data.") }}</p>
+  </li>
+  {% endif %}
+  <li class="download">
+    <a class="download__name" href="/export/gold.ttl">RDF (Turtle)</a>
+    <p>{{ _("Linked data for researchers, aligned to public vocabularies where the case defines them.") }}</p>
+  </li>
+</ul>
+<p class="note">{{ _("To download only the {plural} you follow, use the download on", plural=domain.class_label(plural=True)|lower) }} <a href="/watchlist">{{ _("My list") }}</a>.</p>
+
+<section class="block" aria-labelledby="reuse-h">
+  <h2 id="reuse-h">{{ _("Reusing it") }}</h2>
+  <p>{{ _("The values come from public records; check each source's own terms before republishing. The case package (the question, the definition, the rules behind signals) and this site's code are in the public repository and can be forked.") }} <a href="https://github.com/ricalanis/proveedor-abierto" rel="noopener">github.com/ricalanis/proveedor-abierto</a></p>
+  <p class="note muted">{{ _("Data from run") }} <span class="mono">{{ run.run_id }}</span>.</p>
+</section>
+{% endblock %}

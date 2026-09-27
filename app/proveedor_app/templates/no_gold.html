@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}No gold yet{% endblock %}
+{% block title %}{{ _("Nothing published yet") }}{% endblock %}
 {% block main %}
 <section class="page-head">
-  <h1>No gold export to read yet</h1>
-  <p class="lede">The engine has not exported a run for this case, or this instance is not pointed at one. {% if role == "approver" %}Checkpoints waiting for sign-off are under <a href="/approvals">Approvals</a>.{% endif %}</p>
-  <pre class="record">{{ reason }}</pre>
+  <h1>{{ _("Nothing published yet") }}</h1>
+  <p class="lede">{{ _("This case has not published its data yet, or this site is not connected to it. Please come back later.") }}</p>
+  <details><summary>{{ _("Technical reason") }}</summary><pre class="record">{{ reason }}</pre></details>
 </section>
 {% endblock %}

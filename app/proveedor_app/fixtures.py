@@ -521,6 +521,10 @@ def _add_flags_and_links(suppliers: list[dict], contracts: list[dict]) -> None:
                 "explanation": f"The tax authority's published list shows this RFC with status '{status}'. "
                                "A listing is a signal to verify, not proof of wrongdoing; 'presunto' means the "
                                "company can still rebut it.",
+                "label_es": FIXTURE_ES["tax_list_listed"]["label_es"],
+                "explanation_es": f"La lista publicada por la autoridad fiscal muestra este RFC con estatus «{status}». "
+                                  "Aparecer en la lista es una señal por verificar, no prueba de una falta; "
+                                  "«presunto» significa que la empresa todavía puede desvirtuarlo.",
                 "evidence_value_ids": [f["tax_list_status"]["value_id"], f["tax_id"]["value_id"]],
             })
         if val(s, "sanction_status") == "sancionado":
@@ -529,6 +533,9 @@ def _add_flags_and_links(suppliers: list[dict], contracts: list[dict]) -> None:
                 "label": "Appears in the sanctioned-supplier registry",
                 "explanation": "The sanctions registry lists this company. Check the sanction's dates and scope "
                                "against the contract dates before drawing conclusions.",
+                "label_es": FIXTURE_ES["sanctioned_supplier"]["label_es"],
+                "explanation_es": "El registro de sancionados incluye a esta empresa. Compara las fechas y el alcance "
+                                  "de la sanción con las fechas de los contratos antes de sacar conclusiones.",
                 "evidence_value_ids": [f["sanction_status"]["value_id"]],
             })
         founded = val(s, "founding_date")
@@ -540,6 +547,10 @@ def _add_flags_and_links(suppliers: list[dict], contracts: list[dict]) -> None:
                     "label": "Created shortly before its first award",
                     "explanation": f"Founded {days} days before its first recorded contract. New companies win "
                                    "contracts legitimately too; compare with the procedure's requirements.",
+                    "label_es": FIXTURE_ES["founded_shortly_before_award"]["label_es"],
+                    "explanation_es": f"Se constituyó {days} días antes de su primer contrato registrado. Las empresas "
+                                      "nuevas también ganan contratos legítimamente; compáralo con los requisitos "
+                                      "del procedimiento.",
                     "evidence_value_ids": [f["founding_date"]["value_id"]],
                 })
         for peer_id in sorted(procedure_peers.get(s["id"], ())):
@@ -557,6 +568,10 @@ def _add_flags_and_links(suppliers: list[dict], contracts: list[dict]) -> None:
                             "label": "Shares an address with another bidder in the same procedure",
                             "explanation": "Two participants in one procedure declare the same address. This can "
                                            "indicate simulated competition, or simply a shared office building.",
+                            "label_es": FIXTURE_ES["shared_address_bidders"]["label_es"],
+                            "explanation_es": "Dos participantes de un mismo procedimiento declaran el mismo domicilio. "
+                                              "Puede indicar competencia simulada, o simplemente un edificio de "
+                                              "oficinas compartido.",
                             "evidence_value_ids": [f["address"]["value_id"], peer["fields"]["address"]["value_id"]],
                         })
         for other in suppliers:  # shared representative across procedures too
@@ -649,12 +664,65 @@ FIXTURE_ONTOLOGY_EXTRA = {  # the §11a keys this synthetic case's ontology carr
 }
 
 
+# Spanish twins (`<key>_es`) for the synthetic case's labels: the product is Spanish-first (domain.localize_ontology).
+FIXTURE_ES = {
+    "supplier": {"label_es": "Proveedor", "label_plural_es": "Proveedores"},
+    "contract": {"label_es": "Contrato", "label_plural_es": "Contratos"},
+    "legal_name": {"label_es": "Razón social"}, "tax_id": {"label_es": "RFC"}, "address": {"label_es": "Domicilio"},
+    "founding_date": {"label_es": "Fecha de constitución"}, "tax_list_status": {"label_es": "Lista del SAT (69-B)"},
+    "sanction_status": {"label_es": "Sanciones"}, "legal_representative": {"label_es": "Representante legal"},
+    "title": {"label_es": "Contrato"}, "buyer": {"label_es": "Comprador"}, "procedure_type": {"label_es": "Procedimiento"},
+    "date": {"label_es": "Fecha"}, "amount": {"label_es": "Monto"}, "currency": {"label_es": "Moneda"},
+    "shared_address": {"label_es": "Mismo domicilio"},
+    "shared_representative": {"label_es": "Mismo representante legal"},
+    "same_procedure": {"label_es": "Mismo procedimiento"}, "awarded": {"label_es": "Contratos"},
+    "awarded_to": {"label_es": "Adjudicado a"},
+    "tax_list_listed": {
+        "label_es": "Aparece en la lista del SAT de empresas que facturan operaciones simuladas",
+        "checks_es": "Si el RFC del proveedor aparece en la lista publicada por la autoridad fiscal de empresas "
+                     "que se presume o se confirmó que emiten facturas por operaciones simuladas.",
+        "verify_es": [("Abre la captura de la lista y confirma que el RFC coincide exactamente (no solo un nombre "
+                       "parecido)."),
+                      ("Revisa la etapa: «presunto» todavía se puede desvirtuar; «definitivo» es una resolución "
+                       "firme."),
+                      "Compara la fecha de publicación con las fechas de los contratos."]},
+    "sanctioned_supplier": {
+        "label_es": "Aparece en el registro de proveedores sancionados",
+        "checks_es": "Si el proveedor aparece en el registro de proveedores y contratistas sancionados.",
+        "verify_es": ["Confirma que el registro se refiere a esta persona moral (por RFC, no solo por nombre).",
+                      "Revisa las fechas de inicio y fin de la sanción y si alcanza a la dependencia contratante.",
+                      "Busca una resolución judicial posterior que suspenda la sanción."]},
+    "founded_shortly_before_award": {
+        "label_es": "Se constituyó poco antes de su primer contrato",
+        "checks_es": "Si la empresa se constituyó menos de un año antes de su primer contrato público registrado.",
+        "verify_es": ["Confirma la fecha de constitución en la captura del registro o del diario oficial.",
+                      "Revisa los requisitos de experiencia del procedimiento y si la empresa los cumplía.",
+                      "Busca una empresa anterior con los mismos socios o domicilio."]},
+    "shared_address_bidders": {
+        "label_es": "Comparte domicilio con otro participante del mismo procedimiento",
+        "checks_es": "Si dos participantes del mismo procedimiento declaran el mismo domicilio.",
+        "verify_es": ["Compara ambas capturas del domicilio carácter por carácter.",
+                      "Revisa si el domicilio es un edificio de oficinas grande o un centro de negocios.",
+                      "Busca representantes, socios o teléfonos compartidos entre las dos empresas."]},
+    "procurement_portal": {"label_es": "Portal de compras públicas"},
+    "tax_authority_list": {"label_es": "Lista de la autoridad fiscal"},
+    "sanctions_registry": {"label_es": "Registro de sancionados"},
+    "company_registry": {"label_es": "Registro de empresas"}, "official_gazette": {"label_es": "Diario oficial"},
+}
+
+
+def _with_spanish(items: list[dict]) -> list[dict]:
+    return [{**item, **FIXTURE_ES.get(item.get("id"), {})} for item in items]
+
+
 def case_ontology() -> dict:
     """Engine-shaped ontology (fixture_case.ONTOLOGY) plus the §11a keys, classes and properties it describes."""
     onto = dict(fixture_case.ONTOLOGY)
     onto.update(FIXTURE_ONTOLOGY_EXTRA)
     onto["classes"] = LEGACY_ONTOLOGY["classes"]
     onto["properties"] = LEGACY_ONTOLOGY["properties"]
+    for key in ("classes", "properties", "relations", "rules", "source_classes"):
+        onto[key] = _with_spanish(onto.get(key) or [])
     onto["dod_queries_path"] = "02-ontology/dod-queries.json"
     return onto
 

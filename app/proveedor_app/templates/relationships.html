@@ -1,29 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Relationships{% endblock %}
+{% block title %}{{ _("Connections") }}{% endblock %}
 {% block main %}
 <section class="page-head">
-  <h1>Relationships</h1>
-  <p class="lede">{{ domain.class_label(plural=True) }} connected by the relations the case ontology defines. Each line links to the value that connects them.</p>
+  <h1>{{ _("Connections") }}</h1>
+  <p class="lede">{{ _("{plural} that share something in public records, such as an address or a representative. A shared detail is a lead to check, not proof of a relationship. Each line links to the record that connects them.", plural=domain.class_label(plural=True)) }}</p>
 </section>
 
 <form class="filters filters--types" method="get" action="/relationships">
   {% if focus %}<input type="hidden" name="focus" value="{{ focus }}">{% endif %}
   <fieldset>
-    <legend>Connect by</legend>
+    <legend>{{ _("Connect by") }}</legend>
     {% for t in LINK_TYPES %}
     <label class="check"><input type="checkbox" name="t" value="{{ t }}" {% if t in chosen %}checked{% endif %} data-type="{{ t }}"> <span class="edge-key edge-key--{{ t }}" aria-hidden="true"></span>{{ domain.relation_label(t) }}</label>
     {% endfor %}
-    <button type="submit" class="btn btn--quiet">Apply</button>
+    <button type="submit" class="btn btn--quiet">{{ _("Apply") }}</button>
   </fieldset>
 </form>
 
-<p class="count">{{ clusters|length }} {{ "group" if clusters|length == 1 else "groups" }} of connected {{ domain.class_label(plural=True)|lower }}</p>
+<p class="count">{{ ngettext("{n} group of connected records", "{n} groups of connected records", clusters|length) }}</p>
 <div class="clusters">
 {% for c in clusters %}
   {% set pos = c.layout(280) %}
-  <section class="cluster {% if focus in c.members %}cluster--focus{% endif %}" aria-label="Group of {{ c.members|length }} {{ domain.class_label(plural=True)|lower }}">
+  <section class="cluster {% if focus in c.members %}cluster--focus{% endif %}" aria-label="{{ _('Group of {n}', n=c.members|length) }}">
     {% if c.members|length <= 12 %}
-    <svg class="graph" viewBox="0 0 280 280" role="img" aria-label="Network of {{ c.members|length }} connected {{ domain.class_label(plural=True)|lower }}">
+    <svg class="graph" viewBox="0 0 280 280" role="img" aria-label="{{ _('Map of {n} connected records', n=c.members|length) }}">
       {% for e in c.edges %}{% set a = pos[e.a] %}{% set b = pos[e.b] %}
         <line class="edge edge--{{ e.type }}" x1="{{ a[0]|round(1) }}" y1="{{ a[1]|round(1) }}" x2="{{ b[0]|round(1) }}" y2="{{ b[1]|round(1) }}"><title>{{ domain.relation_label(e.type) }}</title></line>
       {% endfor %}
@@ -38,7 +38,7 @@
     <div class="cluster__list">
       <ol class="members">
         {% for m in c.members %}{% set ms = run.entities_by_id[m] %}
-        <li><a href="/entities/{{ m }}" {% if m == focus %}aria-current="true"{% endif %}>{{ run.title(ms) }}</a>{% if ms.flags %} <span class="signal-count" title="Signals">{{ ms.flags|length }} {{ "signal" if ms.flags|length == 1 else "signals" }}</span>{% endif %}</li>
+        <li><a href="/entities/{{ m }}" {% if m == focus %}aria-current="true"{% endif %}>{{ run.title(ms) }}</a>{% if ms.flags %} <span class="signal-count">{{ ngettext("{n} signal", "{n} signals", ms.flags|length) }}</span>{% endif %}</li>
         {% endfor %}
       </ol>
       <ul class="edges">
@@ -53,7 +53,7 @@
     </div>
   </section>
 {% else %}
-  <p class="empty">No connections of the chosen kinds in this run.</p>
+  <p class="empty">{{ _("No connections of the chosen kinds in this data.") }}</p>
 {% endfor %}
 </div>
 {% endblock %}

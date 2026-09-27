@@ -3,63 +3,58 @@
 {% set dod_props = domain.dod_props() %}
 {% set title_prop = domain.title_property() %}
 {% set id_prop = domain.identifier_property() %}
-{% block title %}{{ plural }}{% endblock %}
+{% block title %}{{ _("Search") }} · {{ plural }}{% endblock %}
 {% block main %}
-<section class="page-head">
-  <h1>{{ plural }}</h1>
-  <p class="lede">{{ rows|length if not q and show == "all" else run.primary|length }} {{ plural|lower }} in this run. Open one to see every property with the capture it came from.</p>
+<section class="lookup">
+  <h1 class="lookup__title">{{ _("Who receives public money?") }}</h1>
+  <p class="lookup__lede">{{ _("Look up a {cls} and see what public records say about it: every value with the page it came from and when it was captured.", cls=domain.class_label()|lower) }}</p>
+  <form class="finder" method="get" action="/" role="search">
+    <label class="finder__label" for="q">{{ _("Name, {idlabel} or ID", idlabel=domain.prop_label(id_prop) if id_prop else _("identifier")) }}</label>
+    <div class="finder__row">
+      <input id="q" name="q" type="search" value="{{ q }}" autocomplete="off" spellcheck="false" enterkeyhint="search">
+      <input type="hidden" name="show" value="{{ show }}">
+      {% if lang_param %}<input type="hidden" name="lang" value="{{ lang }}">{% endif %}
+      <button type="submit">{{ _("Search") }}</button>
+    </div>
+  </form>
 </section>
 
-<form class="finder" method="get" action="/" role="search">
-  <label class="finder__label" for="q">{{ domain.prop_label(title_prop) if title_prop else "Name" }}{% if id_prop %}, {{ domain.prop_label(id_prop) }}{% endif %} or ID</label>
-  <div class="finder__row">
-    <input id="q" name="q" type="search" value="{{ q }}" autocomplete="off">
-    <input type="hidden" name="show" value="{{ show }}">
-    <button type="submit">Search</button>
-  </div>
-  <div class="filters" role="group" aria-label="Filter">
-    {% for key, label in [("all", "All"), ("signals", "With signals"), ("incomplete", "Profile below " ~ (domain.dod_threshold * 100)|round|int ~ "%"), ("conflicts", "Conflicting sources")] %}
-      <a href="/?q={{ q|urlencode }}&show={{ key }}" {% if show == key %}aria-current="true"{% endif %}>{{ label }}</a>
-    {% endfor %}
-  </div>
-</form>
+<dl class="tally" aria-label="{{ _('This dataset') }}">
+  <div><dt>{{ plural }}</dt><dd>{{ stats.total }}</dd></div>
+  <div><dt>{{ _("with a complete basic profile") }}</dt><dd>{{ stats.complete }} <span class="tally__pct">{{ stats.complete_ratio|pct }}</span></dd></div>
+  <div><dt>{{ _("with signals to verify") }}</dt><dd>{{ stats.flagged }}</dd></div>
+  <div><dt>{{ _("public sources consulted") }}</dt><dd>{{ stats.sources }}</dd></div>
+  {% if stats.latest %}<div><dt>{{ _("latest capture") }}</dt><dd class="tally__date">{{ stats.latest|date }}</dd></div>{% endif %}
+</dl>
+<p class="tally__more"><a href="/completeness">{{ _("How complete is this data?") }}</a></p>
 
-<p class="count" aria-live="polite">{{ rows|length }} shown</p>
-{% if rows %}
-<div class="table-wrap">
-<table class="ledger ledger--index">
-  <thead>
-    <tr>
-      <th scope="col">{{ domain.class_label() }}</th>
-      <th scope="col">Profile <span class="th-note">{% for p in dod_props %}{{ p.label }}{% if not loop.last %} · {% endif %}{% endfor %}</span></th>
-      <th scope="col" class="num">Signals</th>
-      <th scope="col" class="num">Linked</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for row in rows %}
-    {% set e = row.e %}
-    <tr>
-      <th scope="row">
-        <a class="entity" href="/entities/{{ e.id }}">{{ run.title(e) }}</a>
-        {% if id_prop %}<span class="mono sub">{{ (row.props[id_prop] or {}).value or (domain.prop_label(id_prop) ~ " missing") }}</span>{% endif %}
-      </th>
-      <td>
-        <span class="cells" aria-label="Profile {{ row.ratio|pct }} complete">
-          {% for p in dod_props %}{% set st = (row.props[p.id] or {}).status or "missing" %}<span class="cell cell--{{ st }}" title="{{ p.label }}: {{ st }}"></span>{% endfor %}
-        </span>
-        <span class="mono sub">{{ row.ratio|pct }}</span>
-      </td>
-      <td class="num">
-        {% if e.flags %}<span class="signal-count">{{ e.flags|length }}</span>{% else %}<span class="muted">0</span>{% endif %}
-      </td>
-      <td class="num">{{ row.linked }}</td>
-    </tr>
+<section class="browse" aria-labelledby="browse-h">
+  <div class="browse__head">
+    <h2 id="browse-h">{% if q %}{{ _("Results for “{q}”", q=q) }}{% else %}{{ _("Browse all {plural}", plural=plural|lower) }}{% endif %}</h2>
+    <div class="filters" role="group" aria-label="{{ _('Show') }}">
+      {% for key, label in [("all", _("All")), ("signals", _("With signals")), ("incomplete", _("Incomplete profile")), ("conflicts", _("Sources disagree"))] %}
+        <a href="/?q={{ q|urlencode }}&show={{ key }}" {% if show == key %}aria-current="true"{% endif %}>{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  <p class="count" aria-live="polite">{{ _("{n} of {total} shown", n=rows|length, total=stats.total) }}</p>
+
+  {% if rows %}
+  <ol class="roster">
+  {% for row in rows %}{% set e = row.e %}
+    <li class="roster__item">
+      <a class="roster__name" href="/entities/{{ e.id }}">{{ run.title(e) }}</a>
+      <span class="roster__id mono">{% if id_prop %}{{ (row.props[id_prop] or {}).value or _("{label} not found", label=domain.prop_label(id_prop)) }}{% else %}{{ e.id }}{% endif %}</span>
+      <span class="roster__profile">
+        <span class="cells" aria-hidden="true">{% for p in dod_props %}{% set st = (row.props[p.id] or {}).status or "missing" %}<span class="cell cell--{{ st }}" title="{{ p.label }}: {{ status_word(st) }}"></span>{% endfor %}</span>
+        <span class="roster__ratio">{{ _("{n} of {m} basic facts", n=row.filled, m=dod_props|length) }}</span>
+      </span>
+      <span class="roster__flags">{% if e.flags %}<span class="signal-count">{{ ngettext("{n} signal", "{n} signals", e.flags|length) }}</span>{% endif %}{% if row.conflicts %} <span class="conflict-count">{{ ngettext("{n} disagreement", "{n} disagreements", row.conflicts) }}</span>{% endif %}</span>
+    </li>
   {% endfor %}
-  </tbody>
-</table>
-</div>
-{% else %}
-<p class="empty">Nothing matches. Clear the search or pick another filter.</p>
-{% endif %}
+  </ol>
+  {% else %}
+  <p class="empty">{{ _("Nothing matches. Check the spelling, try the {idlabel}, or clear the filter.", idlabel=domain.prop_label(id_prop) if id_prop else _("identifier")) }} <a href="/">{{ _("Show everything") }}</a></p>
+  {% endif %}
+</section>
 {% endblock %}

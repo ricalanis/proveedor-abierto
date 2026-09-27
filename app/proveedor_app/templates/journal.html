@@ -1,41 +1,41 @@
 {% extends "base.html" %}
-{% block title %}Journal · {{ domain.prop_label(ref.prop) }} of {{ run.title(e) }}{% endblock %}
+{% block title %}{{ _("Case journal") }} · {{ domain.prop_label(ref.prop) }} · {{ run.title(e) }}{% endblock %}
 {% block main %}
-<nav class="crumbs" aria-label="Breadcrumb"><a href="/journal">Case journal</a> <span aria-hidden="true">/</span> <span class="mono">{{ ref.value_id }}</span></nav>
+<nav class="crumbs" aria-label="{{ _('Breadcrumb') }}"><a href="/journal">{{ _("Case journal") }}</a> <span aria-hidden="true">/</span> <span class="mono">{{ ref.value_id }}</span></nav>
 <section class="page-head">
-  <h1>How we know: {{ domain.prop_label(ref.prop) }} of {{ run.title(e) }}</h1>
-  <p class="lede">A replay from this value back to the brief. Read top to bottom: the value, the step that captured it, the technical definition that step followed, the objective it served, the ontology and PRD behind that objective, and the brief everything started from.</p>
+  <h1>{{ _("How we got this value") }}: {{ domain.prop_label(ref.prop) }} · {{ run.title(e) }}</h1>
+  <p class="lede">{{ _("From this value back to the original question. Read top to bottom: the value, the step that captured it, the instructions that step followed, the goal it served, the case definition behind that goal, and the question everything started from.") }}</p>
 </section>
 
 <ol class="journal">
   <li class="stop stop--value">
-    <p class="stop__phase">Value</p>
-    <p class="stop__title"><span class="ev__value">{{ ref.data.value if ref.data.value is not none else "not found" }}</span></p>
-    <p class="stop__meta"><span class="status status--{{ ref.data.status }}">{{ ref.data.status }}</span> <span class="mono">confidence {{ "%.2f"|format(ref.data.confidence if ref.data.confidence is number else 0) }}</span>
-      · <a href="/entities/{{ ref.entity_id }}?ev={{ ref.value_id|urlencode }}#evidence">{{ ref.data.evidence|length }} {{ "capture" if ref.data.evidence|length == 1 else "captures" }} in the dossier</a></p>
+    <p class="stop__phase">{{ _("Value") }}</p>
+    <p class="stop__title"><span class="ev__value">{{ ref.data.value if ref.data.value is not none else _("not found") }}</span></p>
+    <p class="stop__meta"><span class="status status--{{ ref.data.status }}">{{ status_word(ref.data.status) }}</span> <span>{{ _("confidence {level}", level=confidence_word(ref.data.confidence)) }}</span>
+      · <a href="/entities/{{ ref.entity_id }}?ev={{ ref.value_id|urlencode }}#evidence">{{ ngettext("See receipt", "See {n} receipts", ref.data.evidence|length) }}</a></p>
   </li>
 
   {% if not replays %}
-  <li class="stop"><p class="muted">No trace step lists this value. The export is missing part of its lineage.</p></li>
+  <li class="stop"><p class="muted">{{ _("No collection step lists this value; part of its history is missing from the published data.") }}</p></li>
   {% endif %}
   {% for stops in replays %}
-    {% if replays|length > 1 %}<li class="stop stop--divider"><p class="stop__phase">Path {{ loop.index }} of {{ replays|length }}</p></li>{% endif %}
+    {% if replays|length > 1 %}<li class="stop stop--divider"><p class="stop__phase">{{ _("Path {n} of {m}", n=loop.index, m=replays|length) }}</p></li>{% endif %}
     {% for stop in stops %}{% set st = stop.step %}
     <li class="stop">
-      <p class="stop__phase">Phase {{ st.phase }} · {{ stop.phase_name }} <span class="mode mono" title="Execution mode">{{ st.mode }}</span></p>
+      <p class="stop__phase">{{ _("Phase") }} {{ st.phase }} · {{ _(stop.phase_name) }} <span class="mode mono" title="{{ _('Collection mode') }}">{{ st.mode }}</span></p>
       <dl class="stop__olde">
-        <div><dt>Observed</dt><dd>{{ st.observed|brief(600) }}</dd></div>
-        <div><dt>Requested</dt><dd>{{ st.requested|brief(600) }}</dd></div>
-        <div><dt>Executed</dt><dd>{{ st.executed|brief(600) }}</dd></div>
-        <div><dt>Evaluated</dt><dd>{{ st.evaluated|brief(600) }}</dd></div>
+        <div><dt>{{ _("Observed") }}</dt><dd>{{ st.observed|brief(600) }}</dd></div>
+        <div><dt>{{ _("Requested") }}</dt><dd>{{ st.requested|brief(600) }}</dd></div>
+        <div><dt>{{ _("Executed") }}</dt><dd>{{ st.executed|brief(600) }}</dd></div>
+        <div><dt>{{ _("Evaluated") }}</dt><dd>{{ st.evaluated|brief(600) }}</dd></div>
       </dl>
-      <p class="stop__meta mono muted">{{ st.step_id }} · {{ st.ts }}{% if st.source_id %} · {{ st.source_id }}{% endif %}{% if st.objective_id %} · objective {{ st.objective_id }}{% endif %}</p>
-      {% if stop.discovered_by %}<p class="note">How this source was found: <span class="mono">{{ stop.discovered_by }}</span></p>{% endif %}
+      <p class="stop__meta mono muted">{{ st.step_id }} · {{ st.ts }}{% if st.source_id %} · {{ st.source_id }}{% endif %}{% if st.objective_id %} · {{ _("objective") }} {{ st.objective_id }}{% endif %}</p>
+      {% if stop.discovered_by %}<p class="note">{{ _("How this source was found:") }} <span class="mono">{{ stop.discovered_by }}</span></p>{% endif %}
       {% if stop.objective %}<pre class="record record--short">{{ stop.objective|tojson(indent=2) }}</pre>{% endif %}
       {% for d in stop.docs %}
       <details class="doc" {% if loop.first %}open{% endif %}>
-        <summary>{{ d.label }} · <span class="mono">{{ d.path }}</span></summary>
-        {% if d.text %}<pre class="record">{{ d.text }}</pre><a href="/case-file?path={{ d.path|urlencode }}">Open the full document</a>{% else %}<p class="muted">Not in this copy of the case package.</p>{% endif %}
+        <summary>{{ _(d.label) }} · <span class="mono">{{ d.path }}</span></summary>
+        {% if d.text %}<pre class="record">{{ d.text }}</pre><a href="/case-file?path={{ d.path|urlencode }}">{{ _("Open the full document") }}</a>{% else %}<p class="muted">{{ _("Not in this copy of the case package.") }}</p>{% endif %}
       </details>
       {% endfor %}
     </li>
@@ -44,14 +44,14 @@
 
   {% for a in anchors|reverse %}
   <li class="stop stop--anchor">
-    <p class="stop__phase">{{ a.label }}</p>
+    <p class="stop__phase">{{ _(a.label) }}</p>
     {% if a.text %}
     <details class="doc" {% if a.label == "Brief" %}open{% endif %}>
       <summary class="mono">{{ a.path }}</summary>
       <pre class="record">{{ a.text }}</pre>
-      <a href="/case-file?path={{ a.path|urlencode }}">Open the full document</a>
+      <a href="/case-file?path={{ a.path|urlencode }}">{{ _("Open the full document") }}</a>
     </details>
-    {% else %}<p class="muted"><span class="mono">{{ a.path }}</span> is not in this copy of the case package yet.</p>{% endif %}
+    {% else %}<p class="muted"><span class="mono">{{ a.path }}</span> · {{ _("not in this copy of the case package yet") }}</p>{% endif %}
   </li>
   {% endfor %}
 </ol>

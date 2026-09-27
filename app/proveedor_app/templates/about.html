@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ _("How it works") }}{% endblock %}
+{% block main %}
+<article class="prose">
+  <h1>{{ _("How it works") }}</h1>
+  <p class="lede">{{ _("Proveedor Abierto gathers what public records say about the companies that receive public money, and shows where each fact came from.") }}</p>
+
+  <h2>{{ _("Where the data comes from") }}</h2>
+  <p>{{ _("Software agents read public websites, such as official registries, open-data portals and gazettes, the way a person would: searching, paging through results and downloading published files. They never log in, never get past a captcha and never submit anything except searches. Every page they read is kept as a saved copy with a screenshot.") }}</p>
+  {% if sources %}<p>{{ ngettext("This data draws on {n} public source.", "This data draws on {n} public sources.", sources|length) }} <a href="/journal">{{ _("See them in the case journal") }}</a>.</p>{% endif %}
+
+  <h2>{{ _("How to read a profile") }}</h2>
+  <dl class="glossary">
+    <div><dt><span class="status status--gold">{{ status_word("gold") }}</span></dt><dd>{{ _("A public source published it, and the receipt shows where.") }}</dd></div>
+    <div><dt><span class="status status--conflict">{{ status_word("conflict") }}</span></dt><dd>{{ _("Two sources say different things. Both are shown; neither is hidden.") }}</dd></div>
+    <div><dt><span class="status status--missing">{{ status_word("missing") }}</span></dt><dd>{{ _("No source we reached published it. That is not evidence of anything.") }}</dd></div>
+  </dl>
+  <p>{{ _("Confidence (high, medium, low) is how sure the collector is that it read the value correctly from the page, not a judgment about the company.") }}</p>
+
+  <h2>{{ _("Signals are not accusations") }}</h2>
+  <p>{{ _("A signal marks a pattern that investigators usually check first, such as a company appearing on an official list or two bidders sharing an address. Each follows a written rule, lists the records it rests on and explains how to verify it. Many signals have an ordinary explanation. This site does not score anyone and does not say anyone did anything wrong.") }}</p>
+  <p>{{ _("Profiles are of companies. Information about people is limited to what public records publish about their role, such as a legal representative.") }}</p>
+
+  <h2 id="dispute">{{ _("Something wrong? Dispute it") }}</h2>
+  <ol class="howto">
+    <li>{{ _("Open the signal or value and use its receipt to find the office that published it.") }}</li>
+    <li>{{ _("Ask that office to correct the public record.") }}</li>
+    <li>{{ _("Tell us by opening an issue in the public repository with the dispute record the page gives you and the document that shows the correct value. Issues are public.") }} <a href="https://github.com/ricalanis/proveedor-abierto/issues/new" rel="noopener">{{ _("Open an issue") }}</a></li>
+  </ol>
+  <p>{{ _("When the public record changes, the next collection picks it up.") }}</p>
+
+  <h2>{{ _("Open and reusable") }}</h2>
+  <p>{{ _("All of this data can be downloaded (CSV, OCDS JSON, RDF), and the case definition that produced it is public so anyone can check or repeat the work.") }} <a href="/data">{{ _("Download the data") }}</a></p>
+  {% if run %}<p class="note muted">{{ _("Data from run") }} <span class="mono">{{ run.run_id }}</span>{% if latest %} · {{ _("latest capture {date}", date=latest|date) }}{% endif %}.</p>{% endif %}
+</article>
+{% endblock %}

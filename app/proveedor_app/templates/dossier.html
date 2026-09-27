@@ -6,82 +6,81 @@
 {% block main %}
 <div class="dossier">
   <div class="dossier__body">
-    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">{{ domain.class_label(plural=True) }}</a> <span aria-hidden="true">/</span> <span class="mono">{{ e.id }}</span></nav>
+    <nav class="crumbs" aria-label="{{ _('Breadcrumb') }}"><a href="/">{{ domain.class_label(plural=True) }}</a> <span aria-hidden="true">/</span> <span class="mono">{{ run.identifier(e) or e.id }}</span></nav>
     <header class="dossier__head">
       <h1>{{ run.title(e) }}</h1>
       <dl class="facts">
         {% if id_prop %}<div><dt>{{ domain.prop_label(id_prop, cls) }}</dt><dd class="mono">{{ (props[id_prop] or {}).value or "—" }}</dd></div>{% endif %}
-        {% if dod_ids %}<div><dt>Profile</dt><dd><span class="mono">{{ ratio|pct }}</span> of {{ dod_ids|length }} properties in gold</dd></div>{% endif %}
+        {% if dod_ids %}<div><dt>{{ _("Basic profile") }}</dt><dd>{{ _("{n} of {m} facts confirmed", n=filled, m=dod_ids|length) }}</dd></div>{% endif %}
         {% for rel, group in related.items() %}<div><dt>{{ domain.relation_label(rel) }}</dt><dd class="mono">{{ group.rows|length }}</dd></div>{% endfor %}
-        {% if e.classified_as %}<div><dt>Classified as</dt><dd>{% for c in e.classified_as %}<span class="tag mono">{{ c }}</span>{% endfor %}</dd></div>{% endif %}
+        <div><dt>{{ _("Sources") }}</dt><dd class="mono">{{ source_count }}</dd></div>
       </dl>
       <div class="head-actions">
-        <a class="btn btn--quiet" href="/watchlist?ids={{ e.id|urlencode }}" data-watch="{{ e.id }}" role="button" aria-pressed="false">Watch</a>
-        {% if peers %}<a class="btn btn--quiet" href="/relationships?focus={{ e.id|urlencode }}{% for rel in domain.peer_relations() %}&t={{ rel }}{% endfor %}">Show connections</a>{% endif %}
+        <a class="btn btn--quiet" href="/watchlist?ids={{ e.id|urlencode }}" data-watch="{{ e.id }}" data-on="{{ _('On my list') }}" data-off="{{ _('Add to my list') }}" role="button" aria-pressed="false">{{ _("Add to my list") }}</a>
+        {% if peers %}<a class="btn btn--quiet" href="/relationships?focus={{ e.id|urlencode }}{% for rel in domain.peer_relations() %}&t={{ rel }}{% endfor %}">{{ _("See connections") }}</a>{% endif %}
+        <a class="btn btn--quiet" href="/export/entities.csv?ids={{ e.id|urlencode }}">{{ _("Download CSV") }}</a>
       </div>
     </header>
 
     <section aria-labelledby="signals-h" class="block">
-      <h2 id="signals-h">Signals to verify <span class="count-inline">{{ (e.flags or [])|length }}</span></h2>
+      <h2 id="signals-h">{{ _("Signals to verify") }} <span class="count-inline">{{ (e.flags or [])|length }}</span></h2>
       {% if e.flags %}
+      <p class="note muted">{{ _("A signal is a pattern in public records worth checking. It is not an accusation, and it can have an ordinary explanation.") }}</p>
       <ul class="signals">
         {% for f in e.flags %}
         <li class="signal">
-          <a class="signal__label" href="/signals/{{ e.id }}/{{ loop.index0 }}">{{ f.label }}</a>
-          <p>{{ f.explanation }}</p>
-          <p class="signal__ev">Evidence:
+          <a class="signal__label" href="/signals/{{ e.id }}/{{ loop.index0 }}">{{ loc(f, "label") }}</a>
+          <p>{{ loc(f, "explanation") }}</p>
+          <p class="signal__ev">{{ _("Based on:") }}
             {% for vid in f.evidence_value_ids %}{% set ref = run.values.get(vid) %}
-              {% if ref %}<a href="/entities/{{ ref.entity_id }}?ev={{ vid|urlencode }}#evidence" data-evidence="{{ vid }}" class="mono">{{ domain.prop_label(ref.prop) }}{% if ref.entity_id != e.id %} of {{ run.title(run.entities_by_id.get(ref.entity_id)) }}{% endif %}</a>{% else %}<span class="mono">{{ vid }}</span>{% endif %}{% if not loop.last %}, {% endif %}
+              {% if ref %}<a href="/entities/{{ ref.entity_id }}?ev={{ vid|urlencode }}#evidence" data-evidence="{{ vid }}">{{ domain.prop_label(ref.prop) }}{% if ref.entity_id != e.id %} · {{ run.title(run.entities_by_id.get(ref.entity_id)) }}{% endif %}</a>{% else %}<span class="mono">{{ vid }}</span>{% endif %}{% if not loop.last %}, {% endif %}
             {% endfor %}
           </p>
+          <p class="signal__actions"><a href="/signals/{{ e.id }}/{{ loop.index0 }}">{{ _("How to verify it") }}</a> · <a href="/signals/{{ e.id }}/{{ loop.index0 }}#dispute">{{ _("Dispute it") }}</a></p>
         </li>
         {% endfor %}
       </ul>
       {% else %}
-      <p class="muted">No rule fired in this run.</p>
+      <p class="muted">{{ _("No signal in this data.") }}</p>
       {% endif %}
     </section>
 
     <section aria-labelledby="fields-h" class="block">
-      <h2 id="fields-h">Profile</h2>
-      <div class="table-wrap">
-      <table class="ledger ledger--fields">
-        <thead><tr><th scope="col">Property</th><th scope="col">Value</th><th scope="col" class="num">Confidence</th><th scope="col">Status</th><th scope="col">Evidence</th></tr></thead>
-        <tbody>
-        {% for name in order %}{% set f = props.get(name) %}
-          <tr class="{% if selected and f and selected.value_id == f.value_id %}is-selected{% endif %}" {% if f %}id="row-{{ f.value_id }}"{% endif %}>
-            <th scope="row">{{ domain.prop_label(name, cls) }}{% if name in dod_ids %}<span class="core" title="Counts toward the definition of done">dod</span>{% endif %}</th>
-            <td class="value">{% if f and f.value is not none %}{{ f.value }}{% else %}<span class="muted">not found</span>{% endif %}</td>
-            <td class="num mono">{% if f and f.status != "missing" %}{% if f.confidence is number %}{{ "%.2f"|format(f.confidence) }}<span class="conf" style="--w: {{ (f.confidence * 100)|round }}%"></span>{% else %}—{% endif %}{% else %}—{% endif %}</td>
-            <td><span class="status status--{{ (f or {}).status or 'missing' }}">{{ (f or {}).status or "missing" }}</span>{% if ((f or {}).generated_by or {}).backend == "jev" %} <span class="backend backend--jev" title="Decided by Jev alone; needs Vultr confirmation">Jev</span>{% endif %}</td>
-            <td>
-              {% if f and f.evidence %}
-                <a class="ev-link" href="/entities/{{ e.id }}?ev={{ f.value_id|urlencode }}#evidence" data-evidence="{{ f.value_id }}">
-                  {{ f.evidence|length }} {{ "capture" if f.evidence|length == 1 else "captures" }}
-                </a>
-              {% else %}<span class="muted">none</span>{% endif %}
-            </td>
-          </tr>
+      <h2 id="fields-h">{{ _("What public records say") }}</h2>
+      <ol class="record-list">
+        {% for name in order %}{% set f = props.get(name) %}{% set ev0 = ((f or {}).evidence or [])|first %}
+        <li class="fact {% if selected and f and selected.value_id == f.value_id %}is-selected{% endif %} fact--{{ (f or {}).status or 'missing' }}" {% if f %}id="row-{{ f.value_id }}"{% endif %}>
+          <p class="fact__label">{{ domain.prop_label(name, cls) }}{% if name in dod_ids %} <span class="core" title="{{ _('Part of the basic profile') }}">{{ _("basic") }}</span>{% endif %}</p>
+          <p class="fact__value">{% if f and f.value is not none %}{{ f.value|date if ptypes.get(name) == "xsd:date" else f.value }}{% else %}<span class="muted">{{ _("Not found in public sources") }}</span>{% endif %}</p>
+          <p class="fact__receipt">
+            <span class="status status--{{ (f or {}).status or 'missing' }}">{{ status_word((f or {}).status or "missing") }}</span>
+            {% if ((f or {}).generated_by or {}).backend == "jev" %}<span class="backend backend--jev" title="{{ _('Only a supporting model backs this value; it still needs a second check.') }}">{{ _("needs a second check") }}</span>{% endif %}
+            {% if ev0 %}
+              <span class="fact__src">{{ host_of(ev0.url) }}</span>
+              <span class="fact__when">{{ _("captured {date}", date=ev0.captured_at|date) }}</span>
+              {% if f.status != "missing" %}<span class="fact__conf">{{ _("confidence {level}", level=confidence_word(f.confidence)) }}</span>{% endif %}
+              <a class="ev-link" href="/entities/{{ e.id }}?ev={{ f.value_id|urlencode }}#evidence" data-evidence="{{ f.value_id }}">{{ ngettext("See receipt", "See {n} receipts", f.evidence|length) }}</a>
+            {% endif %}
+          </p>
+        </li>
         {% endfor %}
-        </tbody>
-      </table>
-      </div>
+      </ol>
     </section>
 
     {% for rel, group in related.items() %}
     {% set cols = domain.props(group.cls) %}
     <section aria-labelledby="rel-{{ loop.index }}" class="block">
-      <h2 id="rel-{{ loop.index }}">{{ domain.relation_label(rel) }}</h2>
+      <h2 id="rel-{{ loop.index }}">{{ domain.relation_label(rel) }} <span class="count-inline">{{ group.rows|length }}</span></h2>
       <div class="table-wrap">
-      <table class="ledger">
+      <table class="ledger ledger--related">
         <thead><tr>{% for p in cols %}<th scope="col" {% if p.datatype in ("xsd:decimal", "xsd:integer") %}class="num"{% endif %}>{{ p.label }}</th>{% endfor %}</tr></thead>
         <tbody>
         {% for t in group.rows %}{% set tp = t.properties or {} %}
           <tr>{% for p in cols %}{% set v = (tp[p.id] or {}).value %}
             {% if loop.first %}<th scope="row">{{ v if v is not none else "—" }}<span class="mono sub">{{ t.id }}</span></th>
-            {% elif p.datatype in ("xsd:decimal", "xsd:integer") %}<td class="num mono">{{ v|money }}</td>
-            {% elif p.datatype == "xsd:date" %}<td class="mono">{{ v or "—" }}</td>
-            {% else %}<td>{{ (v|string)|replace("_", " ") if v is not none else "—" }}</td>{% endif %}
+            {% elif p.datatype in ("xsd:decimal", "xsd:integer") %}<td class="num mono" data-label="{{ p.label }}">{{ v|money }}</td>
+            {% elif p.datatype == "xsd:date" %}<td data-label="{{ p.label }}">{{ v|date if v else "—" }}</td>
+            {% else %}<td data-label="{{ p.label }}">{{ (v|string)|replace("_", " ") if v is not none else "—" }}</td>{% endif %}
           {% endfor %}</tr>
         {% endfor %}
         </tbody>
@@ -91,7 +90,7 @@
     {% endfor %}
 
     <section aria-labelledby="links-h" class="block">
-      <h2 id="links-h">Connected {{ domain.class_label(plural=True)|lower }}</h2>
+      <h2 id="links-h">{{ _("Connected {plural}", plural=domain.class_label(plural=True)|lower)|sentence }}</h2>
       {% if peers %}
       <ul class="links">
         {% for p in peers %}{% set l = p.link %}
@@ -99,20 +98,20 @@
             <span class="link-type">{{ domain.relation_label(l.property) }}</span>
             <a href="/entities/{{ p.target.id }}">{{ run.title(p.target) }}</a>
             {% set ref = run.values.get(l.via_value_id) %}
-            {% if ref %}<span class="muted">via</span> <a href="/entities/{{ e.id }}?ev={{ l.via_value_id|urlencode }}#evidence" data-evidence="{{ l.via_value_id }}">{{ domain.prop_label(ref.prop) }}</a>{% endif %}
+            {% if ref %}<span class="muted">{{ _("through") }}</span> <a href="/entities/{{ e.id }}?ev={{ l.via_value_id|urlencode }}#evidence" data-evidence="{{ l.via_value_id }}">{{ domain.prop_label(ref.prop) }}</a>{% endif %}
           </li>
         {% endfor %}
       </ul>
-      <p><a href="/relationships?focus={{ e.id|urlencode }}">Open in the relationship view</a></p>
-      {% else %}<p class="muted">No connection to another {{ domain.class_label(cls)|lower }} in this run.</p>{% endif %}
+      <p><a href="/relationships?focus={{ e.id|urlencode }}">{{ _("Open in the connections map") }}</a></p>
+      {% else %}<p class="muted">{{ _("No connection to another {cls} in this data.", cls=domain.class_label(cls)|lower) }}</p>{% endif %}
     </section>
   </div>
 
   <aside class="evidence" id="evidence" aria-labelledby="evidence-h" tabindex="-1">
-    <h2 id="evidence-h">Evidence</h2>
+    <h2 id="evidence-h">{{ _("Receipt") }}</h2>
     <div id="evidence-panel" aria-live="polite">
       {% if selected %}{% include "_evidence.html" %}{% else %}
-      <p class="muted">Pick a value's captures to see where it came from: the source link, the capture's screenshot, and the selector the agent read.</p>
+      <p class="muted">{{ _("Choose “See receipt” on any value to see where it came from: the public page, a screenshot of it, and when it was captured.") }}</p>
       {% endif %}
     </div>
   </aside>

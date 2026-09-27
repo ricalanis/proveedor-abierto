@@ -144,7 +144,7 @@ def diff_entity(old: dict | None, new: dict | None) -> list[dict]:
     old_links = {(x.get("property"), x.get("target")) for x in old.get("links") or []}
     added = [x for x in new.get("links") or [] if (x.get("property"), x.get("target")) not in old_links]
     if added:
-        changes.append({"kind": "links", "text": f"{len(added)} new link{'s' if len(added) > 1 else ''}"})
+        changes.append({"kind": "links", "n": len(added), "text": f"{len(added)} new link{'s' if len(added) > 1 else ''}"})
     return changes
 
 

@@ -1,0 +1,377 @@
+"""Spanish-first copy (English optional).
+
+Templates write their English source text through `_()`. Spanish is the default language; `?lang=en` switches to
+English and a cookie keeps the choice. Domain words (class, property and relation labels, rule text) come from the
+case's ontology in whatever language the ontology phase wrote them; only the app's own copy is translated here.
+`tests/test_i18n.py` fails when a template string has no Spanish entry.
+"""
+
+from __future__ import annotations
+
+from datetime import UTC, datetime
+
+LANGS = ("es", "en")
+DEFAULT_LANG = "es"
+COOKIE = "pa_lang"
+
+MONTHS_ES = ("ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic")
+MONTHS_EN = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+ES: dict[str, str] = {
+    # chrome
+    "Skip to content": "Saltar al contenido",
+    "Sections": "Secciones",
+    "Breadcrumb": "Ruta",
+    "Who receives public money": "Quién recibe dinero público",
+    "Who receives public money?": "¿Quién recibe dinero público?",
+    "Who receives public money, with the receipts": "Quién recibe dinero público, con sus comprobantes",
+    "Public-procurement suppliers with the public record behind every value. Signals to verify, not accusations.":
+        "Proveedores del gobierno con el registro público detrás de cada dato. Señales para verificar, no acusaciones.",
+    "Search": "Buscar",
+    "Signals": "Señales",
+    "Connections": "Conexiones",
+    "My list": "Mi lista",
+    "Open data": "Datos abiertos",
+    "How complete": "Qué tan completo",
+    "How it works": "Cómo funciona",
+    "Practice data.": "Datos de práctica.",
+    "Every name, identifier and source on this site is invented (.example sites, obviously fake names). The real case has not published its data yet.":
+        "Todos los nombres, identificadores y fuentes de este sitio son inventados (sitios .example, nombres obviamente falsos). El caso real todavía no publica sus datos.",
+    "Simulated collection.": "Recolección simulada.",
+    "These values came from recorded model responses, not a live collection run. Treat them as a placeholder.":
+        "Estos datos salieron de respuestas grabadas de un modelo, no de una recolección real. Tómalos como un ejemplo.",
+    "Unreviewed preview.": "Vista previa sin revisar.",
+    "This data was produced before a person approved the case's definition. It is not the published result.":
+        "Estos datos se produjeron antes de que una persona aprobara la definición del caso. No son el resultado publicado.",
+    "Every value comes from a public source and links to its capture. A signal says where to look; it is not an accusation.":
+        "Cada dato viene de una fuente pública y enlaza a su captura. Una señal dice dónde mirar; no es una acusación.",
+    "Something wrong? Dispute it": "¿Algo está mal? Dispútalo",
+    "Case journal": "Bitácora del caso",
+    "Source code and case package": "Código y paquete del caso",
+    "Engine operation (moving to the Ontofill Console):": "Operación del motor (se muda a Ontofill Console):",
+    "Live run": "Corrida en vivo",
+    "Engine report": "Reporte del motor",
+    "Track evidence": "Evidencia del track",
+    "Spend": "Gasto",
+    "Approvals": "Aprobaciones",
+    # status and confidence words
+    "Confirmed": "Confirmado",
+    "Sources disagree": "Fuentes en desacuerdo",
+    "Not found": "No encontrado",
+    "high": "alta",
+    "medium": "media",
+    "low": "baja",
+    "unknown": "desconocida",
+    # search
+    "Look up a {cls} and see what public records say about it: every value with the page it came from and when it was captured.":
+        "Busca un {cls} y mira lo que dicen los registros públicos: cada dato con la página de donde salió y cuándo se capturó.",
+    "Name, {idlabel} or ID": "Nombre, {idlabel} o ID",
+    "identifier": "identificador",
+    "This dataset": "Estos datos",
+    "with a complete basic profile": "con perfil básico completo",
+    "with signals to verify": "con señales por verificar",
+    "public sources consulted": "fuentes públicas consultadas",
+    "latest capture": "última captura",
+    "How complete is this data?": "¿Qué tan completos son estos datos?",
+    "Results for “{q}”": "Resultados para «{q}»",
+    "Browse all {plural}": "Todos los {plural}",
+    "Show": "Mostrar",
+    "All": "Todos",
+    "With signals": "Con señales",
+    "Incomplete profile": "Perfil incompleto",
+    "{n} of {total} shown": "{n} de {total}",
+    "{label} not found": "{label} no encontrado",
+    "{n} of {m} basic facts": "{n} de {m} datos básicos",
+    "{n} signal": "{n} señal",
+    "{n} signals": "{n} señales",
+    "{n} disagreement": "{n} desacuerdo",
+    "{n} disagreements": "{n} desacuerdos",
+    "Nothing matches. Check the spelling, try the {idlabel}, or clear the filter.":
+        "Nada coincide. Revisa la ortografía, prueba con {idlabel} o quita el filtro.",
+    "Show everything": "Mostrar todo",
+    # dossier
+    "Basic profile": "Perfil básico",
+    "{n} of {m} facts confirmed": "{n} de {m} datos confirmados",
+    "Sources": "Fuentes",
+    "Add to my list": "Agregar a mi lista",
+    "On my list": "En mi lista",
+    "See connections": "Ver conexiones",
+    "Download CSV": "Descargar CSV",
+    "Signals to verify": "Señales por verificar",
+    "A signal is a pattern in public records worth checking. It is not an accusation, and it can have an ordinary explanation.":
+        "Una señal es un patrón en los registros públicos que vale la pena revisar. No es una acusación y puede tener una explicación ordinaria.",
+    "Based on:": "Se basa en:",
+    "How to verify it": "Cómo verificarla",
+    "Dispute it": "Disputarla",
+    "No signal in this data.": "No hay señales en estos datos.",
+    "What public records say": "Lo que dicen los registros públicos",
+    "Part of the basic profile": "Parte del perfil básico",
+    "basic": "básico",
+    "Not found in public sources": "No se encontró en fuentes públicas",
+    "captured {date}": "capturado el {date}",
+    "confidence {level}": "confianza {level}",
+    "See receipt": "Ver comprobante",
+    "See {n} receipts": "Ver {n} comprobantes",
+    "Connected {plural}": "{plural} conectados",
+    "through": "por",
+    "Open in the connections map": "Abrir en el mapa de conexiones",
+    "No connection to another {cls} in this data.": "Sin conexión con otro {cls} en estos datos.",
+    "Receipt": "Comprobante",
+    "Choose “See receipt” on any value to see where it came from: the public page, a screenshot of it, and when it was captured.":
+        "Elige «Ver comprobante» en cualquier dato para ver de dónde salió: la página pública, una captura de pantalla y cuándo se capturó.",
+    # receipt
+    "not found": "no encontrado",
+    "How we got this value": "Cómo obtuvimos este dato",
+    "Only a supporting model backs this value; it still needs a second check.":
+        "Solo un modelo de apoyo respalda este dato; todavía necesita una segunda revisión.",
+    "Simulated collection: this value came from recorded responses and will be replaced by a live run.":
+        "Recolección simulada: este dato salió de respuestas grabadas y se reemplazará con una recolección real.",
+    "Sources disagree. Each receipt below shows what that source says; the value above is the best-supported one.":
+        "Las fuentes no coinciden. Cada comprobante muestra lo que dice esa fuente; el dato de arriba es el mejor respaldado.",
+    "Captured {date}": "Capturado el {date}",
+    "Screenshot of {host} captured {date}": "Captura de pantalla de {host} tomada el {date}",
+    "Screenshot of the page as the collector saw it. Open it full size.":
+        "Captura de la página tal como la vio el recolector. Ábrela en tamaño completo.",
+    "Technical details": "Detalles técnicos",
+    "Where on the page": "Lugar en la página",
+    "Saved copy": "Copia guardada",
+    "Source ID": "ID de la fuente",
+    "Timestamp": "Marca de tiempo",
+    "needs a second check": "necesita una segunda revisión",
+    "No receipt backs this value.": "Ningún comprobante respalda este dato.",
+    # signals
+    "Patterns in public records that are worth a closer look. Each one follows a written rule and links to the records it rests on. A signal is where to start checking, not a finding: many have an ordinary explanation.":
+        "Patrones en los registros públicos que vale la pena mirar de cerca. Cada uno sigue una regla escrita y enlaza a los registros en que se basa. Una señal es por dónde empezar a revisar, no un hallazgo: muchas tienen una explicación ordinaria.",
+    "The rule:": "La regla:",
+    "Signal to verify": "Señal por verificar",
+    "This is not an accusation. It means public records match a pattern that investigators check first. It may have an ordinary explanation, and the records themselves can be wrong or out of date.":
+        "Esto no es una acusación. Significa que los registros públicos coinciden con un patrón que quienes investigan revisan primero. Puede tener una explicación ordinaria, y los propios registros pueden estar equivocados o desactualizados.",
+    "Why it appears": "Por qué aparece",
+    "The rule": "La regla",
+    "The records it rests on": "Los registros en que se basa",
+    "From": "De",
+    "How to verify it yourself": "Cómo verificarla tú",
+    "Is this wrong? Dispute it": "¿Está mal? Dispútala",
+    "If you represent this {cls} and a value is wrong:": "Si representas a este {cls} y un dato está mal:",
+    "Ask the office that published the record to correct it. The receipt above links to the exact page.":
+        "Pide a la oficina que publicó el registro que lo corrija. El comprobante de arriba enlaza a la página exacta.",
+    "Send the dispute record below, with the document that shows the correct value, by opening an issue in the public repository.":
+        "Envía el registro de disputa de abajo, con el documento que muestra el dato correcto, abriendo un issue en el repositorio público.",
+    "Open a dispute": "Abrir una disputa",
+    "When the public record changes, the next collection picks it up and the signal clears if the rule no longer holds.":
+        "Cuando cambie el registro público, la siguiente recolección lo toma y la señal desaparece si la regla ya no se cumple.",
+    "Dispute record for this signal": "Registro de disputa de esta señal",
+    "Dispute": "Disputa",
+    "Copied": "Copiado",
+    "Select the text to copy": "Selecciona el texto para copiarlo",
+    "Copy record": "Copiar registro",
+    # connections
+    "{plural} that share something in public records, such as an address or a representative. A shared detail is a lead to check, not proof of a relationship. Each line links to the record that connects them.":
+        "{plural} que comparten algo en los registros públicos, como un domicilio o un representante. Un dato compartido es una pista por revisar, no prueba de una relación. Cada línea enlaza al registro que los conecta.",
+    "Connect by": "Conectar por",
+    "Apply": "Aplicar",
+    "{n} group of connected records": "{n} grupo de registros conectados",
+    "{n} groups of connected records": "{n} grupos de registros conectados",
+    "Group of {n}": "Grupo de {n}",
+    "Map of {n} connected records": "Mapa de {n} registros conectados",
+    "No connections of the chosen kinds in this data.": "No hay conexiones de los tipos elegidos en estos datos.",
+    # watchlist
+    "The {plural} you follow, and what changed in public records since the previous collection.":
+        "Los {plural} que sigues y lo que cambió en los registros públicos desde la recolección anterior.",
+    "compared with run": "comparado con la corrida",
+    "Your list is kept in this browser only; nothing is stored on our server. To keep it or share it, copy this page's address.":
+        "Tu lista se guarda solo en este navegador; nada se guarda en nuestro servidor. Para conservarla o compartirla, copia la dirección de esta página.",
+    "Remove": "Quitar",
+    "absent": "ausente",
+    "New signal:": "Señal nueva:",
+    "Signal cleared:": "Señal que desapareció:",
+    "No longer in the latest data": "Ya no aparece en los datos más recientes",
+    "New in this collection": "Nuevo en esta recolección",
+    "{n} new connection": "{n} conexión nueva",
+    "{n} new connections": "{n} conexiones nuevas",
+    "No changes since the previous collection.": "Sin cambios desde la recolección anterior.",
+    "This is the first collection, so there is nothing to compare yet.":
+        "Esta es la primera recolección, así que aún no hay con qué comparar.",
+    "Download my list": "Descargar mi lista",
+    "Your list is empty. Open any profile and choose “Add to my list”.":
+        "Tu lista está vacía. Abre cualquier perfil y elige «Agregar a mi lista».",
+    # open data
+    "Download everything on this site. Each file carries the same values you see here, with their sources.":
+        "Descarga todo lo que hay en este sitio. Cada archivo trae los mismos datos que ves aquí, con sus fuentes.",
+    "One row per {cls}, one column per fact, plus the source of each value. Opens in any spreadsheet.":
+        "Una fila por {cls}, una columna por dato, más la fuente de cada valor. Se abre en cualquier hoja de cálculo.",
+    "Contracts in the Open Contracting Data Standard, the format governments use to publish procurement data.":
+        "Contratos en el Estándar de Datos de Contrataciones Abiertas (OCDS), el formato que usan los gobiernos para publicar sus compras.",
+    "Linked data for researchers, aligned to public vocabularies where the case defines them.":
+        "Datos enlazados para investigación, alineados a vocabularios públicos donde el caso los define.",
+    "To download only the {plural} you follow, use the download on": "Para descargar solo los {plural} que sigues, usa la descarga de",
+    "Reusing it": "Reutilizarlos",
+    "The values come from public records; check each source's own terms before republishing. The case package (the question, the definition, the rules behind signals) and this site's code are in the public repository and can be forked.":
+        "Los datos vienen de registros públicos; revisa los términos de cada fuente antes de republicarlos. El paquete del caso (la pregunta, la definición, las reglas de las señales) y el código de este sitio están en el repositorio público y se pueden copiar.",
+    "Data from run": "Datos de la corrida",
+    # completeness
+    "Public records are scattered and often incomplete. This page says plainly how much we found, and what is still missing, so you know how far to trust an empty field.":
+        "Los registros públicos están dispersos y muchas veces incompletos. Esta página dice con claridad cuánto encontramos y qué falta, para que sepas cuánto confiar en un campo vacío.",
+    "of {total} {plural} have a complete basic profile ({pct}).": "de {total} {plural} tienen su perfil básico completo ({pct}).",
+    "A basic profile counts as complete when at least {pct} of its basic facts are confirmed by a public source with a receipt.":
+        "Un perfil básico cuenta como completo cuando al menos {pct} de sus datos básicos están confirmados por una fuente pública con comprobante.",
+    "Fact by fact": "Dato por dato",
+    "Fact": "Dato",
+    "Share confirmed": "Porcentaje confirmado",
+    "Count": "Cantidad",
+    "{n} of {m}": "{n} de {m}",
+    "Hardest to find so far:": "Lo más difícil de encontrar hasta ahora:",
+    "An empty field means no public source we reached published it, not that the fact is false.":
+        "Un campo vacío significa que ninguna fuente pública que consultamos lo publicó, no que el dato sea falso.",
+    "What you can rely on": "En qué puedes confiar",
+    "Values without a receipt: {n}.": "Datos sin comprobante: {n}.",
+    "Every confirmed value links to the public page it came from.": "Cada dato confirmado enlaza a la página pública de donde salió.",
+    "{n} value where sources disagree; both versions are shown.": "{n} dato en que las fuentes no coinciden; se muestran ambas versiones.",
+    "{n} values where sources disagree; every version is shown.": "{n} datos en que las fuentes no coinciden; se muestran todas las versiones.",
+    "{n} kind of public source consulted.": "{n} tipo de fuente pública consultada.",
+    "{n} kinds of public source consulted.": "{n} tipos de fuente pública consultados.",
+    "Our recount of these numbers does not match the collector's own report; treat them with care.":
+        "Nuestro recuento de estas cifras no coincide con el reporte del recolector; tómalas con cuidado.",
+    "We recount these numbers from the published data, and they match the collector's own report.":
+        "Recontamos estas cifras a partir de los datos publicados y coinciden con el reporte del recolector.",
+    "The case's own definition of done (technical)": "La definición de terminado del caso (técnico)",
+    "target": "meta",
+    "Not counted (simulated)": "No cuenta (simulado)",
+    "Met": "Cumplido",
+    "Not yet": "Todavía no",
+    # about
+    "Proveedor Abierto gathers what public records say about the companies that receive public money, and shows where each fact came from.":
+        "Proveedor Abierto reúne lo que dicen los registros públicos sobre las empresas que reciben dinero público y muestra de dónde salió cada dato.",
+    "Where the data comes from": "De dónde vienen los datos",
+    "Software agents read public websites, such as official registries, open-data portals and gazettes, the way a person would: searching, paging through results and downloading published files. They never log in, never get past a captcha and never submit anything except searches. Every page they read is kept as a saved copy with a screenshot.":
+        "Agentes de software leen sitios públicos, como registros oficiales, portales de datos abiertos y diarios oficiales, como lo haría una persona: buscan, pasan páginas de resultados y descargan archivos publicados. Nunca inician sesión, nunca saltan un captcha y nunca envían nada que no sea una búsqueda. Cada página que leen se guarda como copia con una captura de pantalla.",
+    "This data draws on {n} public source.": "Estos datos provienen de {n} fuente pública.",
+    "This data draws on {n} public sources.": "Estos datos provienen de {n} fuentes públicas.",
+    "See them in the case journal": "Consúltalas en la bitácora del caso",
+    "How to read a profile": "Cómo leer un perfil",
+    "A public source published it, and the receipt shows where.": "Una fuente pública lo publicó y el comprobante muestra dónde.",
+    "Two sources say different things. Both are shown; neither is hidden.":
+        "Dos fuentes dicen cosas distintas. Se muestran ambas; no se oculta ninguna.",
+    "No source we reached published it. That is not evidence of anything.":
+        "Ninguna fuente que consultamos lo publicó. Eso no es evidencia de nada.",
+    "Confidence (high, medium, low) is how sure the collector is that it read the value correctly from the page, not a judgment about the company.":
+        "La confianza (alta, media, baja) indica qué tan seguro está el recolector de haber leído bien el dato en la página; no es un juicio sobre la empresa.",
+    "Signals are not accusations": "Las señales no son acusaciones",
+    "A signal marks a pattern that investigators usually check first, such as a company appearing on an official list or two bidders sharing an address. Each follows a written rule, lists the records it rests on and explains how to verify it. Many signals have an ordinary explanation. This site does not score anyone and does not say anyone did anything wrong.":
+        "Una señal marca un patrón que quienes investigan suelen revisar primero, como que una empresa aparezca en una lista oficial o que dos participantes compartan domicilio. Cada una sigue una regla escrita, enumera los registros en que se basa y explica cómo verificarla. Muchas señales tienen una explicación ordinaria. Este sitio no califica a nadie ni dice que alguien haya hecho algo mal.",
+    "Profiles are of companies. Information about people is limited to what public records publish about their role, such as a legal representative.":
+        "Los perfiles son de empresas. La información sobre personas se limita a lo que los registros públicos publican sobre su cargo, como un representante legal.",
+    "Open the signal or value and use its receipt to find the office that published it.":
+        "Abre la señal o el dato y usa su comprobante para encontrar la oficina que lo publicó.",
+    "Ask that office to correct the public record.": "Pide a esa oficina que corrija el registro público.",
+    "Tell us by opening an issue in the public repository with the dispute record the page gives you and the document that shows the correct value. Issues are public.":
+        "Avísanos abriendo un issue en el repositorio público con el registro de disputa que te da la página y el documento que muestra el dato correcto. Los issues son públicos.",
+    "Open an issue": "Abrir un issue",
+    "When the public record changes, the next collection picks it up.": "Cuando cambie el registro público, la siguiente recolección lo tomará.",
+    "Open and reusable": "Abierto y reutilizable",
+    "All of this data can be downloaded (CSV, OCDS JSON, RDF), and the case definition that produced it is public so anyone can check or repeat the work.":
+        "Todos estos datos se pueden descargar (CSV, OCDS JSON, RDF), y la definición del caso que los produjo es pública para que cualquiera pueda revisar o repetir el trabajo.",
+    "Download the data": "Descargar los datos",
+    "latest capture {date}": "última captura el {date}",
+    # journal
+    "Every value on this site can be traced back to the original question. Open any receipt and choose “How we got this value”, or start from the documents below.":
+        "Cada dato de este sitio se puede rastrear hasta la pregunta original. Abre cualquier comprobante y elige «Cómo obtuvimos este dato», o empieza por los documentos de abajo.",
+    "Follow an example value": "Seguir un dato de ejemplo",
+    "The case package": "El paquete del caso",
+    "Document": "Documento",
+    "File": "Archivo",
+    "State": "Estado",
+    "published": "publicado",
+    "not produced yet": "aún no se produce",
+    "not in this copy": "no está en esta copia",
+    "Technical definition": "Definición técnica",
+    "Technical definition document": "Documento de definición técnica",
+    "Public sources the collectors found": "Fuentes públicas que encontraron los recolectores",
+    "Source": "Fuente",
+    "Kind": "Tipo",
+    "How it was found": "Cómo se encontró",
+    "Objectives": "Objetivos",
+    "No sources published yet.": "Aún no hay fuentes publicadas.",
+    "Steps in run": "Pasos de la corrida",
+    "Phase": "Fase",
+    "Steps": "Pasos",
+    "Brief": "Pregunta inicial",
+    "Global PRD": "Definición del caso (PRD)",
+    "Ontology": "Ontología",
+    "Scope": "Alcance",
+    "Fan out": "Búsqueda de fuentes",
+    "Local scoping": "Acuerdo por fuente",
+    "Execute": "Recolección",
+    "From this value back to the original question. Read top to bottom: the value, the step that captured it, the instructions that step followed, the goal it served, the case definition behind that goal, and the question everything started from.":
+        "De este dato de regreso a la pregunta original. Lee de arriba abajo: el dato, el paso que lo capturó, las instrucciones que siguió ese paso, el objetivo al que servía, la definición del caso detrás de ese objetivo y la pregunta con la que empezó todo.",
+    "Value": "Dato",
+    "No collection step lists this value; part of its history is missing from the published data.":
+        "Ningún paso de recolección menciona este dato; falta parte de su historia en los datos publicados.",
+    "Path {n} of {m}": "Camino {n} de {m}",
+    "Collection mode": "Modo de recolección",
+    "Observed": "Observado",
+    "Requested": "Solicitado",
+    "Executed": "Ejecutado",
+    "Evaluated": "Evaluado",
+    "objective": "objetivo",
+    "How this source was found:": "Cómo se encontró esta fuente:",
+    "Open the full document": "Abrir el documento completo",
+    "Not in this copy of the case package.": "No está en esta copia del paquete del caso.",
+    "not in this copy of the case package yet": "aún no está en esta copia del paquete del caso",
+    # no gold / case file
+    "Nothing published yet": "Aún no hay nada publicado",
+    "This case has not published its data yet, or this site is not connected to it. Please come back later.":
+        "Este caso aún no publica sus datos, o este sitio no está conectado a ellos. Vuelve más tarde.",
+    "Technical reason": "Motivo técnico",
+    "Case package": "Paquete del caso",
+}
+
+
+def pick_lang(query: str | None, cookie: str | None) -> str:
+    for candidate in (query, cookie):
+        if candidate in LANGS:
+            return candidate
+    return DEFAULT_LANG
+
+
+def translator(lang: str):
+    catalog = ES if lang == "es" else {}
+
+    def _(text: str, **kw) -> str:
+        out = catalog.get(text, text)
+        return out.format(**kw) if kw else out
+
+    return _
+
+
+def ngettext(lang: str):
+    _ = translator(lang)
+
+    def plural(singular: str, many: str, n: int, **kw) -> str:
+        return _(singular if n == 1 else many, n=n, **kw)
+
+    return plural
+
+
+def parse_ts(value) -> datetime | None:
+    if not value:
+        return None
+    try:
+        ts = datetime.fromisoformat(str(value))
+    except ValueError:
+        return None
+    return ts if ts.tzinfo else ts.replace(tzinfo=UTC)  # comparable with offset-aware timestamps
+
+
+def date_label(value, lang: str = DEFAULT_LANG, with_time: bool = False) -> str:
+    """'26 sep 2026' (es) or 'Sep 26, 2026' (en); the raw text when it is not an ISO timestamp."""
+    ts = parse_ts(value)
+    if ts is None:
+        return str(value or "—")
+    if lang == "es":
+        out = f"{ts.day} {MONTHS_ES[ts.month - 1]} {ts.year}"
+    else:
+        out = f"{MONTHS_EN[ts.month - 1]} {ts.day}, {ts.year}"
+    if with_time and (ts.hour or ts.minute):
+        out += f", {ts:%H:%M}" + (" UTC" if ts.utcoffset() is not None and not ts.utcoffset() else "")
+    return out

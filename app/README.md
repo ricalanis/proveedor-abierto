@@ -1,26 +1,26 @@
-# App layer
+# Proveedor Abierto: the consumer app
 
-The app is generic over the case's ontology (CONTRACT v0.7 §11): `domain.py` reads the approved `ontology.json`
-(primary class, property labels and order, DoD properties, relations, rules, source classes) and every screen takes
-its words from it. `pa-app fixtures --domain libraries` builds an unrelated second domain that renders with no code
-changes (`tests/test_genericity.py`). The pre-§11 export (`suppliers.jsonl` + `contracts.jsonl`) is still read
-through one adapter, `domain.legacy_to_entities`.
+The B2C product (CONTRACT §14): a reader of ONE case's published gold export, for citizens and journalists.
+Spanish first (`?lang=en` switches to English and a cookie keeps it). Every value shows its receipt: the public
+page it came from, a screenshot of that page, and when it was captured. Signals are shown as signals to verify,
+never as accusations, and each has a dispute path. Operator and approver work lives in the Ontofill Console.
 
-Investigation, not a dashboard. Reads the gold export (CONTRACT section 4) from the lake over the S3 API, or from
-a local directory with the same layout. Served behind NetBird: one gated URL per role, zero open ports.
+The app is generic over the case's ontology (CONTRACT v0.7 §11): `domain.py` reads `ontology.json` (primary class,
+labels, DoD properties, relations, rules, source classes). Any label may carry a per-language twin (`label_es`,
+`label_plural_es`, `checks_es`, `verify_es`, and `label_es` / `explanation_es` on flags); the Spanish UI uses it
+when present. The app's own copy is in `i18n.py`; `tests/test_product.py` fails when a template string has no
+Spanish entry.
 
 Run it: `uv run pa-app serve --fixtures` (synthetic data), or point `PA_GOLD_DIR` / `lake.yaml` at a real export.
 
-| Screen | Route | Module / template |
-|--------|-------|-------------------|
-| Index of the ontology's primary class | `/` | `web.py`, `templates/index.html` |
-| Dossier: every property with value, confidence, status and evidence (link + screenshot) | `/entities/<id>` (`/suppliers/<id>` alias) | `templates/dossier.html`, `_evidence.html` |
-| Red-flag explainer: rule, evidence, plain-language explanation, dispute path | `/signals`, `/signals/<id>/<n>` | `investigate.py`, `templates/signals.html`, `signal.html` |
-| Relationship view: shared address, representative or procedure | `/relationships` | `investigate.clusters`, `templates/relationships.html` |
-| Case journal: value → step → TDD → objective → ontology → PRD → brief | `/journal`, `/journal/<value_id>` | `investigate.journal_chain`, `templates/journal.html` |
-| Watchlist + export (OCDS JSON, CSV, RDF) | `/watchlist`, `/export/{ocds.json,suppliers.csv,gold.ttl}` | `export.py`, `templates/watchlist.html` |
-| Per-field completeness + taxonomy coverage | `/completeness`, `/api/completeness` | `dod.py`, `templates/completeness.html` |
-| Phase sign-off (approver role only) | `/approvals` | `investigate.approve`, `templates/approvals.html` |
-
-Roles (`PA_ROLE`, one process per role): `investigator` is read-only; `approver` adds phase sign-off
-(PRD, factors, ontology) that writes the engine's `APPROVED` file.
+| Screen | Route | Template |
+|--------|-------|----------|
+| Search-first lookup, dataset tally, browse list | `/` | `index.html` |
+| Dossier: every value with its receipt inline, signals, related records, connections | `/entities/<id>` (`/suppliers/<id>` alias) | `dossier.html`, `_evidence.html` |
+| Signals: rule, records, how to verify, dispute | `/signals`, `/signals/<id>/<n>` | `signals.html`, `signal.html` |
+| Connections (shared address, representative, procedure) | `/relationships` | `relationships.html` |
+| Case journal: value → step → TDD → objective → ontology → PRD → brief | `/journal`, `/journal/<value_id>` | `journal_index.html`, `journal.html` |
+| My list (kept in the browser) + its downloads | `/watchlist` | `watchlist.html` |
+| Open data: CSV, OCDS JSON, RDF | `/data`, `/export/{entities.csv,ocds.json,gold.ttl}` | `data.html`, `export.py` |
+| How complete is this data (plain language) | `/completeness`, `/api/completeness` | `completeness.html`, `dod.py` |
+| How it works, how to read a profile, disputes | `/about` | `about.html` |

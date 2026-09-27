@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Watchlist{% endblock %}
+{% block title %}{{ _("My list") }}{% endblock %}
 {% block main %}
 <section class="page-head">
-  <h1>Watchlist</h1>
-  <p class="lede">{{ domain.class_label(plural=True) }} you follow, with what changed since the previous run{% if prev_id %} (<span class="mono">{{ prev_id }}</span>){% endif %}. The list lives in this browser; nothing is stored on the server.</p>
+  <h1>{{ _("My list") }}</h1>
+  <p class="lede">{{ _("The {plural} you follow, and what changed in public records since the previous collection.", plural=domain.class_label(plural=True)|lower) }}{% if prev_id %} <span class="muted">({{ _("compared with run") }} <span class="mono">{{ prev_id }}</span>)</span>{% endif %}</p>
+  <p class="note muted">{{ _("Your list is kept in this browser only; nothing is stored on our server. To keep it or share it, copy this page's address.") }}</p>
 </section>
 
-<div id="watchlist" data-ids="{{ ids }}">
+<div id="watchlist" data-ids="{{ ids }}" data-unwatch-label="{{ _('Remove') }}">
 {% if items %}
   <ul class="watch">
   {% for it in items %}{% set s = it.e %}
     <li class="watch__item">
       <div class="watch__head">
         <a class="entity" href="/entities/{{ s.id }}">{{ run.title(s) }}</a>
-        <button type="button" class="btn btn--quiet btn--small" data-unwatch="{{ s.id }}">Stop watching</button>
+        <button type="button" class="btn btn--quiet btn--small" data-unwatch="{{ s.id }}">{{ _("Remove") }}</button>
       </div>
       {% if it.changes %}
       <ul class="changes">
@@ -21,40 +22,33 @@
         <li class="change change--{{ c.kind }}">
           {% if c.kind == "field" %}
             <span class="change__field">{{ domain.prop_label(c.field) }}</span>
-            <span class="muted">{{ c.before if c.before is not none else "not found" }}</span> → <strong>{{ c.after if c.after is not none else "not found" }}</strong>
-            {% if c.status_before != c.status_after %}<span class="muted">({{ c.status_before or "absent" }} → {{ c.status_after }})</span>{% endif %}
-            {% if c.value_id and c.after is not none %}<a href="/entities/{{ s.id }}?ev={{ c.value_id|urlencode }}#evidence">captures</a>{% endif %}
-          {% elif c.kind == "signal" %}New signal: {{ c.text }}
-          {% elif c.kind == "signal_cleared" %}Signal no longer fires: {{ c.text }}
+            <span class="muted">{{ c.before if c.before is not none else _("not found") }}</span> → <strong>{{ c.after if c.after is not none else _("not found") }}</strong>
+            {% if c.status_before != c.status_after %}<span class="muted">({{ status_word(c.status_before) if c.status_before else _("absent") }} → {{ status_word(c.status_after) }})</span>{% endif %}
+            {% if c.value_id and c.after is not none %}<a href="/entities/{{ s.id }}?ev={{ c.value_id|urlencode }}#evidence">{{ _("See receipt") }}</a>{% endif %}
+          {% elif c.kind == "signal" %}{{ _("New signal:") }} {{ c.text }}
+          {% elif c.kind == "signal_cleared" %}{{ _("Signal cleared:") }} {{ c.text }}
+          {% elif c.kind == "gone" %}{{ _("No longer in the latest data") }}
+          {% elif c.kind == "new" %}{{ _("New in this collection") }}
+          {% elif c.kind == "links" %}{{ ngettext("{n} new connection", "{n} new connections", c.n or 1) }}
           {% else %}{{ c.text }}{% endif %}
         </li>
         {% endfor %}
       </ul>
-      {% else %}<p class="muted note">No changes since the previous run.</p>{% endif %}
+      {% else %}<p class="muted note">{% if prev_id %}{{ _("No changes since the previous collection.") }}{% else %}{{ _("This is the first collection, so there is nothing to compare yet.") }}{% endif %}</p>{% endif %}
     </li>
   {% endfor %}
   </ul>
 
   <section class="block" aria-labelledby="export-h">
-    <h2 id="export-h">Export the watchlist</h2>
+    <h2 id="export-h">{{ _("Download my list") }}</h2>
     <p class="exports">
-      {% if ocds %}<a class="btn btn--quiet" href="/export/ocds.json?ids={{ ids|urlencode }}">OCDS JSON</a>{% endif %}
       <a class="btn btn--quiet" href="/export/entities.csv?ids={{ ids|urlencode }}">CSV</a>
+      {% if ocds %}<a class="btn btn--quiet" href="/export/ocds.json?ids={{ ids|urlencode }}">OCDS JSON</a>{% endif %}
       <a class="btn btn--quiet" href="/export/gold.ttl?ids={{ ids|urlencode }}">RDF (Turtle)</a>
     </p>
   </section>
 {% else %}
-  <p class="empty">You are not watching anything yet. Open a dossier and choose "Watch".</p>
+  <p class="empty">{{ _("Your list is empty. Open any profile and choose “Add to my list”.") }} <a href="/">{{ _("Search") }}</a></p>
 {% endif %}
 </div>
-
-<section class="block" aria-labelledby="all-h">
-  <h2 id="all-h">Export all of this run's gold</h2>
-  <p class="exports">
-    {% if ocds %}<a class="btn btn--quiet" href="/export/ocds.json">OCDS JSON</a>{% endif %}
-    <a class="btn btn--quiet" href="/export/entities.csv">CSV</a>
-    <a class="btn btn--quiet" href="/export/gold.ttl">RDF (Turtle)</a>
-  </p>
-  <p class="muted note">The case package that produced this data (brief, PRD, ontology, technical definitions) is in the repository and can be forked.</p>
-</section>
 {% endblock %}

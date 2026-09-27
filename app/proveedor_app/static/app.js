@@ -19,7 +19,7 @@
     } finally {
       aside.removeAttribute("aria-busy");
     }
-    document.querySelectorAll("tr.is-selected").forEach((tr) => tr.classList.remove("is-selected"));
+    document.querySelectorAll(".is-selected").forEach((row) => row.classList.remove("is-selected"));
     document.getElementById(`row-${valueId}`)?.classList.add("is-selected");
     history.replaceState(null, "", `${target.pathname}${target.search}#evidence`);
     if (window.matchMedia("(max-width: 960px)").matches) aside.scrollIntoView({ block: "start" });
@@ -94,7 +94,7 @@
     const sync = () => {
       const on = read().includes(id);
       btn.setAttribute("aria-pressed", String(on));
-      btn.textContent = on ? "Watching" : "Watch";
+      btn.textContent = on ? btn.dataset.on || "On my list" : btn.dataset.off || "Add to my list";
     };
     sync();
     btn.addEventListener("click", (event) => {
@@ -129,9 +129,9 @@
     const text = document.querySelector(btn.dataset.copy)?.textContent || "";
     try {
       await navigator.clipboard.writeText(text);
-      btn.textContent = "Copied";
+      btn.textContent = btn.dataset.done || "Copied";
     } catch {
-      btn.textContent = "Select the text to copy";
+      btn.textContent = btn.dataset.fail || "Select the text to copy";
     }
   });
 })();

@@ -1,31 +1,32 @@
 {% extends "base.html" %}
-{% block title %}{{ flag.label }} · {{ run.title(e) }}{% endblock %}
+{% block title %}{{ loc(flag, "label") }} · {{ run.title(e) }}{% endblock %}
 {% block main %}
-<nav class="crumbs" aria-label="Breadcrumb"><a href="/signals">Signals</a> <span aria-hidden="true">/</span> <a href="/entities/{{ e.id }}">{{ run.title(e) }}</a></nav>
+<nav class="crumbs" aria-label="{{ _('Breadcrumb') }}"><a href="/signals">{{ _("Signals") }}</a> <span aria-hidden="true">/</span> <a href="/entities/{{ e.id }}">{{ run.title(e) }}</a></nav>
 <article class="explainer">
   <header class="explainer__head">
-    <p class="explainer__kind">Signal to verify · <span class="mono">{{ flag.rule_id }}</span></p>
-    <h1>{{ flag.label }}</h1>
-    <p class="explainer__who">{{ run.title(e) }} <span class="mono muted">{{ run.identifier(e) or e.id }}</span></p>
+    <p class="explainer__kind">{{ _("Signal to verify") }}</p>
+    <h1>{{ loc(flag, "label") }}</h1>
+    <p class="explainer__who"><a href="/entities/{{ e.id }}">{{ run.title(e) }}</a> <span class="mono muted">{{ run.identifier(e) or e.id }}</span></p>
   </header>
 
+  <p class="notice">{{ _("This is not an accusation. It means public records match a pattern that investigators check first. It may have an ordinary explanation, and the records themselves can be wrong or out of date.") }}</p>
+
   <section class="block" aria-labelledby="why-h">
-    <h2 id="why-h">In plain language</h2>
-    <p class="explainer__text">{{ flag.explanation }}</p>
+    <h2 id="why-h">{{ _("Why it appears") }}</h2>
+    <p class="explainer__text">{{ loc(flag, "explanation") }}</p>
   </section>
 
   <section class="block" aria-labelledby="rule-h">
-    <h2 id="rule-h">The rule</h2>
+    <h2 id="rule-h">{{ _("The rule") }}</h2>
     <p>{{ info.checks }}</p>
   </section>
 
   <section class="block" aria-labelledby="ev-h">
-    <h2 id="ev-h">Evidence</h2>
-    <p class="muted note">The values this signal was computed from, each with the capture it came from.</p>
+    <h2 id="ev-h">{{ _("The records it rests on") }}</h2>
     <div class="ev-stack">
     {% for selected in refs %}
       <div class="ev-card">
-        {% if selected.entity_id != e.id %}<p class="note">From <a href="/entities/{{ selected.entity_id }}">{{ run.title(run.entities_by_id.get(selected.entity_id)) }}</a></p>{% endif %}
+        {% if selected.entity_id != e.id %}<p class="note">{{ _("From") }} <a href="/entities/{{ selected.entity_id }}">{{ run.title(run.entities_by_id.get(selected.entity_id)) }}</a></p>{% endif %}
         {% include "_evidence.html" %}
       </div>
     {% endfor %}
@@ -34,18 +35,23 @@
 
   {% if info.verify %}
   <section class="block" aria-labelledby="verify-h">
-    <h2 id="verify-h">How to verify</h2>
-    <ol class="steps">{% for v in info.verify %}<li>{{ v }}</li>{% endfor %}</ol>
+    <h2 id="verify-h">{{ _("How to verify it yourself") }}</h2>
+    <ol class="howto">{% for v in info.verify %}<li>{{ v }}</li>{% endfor %}</ol>
   </section>
   {% endif %}
 
-  <section class="block dispute" aria-labelledby="dispute-h">
-    <h2 id="dispute-h">Dispute this signal</h2>
-    <p>If you represent this {{ domain.class_label()|lower }} and a value is wrong, two things fix it. First, request the correction from the official source that published it; the capture above links to it. Second, send the record below with the document that shows the correct value. Once the source changes, the next run re-captures it, and the signal clears if the rule no longer holds.</p>
+  <section class="block dispute" id="dispute" aria-labelledby="dispute-h">
+    <h2 id="dispute-h">{{ _("Is this wrong? Dispute it") }}</h2>
+    <p>{{ _("If you represent this {cls} and a value is wrong:", cls=domain.class_label()|lower) }}</p>
+    <ol class="howto">
+      <li>{{ _("Ask the office that published the record to correct it. The receipt above links to the exact page.") }}</li>
+      <li>{{ _("Send the dispute record below, with the document that shows the correct value, by opening an issue in the public repository.") }} <a href="https://github.com/ricalanis/proveedor-abierto/issues/new?title={{ (_('Dispute') ~ ': ' ~ flag.rule_id ~ ' · ' ~ e.id)|urlencode }}" rel="noopener">{{ _("Open a dispute") }}</a></li>
+      <li>{{ _("When the public record changes, the next collection picks it up and the signal clears if the rule no longer holds.") }}</li>
+    </ol>
     <details>
-      <summary>Dispute record for this signal</summary>
+      <summary>{{ _("Dispute record for this signal") }}</summary>
       <pre class="record" id="dispute-record">{{ dispute }}</pre>
-      <button type="button" class="btn--quiet btn" data-copy="#dispute-record">Copy record</button>
+      <button type="button" class="btn--quiet btn" data-copy="#dispute-record" data-done="{{ _('Copied') }}" data-fail="{{ _('Select the text to copy') }}">{{ _("Copy record") }}</button>
     </details>
   </section>
 </article>

@@ -24,9 +24,11 @@ def store(fixture_root) -> GoldStore:
 def make_client(fixture_root, store):
     from fastapi.testclient import TestClient
 
-    def _make(role="investigator", case_dir=None):
+    def _make(role="investigator", case_dir=None, lang="en"):
         settings = Settings(store=store, case_dir=case_dir or fixture_root / "case", role=role)
-        return TestClient(create_app(settings))
+        client = TestClient(create_app(settings))
+        client.cookies.set("pa_lang", lang)  # the product is Spanish-first; most tests read the English copy
+        return client
 
     return _make
 

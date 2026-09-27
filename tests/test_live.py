@@ -22,7 +22,9 @@ def lake(fixture_root, tmp_path):
 
 
 def _client(lake, case_dir):
-    return TestClient(create_app(Settings(store=GoldStore(LocalSource(lake)), case_dir=case_dir)))
+    c = TestClient(create_app(Settings(store=GoldStore(LocalSource(lake)), case_dir=case_dir)))
+    c.cookies.set("pa_lang", "en")
+    return c
 
 
 def test_annotate_events():
@@ -50,7 +52,7 @@ def test_recorded_fixture_feed_renders(lake, fixture_root):
     assert r.status_code == 307 and r.headers["location"] == "/run/run-fixture-0001"
     page = c.get("/run/run-fixture-0001")
     assert page.status_code == 200
-    for needle in ("Sandbox proof", "Crystallized", "Escalations", "BLOCKED", "Synthetic fixture data"):
+    for needle in ("Sandbox proof", "Crystallized", "Escalations", "BLOCKED", "Practice data."):
         assert needle in page.text
     data = c.get("/api/run/run-fixture-0001", params={"after": 10}).json()
     assert data["count"] > 10 and data["state"] == "done" and "step" in data["steps_html"]
@@ -77,16 +79,16 @@ def test_simulated_inference_banner_and_dod(lake, fixture_root):
     metrics["inference_backend"] = "recorded"
     (run_dir / "metrics.json").write_text(json.dumps(metrics))
     c = _client(lake, fixture_root / "case")
-    assert "Simulated inference." in c.get("/").text
+    assert "Simulated collection." in c.get("/").text
     page = c.get("/completeness").text
-    assert "Simulated inference." in page and "✓" not in page.split("dod__grid")[1].split("</dl>")[0]
+    assert "Simulated collection." in page and "✓" not in page.split("dod__grid")[1].split("</dl>")[0]
     run = GoldStore(LocalSource(lake)).run()
     rows = dod.criteria(dod.compute(run.entities, run.domain), run.metrics, run.domain, "recorded")
     assert all(r["met"] is False and r["mock"] for r in rows)
     status = json.loads((lake / "runs/fixture-case/run-fixture-0001/status.json").read_text())
     status["generated_by"] = {"backend": "recorded", "model": "double", "at": "2026-09-26T18:00:00Z"}
     (lake / "runs/fixture-case/run-fixture-0001/status.json").write_text(json.dumps(status))
-    assert "Simulated inference." in c.get("/run/run-fixture-0001").text
+    assert "Simulated collection." in c.get("/run/run-fixture-0001").text
 
 
 def test_value_level_recorded_tag(lake, fixture_root):
@@ -97,8 +99,8 @@ def test_value_level_recorded_tag(lake, fixture_root):
     path.write_text("".join(json.dumps(r) + "\n" for r in rows))
     c = _client(lake, fixture_root / "case")
     frag = c.get(f"/fragments/evidence/{rows[0]['properties']['address']['value_id']}").text
-    assert "Simulated inference" in frag
-    assert "Simulated inference." in c.get("/").text  # one recorded value marks the whole run
+    assert "Simulated collection" in frag
+    assert "Simulated collection." in c.get("/").text  # one recorded value marks the whole run
 
 
 @pytest.mark.ui
@@ -206,8 +208,8 @@ def test_preview_output_is_labelled(lake, fixture_root):
     status_path = lake / "runs/fixture-case/run-fixture-0001/status.json"
     status_path.write_text(json.dumps({**json.loads(status_path.read_text()), "preview": True}))
     c = _client(lake, fixture_root / "case")
-    assert "Preview past a checkpoint." in c.get("/").text
-    assert "Preview past a checkpoint." in c.get("/run/run-fixture-0001").text
+    assert "Unreviewed preview." in c.get("/").text
+    assert "Unreviewed preview." in c.get("/run/run-fixture-0001").text
 
 
 def test_evidence_format_is_shown(lake, fixture_root):
@@ -251,7 +253,7 @@ def test_jev_only_gold_is_flagged_and_not_counted(lake, fixture_root):
     assert not dod.is_filled(target) and dod.jev_only(target)
     c = _client(lake, fixture_root / "case")
     frag = c.get(f"/fragments/evidence/{target['value_id']}").text
-    assert "Jev (supporting)" in frag and "does not count as gold" in frag
+    assert "supporting model" in frag and "second check" in frag
     assert "backend--jev" in c.get(f"/suppliers/{rows[0]['id']}").text
     card = c.get("/engine").text
     assert "rests on a Jev decision alone" in card

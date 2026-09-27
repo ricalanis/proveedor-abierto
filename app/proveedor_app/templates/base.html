@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Proveedor Abierto{% endblock %} · Proveedor Abierto</title>
+  <title>{% block title %}{{ _("Who receives public money") }}{% endblock %} · Proveedor Abierto</title>
+  <meta name="description" content="{{ _('Public-procurement suppliers with the public record behind every value. Signals to verify, not accusations.') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700;800&display=swap">
@@ -11,44 +12,48 @@
   <link rel="stylesheet" href="/static/app.css">
   <script src="/static/app.js" defer></script>
 </head>
-<body>
-  <a class="skip" href="#main">Skip to content</a>
+<body data-lang="{{ lang }}">
+  <a class="skip" href="#main">{{ _("Skip to content") }}</a>
   <header class="masthead">
     <div class="masthead__id">
       <a class="wordmark" href="/">Proveedor Abierto</a>
-      <span class="runline mono" title="Gold export being read">
-        {% if run %}{{ run.case_id }} · {{ run.run_id }}{% elif live_run_id %}live · {{ live_run_id }}{% else %}no gold export yet{% endif %}
-      </span>
+      <span class="tagline">{{ _("Who receives public money, with the receipts") }}</span>
     </div>
-    <nav class="tabs" aria-label="Sections">
-      <a href="/run" {% if nav == "run" %}aria-current="page"{% endif %}>Live run</a>
-      <a href="/" {% if nav == "entities" %}aria-current="page"{% endif %}>{{ domain.class_label(plural=True) }}</a>
-      <a href="/signals" {% if nav == "signals" %}aria-current="page"{% endif %}>Signals</a>
-      <a href="/relationships" {% if nav == "relationships" %}aria-current="page"{% endif %}>Relationships</a>
-      <a href="/journal" {% if nav == "journal" %}aria-current="page"{% endif %}>Case journal</a>
-      <a href="/completeness" {% if nav == "completeness" %}aria-current="page"{% endif %}>Completeness</a>
-      <a href="/engine" {% if nav == "engine" %}aria-current="page"{% endif %}>Engine report</a>
-      <a href="/watchlist" {% if nav == "watchlist" %}aria-current="page"{% endif %}>Watchlist</a>
-      <a href="/evidence" {% if nav == "evidence" %}aria-current="page"{% endif %}>Evidence</a>
-      {% if role == "approver" %}<a href="/spend" {% if nav == "spend" %}aria-current="page"{% endif %}>Spend</a>{% endif %}
-      {% if role == "approver" %}<a href="/approvals" {% if nav == "approvals" %}aria-current="page"{% endif %}>Approvals</a>{% endif %}
+    <a class="lang" href="{{ lang_href }}" hreflang="{{ other_lang }}" lang="{{ other_lang }}">{{ "English" if lang == "es" else "Español" }}</a>
+    <nav class="tabs" aria-label="{{ _('Sections') }}">
+      <a href="/" {% if nav == "entities" %}aria-current="page"{% endif %}>{{ _("Search") }}</a>
+      <a href="/signals" {% if nav == "signals" %}aria-current="page"{% endif %}>{{ _("Signals") }}</a>
+      <a href="/relationships" {% if nav == "relationships" %}aria-current="page"{% endif %}>{{ _("Connections") }}</a>
+      <a href="/watchlist" {% if nav == "watchlist" %}aria-current="page"{% endif %}>{{ _("My list") }}</a>
+      <a href="/data" {% if nav == "data" %}aria-current="page"{% endif %}>{{ _("Open data") }}</a>
+      <a href="/completeness" {% if nav == "completeness" %}aria-current="page"{% endif %}>{{ _("How complete") }}</a>
+      <a href="/about" {% if nav == "about" %}aria-current="page"{% endif %}>{{ _("How it works") }}</a>
     </nav>
-    <span class="role role--{{ role }}" title="Access role for this URL">{{ "Approver" if role == "approver" else "Investigator · read-only" }}</span>
   </header>
+  {% if synthetic %}
+  <p class="banner" role="note"><strong>{{ _("Practice data.") }}</strong> {{ _("Every name, identifier and source on this site is invented (.example sites, obviously fake names). The real case has not published its data yet.") }}</p>
+  {% endif %}
   {% if backend == "recorded" %}
-  <p class="banner banner--sim" role="note"><strong>Simulated inference.</strong> What this page shows came from recorded model responses, not live calls to Vultr Serverless Inference. It is a placeholder for a real run and does not count toward the definition of done.</p>
+  <p class="banner banner--sim" role="note"><strong>{{ _("Simulated collection.") }}</strong> {{ _("These values came from recorded model responses, not a live collection run. Treat them as a placeholder.") }}</p>
   {% endif %}
   {% if preview %}
-  <p class="banner banner--sim" role="note"><strong>Preview past a checkpoint.</strong> This output was produced beyond a checkpoint no one has approved yet (developer preview). It is not the case's latest result.</p>
-  {% endif %}
-  {% if synthetic %}
-  <p class="banner" role="note"><strong>Synthetic fixture data.</strong> Every entity, identifier and source here is invented (<span class="mono">.example</span> sites, obviously fake names) for rehearsal and tests.</p>
+  <p class="banner banner--sim" role="note"><strong>{{ _("Unreviewed preview.") }}</strong> {{ _("This data was produced before a person approved the case's definition. It is not the published result.") }}</p>
   {% endif %}
   <main id="main">
     {% block main %}{% endblock %}
   </main>
   <footer class="colophon">
-    Values come from public sources, each with its capture. Signals need verification; they are not accusations.
+    <p>{{ _("Every value comes from a public source and links to its capture. A signal says where to look; it is not an accusation.") }}</p>
+    <p class="colophon__links">
+      <a href="/about#dispute">{{ _("Something wrong? Dispute it") }}</a>
+      <a href="/journal">{{ _("Case journal") }}</a>
+      <a href="https://github.com/ricalanis/proveedor-abierto" rel="noopener">{{ _("Source code and case package") }}</a>
+    </p>
+    {% if operator_links %}
+    <p class="colophon__ops">{{ _("Engine operation (moving to the Ontofill Console):") }}
+      <a href="/run">{{ _("Live run") }}</a> · <a href="/engine">{{ _("Engine report") }}</a> · <a href="/evidence">{{ _("Track evidence") }}</a>{% if role == "approver" %} · <a href="/spend">{{ _("Spend") }}</a> · <a href="/approvals">{{ _("Approvals") }}</a>{% endif %}
+    </p>
+    {% endif %}
   </footer>
 </body>
 </html>

@@ -41,6 +41,20 @@ class Domain:
     dod_threshold: float = DEFAULT_DOD_THRESHOLD
     threshold_stated: bool = False
     legacy: bool = False
+    raw: dict = field(default_factory=dict, repr=False, compare=False)  # the ontology this was built from
+    _localized: dict = field(default_factory=dict, repr=False, compare=False)
+
+    def localized(self, lang: str) -> Domain:
+        """The same domain with `<key>_<lang>` labels (label_es, checks_es, ...) where the ontology carries them."""
+        if lang not in self._localized:
+            onto = localize_ontology(self.raw, lang)
+            if onto is self.raw:
+                self._localized[lang] = self
+            else:
+                d = Domain.from_ontology(onto, legacy=self.legacy)
+                d.dod_threshold, d.threshold_stated = self.dod_threshold, self.threshold_stated
+                self._localized[lang] = d
+        return self._localized[lang]
 
     # labels ---------------------------------------------------------------------------------------------------
     def class_label(self, cls: str | None = None, plural: bool = False) -> str:
@@ -111,10 +125,28 @@ class Domain:
         threshold = onto.get("dod_threshold")
         return cls(primary_class=primary, classes=classes, properties=props, relations=relations, rules=rules,
                    source_classes=sources, dod_threshold=float(threshold) if threshold else DEFAULT_DOD_THRESHOLD,
-                   threshold_stated=threshold is not None, legacy=legacy)
+                   threshold_stated=threshold is not None, legacy=legacy, raw=onto)
 
     def usable(self) -> bool:
         return bool(self.props())
+
+
+LOCALIZABLE = ("label", "label_plural", "description", "checks", "verify", "explanation")
+_ONTOLOGY_LISTS = ("classes", "properties", "relations", "rules", "source_classes")
+
+
+def localize_ontology(onto: dict, lang: str) -> dict:
+    """Swap in `<key>_<lang>` values (an optional per-language twin of any label). Unchanged input comes back as is."""
+    out, changed = dict(onto), False
+    for key in _ONTOLOGY_LISTS:
+        items = []
+        for item in onto.get(key) or []:
+            if isinstance(item, dict) and any(f"{k}_{lang}" in item for k in LOCALIZABLE):
+                item = {**item, **{k: item[f"{k}_{lang}"] for k in LOCALIZABLE if item.get(f"{k}_{lang}")}}
+                changed = True
+            items.append(item)
+        out[key] = items
+    return out if changed else onto
 
 
 # The pre-§11 export layout (suppliers.jsonl + contracts.jsonl), described as an ontology so the same screens can

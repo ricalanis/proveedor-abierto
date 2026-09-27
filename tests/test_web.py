@@ -1,13 +1,13 @@
 def test_index_lists_fixture_suppliers(client):
     r = client.get("/")
     assert r.status_code == 200
-    assert r.text.count('class="entity"') == 60
+    assert r.text.count('class="roster__name"') == 60
     assert "Proveedor Ejemplo 01 S.A. de C.V." in r.text
 
 
 def test_index_filters(client):
-    assert client.get("/?q=Ejemplo 07").text.count('class="entity"') == 1
-    signals = client.get("/?show=signals").text.count('class="entity"')
+    assert client.get("/?q=Ejemplo 07").text.count('class="roster__name"') == 1
+    signals = client.get("/?show=signals").text.count('class="roster__name"')
     assert 0 < signals < 60
 
 
@@ -45,6 +45,8 @@ def test_unknown_things_404(client):
     assert client.get("/bronze/sha256:00").status_code == 404
 
 
-def test_role_badge(make_client):
-    assert "Investigator · read-only" in make_client().get("/").text
-    assert "Approvals" in make_client(role="approver").get("/").text
+def test_role_links(make_client):
+    # consumer pages carry no role chip; control pages stay reachable from the footer until the strip
+    investigator, approver = make_client().get("/").text, make_client(role="approver").get("/").text
+    assert "read-only" not in investigator and 'href="/approvals"' not in investigator
+    assert 'href="/approvals"' in approver

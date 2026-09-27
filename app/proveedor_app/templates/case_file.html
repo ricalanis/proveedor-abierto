@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ path }}{% endblock %}
 {% block main %}
-<nav class="crumbs" aria-label="Breadcrumb"><a href="/journal">Case journal</a> <span aria-hidden="true">/</span> <span class="mono">{{ path }}</span></nav>
+<nav class="crumbs" aria-label="{{ _('Breadcrumb') }}"><a href="/journal">{{ _("Case journal") }}</a> <span aria-hidden="true">/</span> <span class="mono">{{ path }}</span></nav>
 <section class="page-head"><h1 class="mono h1-path">{{ path }}</h1></section>
 <pre class="record record--doc">{{ text }}</pre>
 {% endblock %}

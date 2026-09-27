@@ -51,7 +51,7 @@ def page(browser):
 
 def test_dossier_evidence_click_shows_source_link(page, base_url, store):
     page.goto(base_url + "/")
-    page.locator("a.entity", has_text="Proveedor Ejemplo 05").click()
+    page.locator("a.roster__name", has_text="Proveedor Ejemplo 05").click()
     page.wait_for_url("**/entities/sup:fixture-005")
     assert page.locator("h1").inner_text() == "Proveedor Ejemplo 05 S.A. de C.V."
 
@@ -61,7 +61,7 @@ def test_dossier_evidence_click_shows_source_link(page, base_url, store):
     link.wait_for()
     assert link.get_attribute("href") == field["evidence"][0]["url"]
     assert link.get_attribute("rel") == "noopener noreferrer nofollow"
-    assert page.locator(f'tr[id="row-{field["value_id"]}"]').get_attribute("class") == "is-selected"
+    assert "is-selected" in page.locator(f'li[id="row-{field["value_id"]}"]').get_attribute("class")
     img = page.locator("#evidence-panel figure.shot img").first
     img.wait_for()
     page.wait_for_function("img => img.complete && img.naturalWidth > 0", arg=img.element_handle())
@@ -90,18 +90,20 @@ def test_completeness_view(page, base_url, store):
     assert rows.count() == 6
     run = store.run()
     first = run.metrics["dod"][1]
+    page.locator("details.tech summary").click()  # the engine's own criteria sit behind a disclosure
     tile = page.locator(f'.dod__item[data-key="{first["criterion_id"]}"]')
     assert tile.locator(".dod__num").inner_text() == str(first["actual"])
     assert first["query"] in tile.inner_text()
-    assert "matches" in page.locator("#crosscheck").inner_text()
+    assert "coinciden" in page.locator("#crosscheck").inner_text()  # Spanish by default
 
 
-@pytest.mark.parametrize("width", [320, 375, 414, 768])
+@pytest.mark.parametrize("width", [320, 375, 390, 414, 768, 1280])
 def test_no_horizontal_scroll(browser, base_url, width):
     ctx = browser.new_context(viewport={"width": width, "height": 800})
     pg = ctx.new_page()
     for path in ("/", "/suppliers/sup:fixture-007", "/completeness", "/signals", "/signals/sup:fixture-005/0",
-                 "/relationships", "/journal/val:0001-008-founding_date", "/watchlist?ids=sup:fixture-005"):
+                 "/relationships", "/journal", "/journal/val:0001-008-founding_date", "/watchlist?ids=sup:fixture-005",
+                 "/data", "/about", "/?lang=en", "/suppliers/sup:fixture-007?ev=val:0001-007-address"):
         pg.goto(base_url + path)
         assert pg.evaluate("document.documentElement.scrollWidth") <= width, path
     ctx.close()
@@ -110,9 +112,9 @@ def test_no_horizontal_scroll(browser, base_url, width):
 def test_evidence_to_journal_to_brief(page, base_url):
     page.goto(base_url + "/suppliers/sup:fixture-008")
     page.locator("a.ev-link[data-evidence$='founding_date']").click()
-    page.locator("#evidence-panel a", has_text="Trace this value to the brief").click()
+    page.locator("#evidence-panel a", has_text="Cómo obtuvimos este dato").click()
     page.wait_for_url("**/journal/**")
-    assert page.locator(".stop__phase", has_text="Phase 1").count() >= 1
+    assert page.locator(".stop__phase", has_text="Fase 1").count() >= 1
     assert "Who receives public money" in page.locator(".stop--anchor").last.inner_text()
 
 
