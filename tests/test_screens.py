@@ -50,7 +50,8 @@ def test_kit_captures_product_views(fixture_root, store, tmp_path):
         for w, s in screens.MODES:
             assert f"product-{view}-{w}-{s}.png" in names, (view, w, s)
     assert all(f["status"] == 200 for f in m["files"]) and (out / "manifest.json").is_file()
-    assert json.loads((out / "manifest.json").read_text())["files"]
+    text = (out / "manifest.json").read_text()
+    assert json.loads(text)["files"] and "127.0.0.1" not in text  # paths only, never the service address
 
 
 @pytest.mark.ui

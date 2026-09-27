@@ -102,8 +102,9 @@ def capture(out: Path, *, product: str | None, console: str | None, targets: lis
     from playwright.sync_api import sync_playwright
 
     out.mkdir(parents=True, exist_ok=True)
+    # the manifest records paths only: service addresses (mesh IPs) stay out of the repo
     manifest = {"captured_at": datetime.now(UTC).isoformat(timespec="seconds"), "files": [], "redactions": 0,
-                "product": product, "console": console, "targets": targets}
+                "product": bool(product), "console": bool(console), "targets": targets}
     with sync_playwright() as p:
         browser = p.chromium.launch()
         sites = [("product", product), ("console", console)]
@@ -125,9 +126,9 @@ def capture(out: Path, *, product: str | None, console: str | None, targets: lis
                     manifest["redactions"] += int(page.evaluate(REDACT_JS) or 0)
                     file = out / f"{site}-{name}-{width}-{scheme}.png"
                     page.screenshot(path=str(file), full_page=True)
-                    manifest["files"].append({"file": file.name, "url": url, "status": resp.status if resp else None,
-                                              "width": width, "scheme": scheme})
-                    log(f"{file.name}  {resp.status if resp else '?'}  {url}")
+                    manifest["files"].append({"file": file.name, "site": site, "path": path,
+                                              "status": resp.status if resp else None, "width": width, "scheme": scheme})
+                    log(f"{file.name}  {resp.status if resp else '?'}  {path}")
                 ctx.close()
         browser.close()
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2))
