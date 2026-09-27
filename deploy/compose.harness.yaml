@@ -1,0 +1,15 @@
+# A second, separate product instance over the HARNESS-ASSISTED dataset (not engine-authored). Run as its own compose
+# project next to the engine-gold product, so the two never share a lake or a case:
+#
+#   PA_LAKE_DIR=/srv/pa-harness-lake PA_INVESTIGATOR_CASE_HOST_DIR=/srv/pa-harness-case-empty \
+#   PA_INVESTIGATOR_PORT=8402 PA_BIND_IP=<NetBird IP> \
+#   docker compose -p proveedor-harness -f compose.yaml -f compose.harness.yaml up -d --no-build
+#
+# PA_PROVENANCE=harness turns on the "Harness-assisted run (Claude Code), not engine-authored" banner on every page.
+# The case mount is an empty directory on purpose: this instance reads only its own gold export (which carries the
+# approved ontology and DoD queries), never the real case package.
+services:
+  investigator:
+    environment:
+      PA_CASE_ID: proveedor-abierto-harness
+      PA_PROVENANCE: harness

@@ -148,3 +148,14 @@ def test_judges_password_never_reuses_an_internal_credential():
         code, text = run(FakeApi([VM]), "plan", env)
         assert code == 1 and "differ from every internal credential" in text and "same" not in text.replace(
             "differ from every internal credential", "")
+
+
+def test_harness_instance_is_a_separate_password_service():
+    api = FakeApi([VM])
+    env = {**ENV, "PA_JUDGES_PASSWORD": "judges-public", "PA_HARNESS_PORT": "8402"}
+    assert run(api, "apply", env)[0] == 0
+    mine = {s["name"]: s for s in api.services if s["id"] != "other"}
+    harness = mine["proveedor-harness.eu1.netbird.services"]
+    assert harness["targets"][0]["port"] == 8402
+    assert harness["auth"] == {"password_auth": {"enabled": True, "password": "judges-public"}}
+    assert mine["proveedor.eu1.netbird.services"]["targets"][0]["port"] == 8400  # the engine-gold product is untouched

@@ -27,6 +27,9 @@ Configuration comes from the environment (deploy/.env or the repo's .env, both g
                                 (PA_APPROVER_PIN is accepted as a fallback name); never the product's credential
     PA_JUDGES_PASSWORD          optional, public: the product URL's password and the read-only judges console's
     PA_CONSOLE_JUDGES_SERVICE   default "ontofill-console-judges"; PA_CONSOLE_JUDGES_PORT default 8411
+    PA_HARNESS_PORT             optional: a second product instance over the harness-assisted dataset (labelled not
+                                engine-authored), published as PA_HARNESS_SERVICE (default "proveedor-harness")
+                                behind the judges password
     PA_ALLOWED_COUNTRIES        optional, e.g. "US,MX": country allowlist on every service
 
 The retired services (<prefix>-approver and <prefix>-replay: approvals and replay moved to the console) are never
@@ -176,6 +179,9 @@ def desired(api, env: dict[str, str]) -> list[dict]:
     if judges:  # the read-only console instance: it refuses every write whatever headers the proxy passes
         services.append(service(env.get("PA_CONSOLE_JUDGES_SERVICE", "ontofill-console-judges"),
                                 int(env.get("PA_CONSOLE_JUDGES_PORT", 8411)),
+                                {"password_auth": {"enabled": True, "password": judges}}))
+    if judges and env.get("PA_HARNESS_PORT"):  # the harness-assisted dataset's own product instance
+        services.append(service(env.get("PA_HARNESS_SERVICE", "proveedor-harness"), int(env["PA_HARNESS_PORT"]),
                                 {"password_auth": {"enabled": True, "password": judges}}))
     return services
 
