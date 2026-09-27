@@ -1,0 +1,27 @@
+<section id="boundary" data-transition="fade" style="background:#f3f5f8; color:#1b2233; font-family:'Public Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:48px">
+<h2 style="font-size:72px; font-weight:600; line-height:1.1">Two Vultr VMs. One boundary.</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:2; display:flex; flex-direction:column; gap:24px">
+<div style="display:flex; flex-direction:column; gap:12px; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">VX1 #1 · CONTROL PLANE</p>
+<p style="font-size:30px; line-height:1.35">Engine phases and runner · inference gateway (the only Vultr key) · browser controller · Postgres + Oxigraph · Ontofill Console and the product</p>
+</div>
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#4a5263">↓ dispatch over NetBird (WireGuard) · sandbox can reach one control port, one way</p>
+<div style="display:flex; flex-direction:column; gap:12px; background:#1b2233; color:#eceff3; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#e9b04a">VX1 #2 · SANDBOX HOST · ZERO SECRETS</p>
+<p style="font-size:30px; line-height:1.35">gVisor runsc cells: Chromium or a parse job behind an egress allowlist proxy · memory, CPU, process and time caps · destroyed after every job</p>
+</div>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:24px">
+<div style="display:flex; flex-direction:column; gap:12px; background:#e3e9f7; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">SERVERLESS INFERENCE</p>
+<p style="font-size:30px; line-height:1.35">Every agent decision, plus a vision model that checks each browser step</p>
+</div>
+<div style="display:flex; flex-direction:column; gap:12px; background:#e3e9f7; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">OBJECT STORAGE</p>
+<p style="font-size:30px; line-height:1.35">Bronze: raw captures, content-addressed and kept, so a new ontology re-refines without browsing again</p>
+</div>
+</div>
+</div>
+<aside>The gateway issues per-session tokens with a time limit and a dollar budget, attributes every call to a run and step, and screens captured page text before a model sees it.</aside>
+</section>

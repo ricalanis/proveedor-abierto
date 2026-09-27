@@ -1,0 +1,12 @@
+<section id="ports" data-transition="fade" style="background:#f3f5f8; color:#1b2233; font-family:'Public Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:48px">
+<h2 style="font-size:72px; font-weight:600; line-height:1.1">Zero open ports, gated by role</h2>
+<table style="width:1664px; font-size:28px; border-collapse:collapse">
+<tr><th style="text-align:left; padding:16px; border-bottom:2px solid #1b2233; width:420px">NetBird criterion</th><th style="text-align:left; padding:16px; border-bottom:2px solid #1b2233">Our setup</th></tr>
+<tr><td style="padding:16px; border-bottom:1px solid #d3d8e0"><b>No open ports</b></td><td style="padding:16px; border-bottom:1px solid #d3d8e0">Both VMs allow zero public inbound ports, SSH included. Public URLs go through the NetBird reverse proxy.</td></tr>
+<tr><td style="padding:16px; border-bottom:1px solid #d3d8e0"><b>Gated by role</b></td><td style="padding:16px; border-bottom:1px solid #d3d8e0">Viewers: the product and a read-only console (writes refused, 403). Approvers: the Ontofill Console via SSO, approvers group only.</td></tr>
+<tr><td style="padding:16px; border-bottom:1px solid #d3d8e0"><b>Peer-to-peer</b></td><td style="padding:16px; border-bottom:1px solid #d3d8e0">Control and sandbox VMs talk over WireGuard. The sandbox group reaches one control port, one way.</td></tr>
+<tr><td style="padding:16px; border-bottom:1px solid #d3d8e0"><b>Lifecycle-bound URLs</b></td><td style="padding:16px; border-bottom:1px solid #d3d8e0">Each browser session's live view gets its own NetBird expose that stops existing when the session closes.</td></tr>
+</table>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-family:'IBM Plex Mono', monospace; font-size:24px; color:#4a5263">deploy/verify.sh remote checks all of this from outside</p>
+<aside>Evidence images in proveedor-abierto docs/evidence are rendered from the NetBird API and name only the two VM peers.</aside>
+</section>

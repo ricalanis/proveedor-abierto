@@ -1,0 +1,21 @@
+<section id="proof" data-transition="fade" style="background:#121826; color:#eceff3; font-family:'Public Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:48px">
+<h2 style="font-size:72px; font-weight:600; line-height:1.1">If a page says rm -rf /, what dies?</h2>
+<div style="display:flex; gap:64px">
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; font-family:'IBM Plex Mono', monospace; font-size:30px">
+<p style="font-size:24px; color:#b7bfcc">SIX PROOF CHECKS, EVERY SANDBOX JOB</p>
+<p>✓ host check</p>
+<p>✓ task result</p>
+<p>✓ where it ran · runtime runsc</p>
+<p>✓ isolation probe · <span style="color:#e9b04a">BLOCKED</span></p>
+<p>✓ teardown · cell destroyed</p>
+<p>✓ secret hygiene · 0 keys · metadata IP and mesh <span style="color:#e9b04a">BLOCKED</span></p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:28px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#b7bfcc">CONTAINMENT, ON A RECORDED RUN</p>
+<p style="font-size:36px; line-height:1.3">A hostile page with a prompt injection is quarantined: kept as evidence, never shown to the planner as instructions.</p>
+<p style="font-size:36px; line-height:1.3">A runaway extractor loop is killed by its cell's limits. The host is untouched.</p>
+<p style="font-size:36px; line-height:1.3; color:#e9b04a">The answer: the sandbox process. Nothing else.</p>
+</div>
+</div>
+<aside>Show the console's Sandbox proof panel on the containment run (library-demo, containment-demo-202609270251) and a real-case run's sandbox jobs.</aside>
+</section>

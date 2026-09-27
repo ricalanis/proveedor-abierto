@@ -1,0 +1,31 @@
+<section id="phases" data-transition="fade" style="background:#f3f5f8; color:#1b2233; font-family:'Public Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:56px">
+<h2 style="font-size:72px; font-weight:600; line-height:1.1">Five phases. People only approve.</h2>
+<div style="display:flex; gap:20px">
+<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">P1 · SCOPE</p>
+<h3 style="font-size:32px; font-weight:600; line-height:1.2">PRD with a testable definition of done</h3>
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">approve / deny</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">P2 · ONTOLOGY</p>
+<h3 style="font-size:32px; font-weight:600; line-height:1.2">Factors, classes, rules, compiled DoD</h3>
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">approve / deny</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">P3 · FAN OUT</p>
+<h3 style="font-size:32px; font-weight:600; line-height:1.2">Discover and review sources</h3>
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">source review</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">P4 · SCOPING</p>
+<h3 style="font-size:32px; font-weight:600; line-height:1.2">A technical plan per source</h3>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:36px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">P5 · EXECUTE</p>
+<h3 style="font-size:32px; font-weight:600; line-height:1.2">Sandboxed capture into bronze → silver → gold</h3>
+</div>
+</div>
+<p style="font-size:36px; line-height:1.35; width:1560px">Every decision inside a run is a Vultr inference call. A person's approval is bound to the sha256 of the exact file they reviewed, and a deny with a reason makes the engine redraft.</p>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-family:'IBM Plex Mono', monospace; font-size:24px; color:#4a5263">Nobody edits a run by hand. A defect is fixed in code, then the run resumes or reruns.</p>
+<aside>The runner service resumes a run on its own after each console decision. Human inputs are the brief, approvals, and start, pause or the kill switch.</aside>
+</section>
