@@ -79,6 +79,16 @@ def safe_url(url: str) -> str | None:
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or settings_from_env()
     app = FastAPI(title="Proveedor Abierto", docs_url=None, redoc_url=None, openapi_url=None)
+
+    if os.environ.get("PA_LOG_HEADER_NAMES") == "1":  # temporary diagnostic: which headers the proxy forwards
+        import logging
+
+        probe = logging.getLogger("uvicorn.error")
+
+        @app.middleware("http")
+        async def log_header_names(request: Request, call_next):
+            probe.info("header-names %s %s", request.url.path, sorted(request.headers.keys()))  # names only
+            return await call_next(request)
     app.state.settings = settings
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
     templates = Jinja2Templates(directory=HERE / "templates")
