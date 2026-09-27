@@ -354,6 +354,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def identity(request: Request) -> str:
         return request.headers.get(settings.identity_header, "") if settings.identity_header else ""
 
+    @app.get("/evidence", response_class=HTMLResponse)
+    def track_evidence(request: Request):
+        """The track checklist with proof from saved files only (both roles; no API calls, no probing)."""
+        from . import evidence
+
+        synthetic = str(getattr(settings.store, "case_id", "") or "").startswith("fixture")
+        return render(request, "track_evidence.html", nav="evidence", run=None, ev=evidence.rows(settings.store),
+                      synthetic=synthetic)
+
     @app.get("/spend", response_class=HTMLResponse)
     def spend(request: Request):
         """Operator billing view: reads the spend tracker's history file only; never calls billing APIs."""

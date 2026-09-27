@@ -21,6 +21,9 @@ x-app: &app
     AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
     AWS_REGION: ${AWS_REGION:-}
+    # /evidence reads saved files only: track-checklist.md, verify-remote.txt, spend-history.jsonl (optional)
+    PA_EVIDENCE_DIR: /evidence
+    PA_SPEND_HISTORY: /evidence/spend-history.jsonl
 
 services:
   investigator:
@@ -34,6 +37,7 @@ services:
       # investigator on the case that matches its gold (e.g. the synthetic fixture case) until real gold exists.
       - ${PA_INVESTIGATOR_CASE_HOST_DIR:-${PA_CASE_HOST_DIR:-../case}}:/case:ro
       - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
+      - ${PA_EVIDENCE_HOST_DIR:-../.cache/evidence}:/evidence:ro
     ports:
       - "${PA_BIND_IP:-127.0.0.1}:${PA_INVESTIGATOR_PORT:-8400}:8400"
 
@@ -53,6 +57,7 @@ services:
       - ${PA_REPLAY_LAKE_DIR:-${PA_LAKE_DIR:-../.lake}}:/lake-src:ro
       - ${PA_INVESTIGATOR_CASE_HOST_DIR:-${PA_CASE_HOST_DIR:-../case}}:/case:ro
       - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
+      - ${PA_EVIDENCE_HOST_DIR:-../.cache/evidence}:/evidence:ro
     ports:
       - "${PA_BIND_IP:-127.0.0.1}:${PA_REPLAY_PORT:-8402}:8400"
 
@@ -66,5 +71,6 @@ services:
       - ${PA_LAKE_DIR:-../.lake}:/lake:ro
       - ${PA_CASE_HOST_DIR:-../case}:/case:rw          # only the approver writes, and only APPROVED markers
       - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
+      - ${PA_EVIDENCE_HOST_DIR:-../.cache/evidence}:/evidence:ro
     ports:
       - "${PA_BIND_IP:-127.0.0.1}:${PA_APPROVER_PORT:-8401}:8400"
