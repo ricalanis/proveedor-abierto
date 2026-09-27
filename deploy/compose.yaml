@@ -21,6 +21,7 @@ services:
       PA_GOLD_DIR: ${PA_GOLD_DIR_IN_CONTAINER-/lake}
       PA_LAKE_YAML: /config/lake.yaml
       PA_CASE_DIR: /case
+      PA_CONSOLE_URL: ${PA_CONSOLE_URL:-}   # optional: empty states link judges to the Ontofill Console /tour
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       AWS_REGION: ${AWS_REGION:-}
