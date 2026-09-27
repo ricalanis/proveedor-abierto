@@ -99,12 +99,13 @@ Three tracks, each labelled for what it is.
    "not in the approved ontology" on screen. The harness data lives outside both repos, `case/` and the lake; its
    caveats are listed on every page of the harness instance.
 3. **A second, unrelated case (engine-authored).** *"Which San Francisco Public Library branches offer free Wi-Fi,
-   and when is each one open?"* The same engine, no domain code: the PRD and factors are approved. On engine
-   `93816dc` its rerun (`run-a12bcc59b7e2`) passed the ontology schema for the first time, then stopped at the next
-   check (R63, below; fix in progress). Its answer page shows the run and fills with gold cards when gold lands:
+   and when is each one open?"* The same engine, no domain code: the PRD, factors and ontology are approved (run
+   `run-09ed86537750`, the first ontology approval for this case), and it is now discovering sources on sfpl.org.
+   Its DoD numbers will read "not met" until R64 (below) lands and gold is re-refined from bronze. Its answer page
+   shows the run and fills with gold cards when gold lands:
    https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
 
-   **Building in the open.** The simpler SF case found six engine defects that the harder case had hidden. Five
+   **Building in the open.** The simpler SF case found seven engine defects that the harder case had hidden. Six
    are fixed, with tests:
    - P1 rejected city-level jurisdictions ("San Francisco, California, USA" against a publisher's "USA").
    - P2 had no presence operator, so invalid rules exhausted the phase. Invalid rules are now set aside as
@@ -113,11 +114,12 @@ Three tracks, each labelled for what it is.
      flag), so no rule could pass. Rules are now defined as flag violations in the prompts (`829559e`).
    - A core PRD field ("weekly opening hours") was never bound to a DoD property. The first fix did not trigger;
      the second (`3c1a2b0`) is verified on a live rerun.
+   - The compiled DoD queries re-authored the thresholds instead of copying them from the approved PRD (R63).
    - The runner reported an exhausted PRD or ontology as a crash. It now pauses as needs-human, with a
      phase-specific ask.
 
-   One is in progress (R63): the compiled DoD queries re-authored the thresholds instead of copying them from the
-   approved PRD. The fix copies them deterministically.
+   One is in progress (R64): criteria written as "≤ 0" compile to counts of branches, so they can never be met,
+   and three criteria measure through an address cross-check relation.
 
 ## Use case
 

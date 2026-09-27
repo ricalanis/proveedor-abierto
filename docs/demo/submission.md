@@ -62,15 +62,16 @@ connections and a journal from any value back to the brief.
   contracts from public data, keyed to the approved ontology and measured by the same unmodified DoD probe.
   0.924 of suppliers have all six core fields, and 0 of 7,761 values lack evidence.
 - **Second brief, same engine:** "Which San Francisco Public Library branches offer free Wi-Fi, and when is each one
-  open?" Its PRD and factors are approved, and its latest rerun passed the ontology schema for the first time. This
-  simpler case found six engine defects the hard case had hidden. Five are fixed in code with tests:
+  open?" Its PRD, factors and ontology are approved, and it is discovering sources. This simpler case found seven
+  engine defects the hard case had hidden. Six are fixed in code with tests:
   - city-level jurisdictions
   - invalid ontology rules exhausting the phase
   - a rule critic that read red-flag rules as passing checks
-  - a core field ("weekly opening hours") never bound to a property
+  - a core field never bound to a property
+  - DoD thresholds re-authored instead of copied from the PRD
   - a runner that reported a needs-human pause as a crash
 
-  One is in progress: definition-of-done thresholds re-authored instead of copied from the approved PRD.
+  One is in progress: "≤ 0" criteria that compile to counts that can never be met.
 
 ## Challenges
 
