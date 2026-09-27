@@ -51,7 +51,7 @@ above).
 | ![The completeness page on the harness-assisted instance](docs/evidence/screens/2026-09-27-final/harness-completeness-1440-dark.png) | ![The SF library case's answer page](docs/evidence/screens/2026-09-27-final/console-sf-library-branches-answer-1440-dark.png) |
 | The DoD recounted from gold on the harness-assisted instance. "100%" is the approved rule (≥ 80% of core fields); 0.924 of suppliers have all six. Source classes: 3 of 4 approved (no company registry reachable), as its banner says | The second, engine-authored case: its answer page says "no answer yet" until gold lands |
 
-### Where things stand (Sun 27 Sep, 17:45 UTC)
+### Where things stand (Sun 27 Sep, 17:55 UTC)
 
 Three tracks, each labelled for what it is.
 
@@ -59,9 +59,11 @@ Three tracks, each labelled for what it is.
    each decision bound to the digest of the exact file reviewed. The engine has run discovery and capture for real
    many times: source reviews, gVisor sandbox jobs with all six proof checks, real document fetches into bronze,
    and every failure fixed in code and rerun. All inference runs on Vultr. It has **no engine gold yet**: the primary
-   federal procurement portal (ComprasMX) is a JavaScript app whose data API the sandbox egress allowlist refused
-   (fix in review), and the source critic has accepted none of the remaining candidates. We did not loosen the
-   allowlist or the critic to get a number.
+   federal procurement portal (ComprasMX) is a JavaScript app whose data API the sandbox egress allowlist refused,
+   and the source critic has accepted none of the remaining candidates. We did not loosen the critic to get a
+   number; the allowlist now admits ComprasMX's own API and CDN hosts (engine `378a8c0`, deployed 10:52 PT), and run
+   `run-efc9be56964b` resumed on it. **The engine run continues after submission; its status is live on the judges
+   console.**
 2. **A harness-assisted run (Claude Code, not engine-authored).** To show what the definition of done looks like
    on real data, a Claude Code session built a dataset by hand-written scripts from public downloads, keyed to the
    **approved** ontology and measured by the same unmodified DoD probe. Result: 394 suppliers and 958 contracts;
@@ -73,10 +75,20 @@ Three tracks, each labelled for what it is.
    "not in the approved ontology" on screen. The harness data lives outside both repos, `case/` and the lake; its
    caveats are listed on every page of the harness instance.
 3. **A second, unrelated case (engine-authored).** *"Which San Francisco Public Library branches offer free Wi-Fi,
-   and when is each one open?"* The same engine, no code changes: the PRD and factors are approved; the ontology step
-   is blocked by an engine validator defect (fix pending). Its answer page shows the live run and fills with gold
-   cards when gold lands:
+   and when is each one open?"* The same engine, no domain code: the PRD and factors are approved, and a rerun
+   (`run-01d4b6d08cfc`) started on `378a8c0`. Its answer page shows the live run and fills with gold cards when
+   gold lands:
    https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
+
+   **Building in the open.** The simpler SF case found four engine defects that the harder case had hidden. All four
+   were fixed today, each with tests:
+   - P1 rejected city-level jurisdictions ("San Francisco, California, USA" against a publisher's "USA").
+   - P2 had no presence operator, so invalid rules exhausted the phase. Invalid rules are now set aside as
+     recommendations, with deterministic salvage.
+   - A core PRD field ("weekly opening hours") was never bound to a DoD property. The missing property is now added
+     deterministically, with a repair receipt for human review.
+   - The runner reported an exhausted PRD or ontology as a crash. It now pauses as needs-human, with a
+     phase-specific ask.
 
 ## Use case
 

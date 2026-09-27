@@ -48,12 +48,17 @@ connections and a journal from any value back to the brief.
 
 - **Engine on the real case:** the PRD, factors and ontology are approved, and many real runs are on the console.
   There is **no engine gold yet**. The primary procurement portal's data API was refused by our egress allowlist,
-  and the source critic accepted no other candidate. We didn't loosen either one to get a number.
+  and the source critic accepted no other candidate. We didn't loosen the critic. The allowlist now admits the
+  portal's own API and CDN hosts, and the run resumed on that fix. **The engine run continues after submission;
+  its status is live on the judges console.**
 - **Harness-assisted run (Claude Code, not engine-authored, labelled on every page):** 394 suppliers and 958
   contracts from public data, keyed to the approved ontology and measured by the same unmodified DoD probe.
   0.924 of suppliers have all six core fields, and 0 of 7,761 values lack evidence.
 - **Second brief, same engine:** "Which San Francisco Public Library branches offer free Wi-Fi, and when is each one
-  open?" Its PRD and factors are approved; the ontology step is waiting on a validator fix.
+  open?" Its PRD and factors are approved, and it is rerunning on today's fixes. This simpler case found four
+  engine defects the hard case had hidden: city-level jurisdictions, a missing presence rule in the ontology
+  validator, a core field never bound to a property, and a runner that reported a needs-human pause as a crash.
+  All four were fixed in code with tests the same day.
 
 ## Challenges
 
