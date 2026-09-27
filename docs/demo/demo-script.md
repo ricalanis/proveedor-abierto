@@ -11,6 +11,9 @@ The architecture behind every beat is `docs/planning/03-technical-architecture.m
 inference gateway, controller) and a sandbox host of disposable cells with zero secrets. Show things working live;
 narrate little; never describe what you cannot show; numbers come from the live run.
 
+**Say it once, early:** "The engine runs itself; people only approve." Every decision inside a run is a Vultr
+inference call through the gateway; humans write the brief, approve checkpoints and can pause or stop a run.
+
 ## Setup (before going on stage)
 
 - **Architecture frame:** the ASCII diagram from `03-technical-architecture.md` (control plane → gVisor cells →
@@ -62,8 +65,9 @@ say that they are recorded. Never describe a containment you cannot show.
 
 - **The run stalls:** start the console replay (see Setup) and keep narrating the same beats on its run view. The
   product's dossier and journal beats keep working on the gold already published.
-- **The approval does not resume:** the `APPROVED` file is in `case/<phase>/`. Show it with `cat`. The engine
-  resumes on the next `ontofill run`.
+- **The approval does not resume:** the approval is recorded (`APPROVED` in `case/<phase>/` and a line in
+  `decisions.jsonl`); the runner resumes the run by itself within a poll. Show the console's runner state line.
+  Never resume by hand during a run: the engine runs itself; people only approve.
 - **A screenshot fails to load:** the evidence panel still shows the source URL and the bronze key. Click the
   raw capture link.
 

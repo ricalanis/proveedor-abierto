@@ -6,6 +6,11 @@ has a receipt. It is generic by construction; a different brief gives a differen
 zero code changes. Proveedor Abierto is its hard, real test case, and this repo holds that case package (`case/`)
 and the investigation app that reads the engine's gold export.
 
+**The engine runs itself; people only approve.** Once a run starts, every decision in it is a Vultr inference call
+made by the engine through its gateway. People act only at the edges: they write the one-sentence brief, approve or
+deny each checkpoint in the Ontofill Console, and can start, pause or stop a run. Nobody edits the case, picks
+sources or fixes values by hand; a defect is fixed in code and the run is resumed or rerun (CONTRACT §16).
+
 **The question:** *"Who receives public money in Mexico through government contracts, and are they legitimate
 companies?"*. There is no dataset and no list of sources. From that sentence, Ontofill researches the problem, writes
 a PRD with a testable definition of done, and derives an ontology that a person approves. It then finds the public
@@ -233,7 +238,7 @@ vocabulary from the case ontology.
   engine's own `metrics.json`, including each declarative DoD query. It shows per-property bars and taxonomy
   coverage per level, and can follow a run live.
 
-Operator and approver work is not in this app: the live run view, approvals (PRD, factors, ontology and
+Approver work and run control are not in this app: the live run view, approvals (PRD, factors, ontology and
 approve-before-submit actions), spend, evidence and replay are the **Ontofill Console**'s (`ontofill/console`,
 CONTRACT §14), behind its own SSO-gated URL.
 
