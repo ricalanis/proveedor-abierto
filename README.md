@@ -198,8 +198,8 @@ flowchart TB
   lake -->|gold + the captures behind each receipt| prod
 ```
 
-- **Control plane (VX1 #1):** the engine plans each phase on Vultr models, this app reads the gold export and the
-  live run feed, and the browser layer runs as three parts:
+- **Control plane (VX1 #1):** the engine plans each phase on Vultr models, this app reads the gold export, the
+  Ontofill Console shows the live run feed, and the browser layer runs as three parts:
   - **Inference gateway:** an OpenAI-compatible proxy in front of Vultr Serverless Inference. It holds the **only
     real key**, issues a per-session token (time limit, dollar budget, revoked at close), attributes every model call
     to a session and step, and screens page content inside prompts with Jev and the Vultr content-safety model
