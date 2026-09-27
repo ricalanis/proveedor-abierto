@@ -141,9 +141,11 @@ and says honestly when its data doesn't exist yet.
 | Lineage | Value → evidence → step → plan → objective → ontology → PRD → brief (generic journal) | trace + case files |
 | Failures | Captcha/login stops, blocked domains, errors, retries, sources dropped and why | trace, jobs |
 | Humans | Cross-case "needs you" inbox; decision log; time waiting on humans | APPROVAL_PENDING, decisions.jsonl |
+| Inference | Every model call joined to its step: model, provider (Vultr Serverless Inference / Jev), purpose, tokens, cost, latency; share of reasoning on Vultr; unattributed calls (must be 0); non-Vultr artifacts flagged; who acted (engine runner vs human approvals; no harness inside runs) | gateway call log, trace usage, generated_by |
 | Cost | Spend by phase, model, mode and source; cost per gold value; run budget burn | trace usage, gateway log, spend history |
 | Compare | Run vs run (what changed; re-refine impact); case vs case (two briefs → two PRDs → two ontologies → two outputs) | runs/*, both cases |
 
+**Autonomy:** once started, a run is orchestrated only by the engine (the runner resumes it after approvals), and every decision inside it is a Vultr Serverless Inference call; humans act only at checkpoints, and the console proves both.
 **Rules:** every case view and every approval review shows the case's question (its brief) at the top (user feedback); honest charts (no decoration, no invented data); each view names its source artifact; missing data leads to an
 empty state that says what will appear and which gap (coord/GAPS.md) produces it; 1280 and 390 px; AA contrast.
 
