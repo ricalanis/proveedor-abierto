@@ -1,0 +1,87 @@
+{
+ "captured_at": "2026-09-27T15:27:42+00:00",
+ "files": [
+  {
+   "file": "console-proveedor-abierto-hub-1280-dark.png",
+   "site": "console",
+   "path": "/cases/proveedor-abierto",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  },
+  {
+   "file": "console-proveedor-abierto-definition-1280-dark.png",
+   "site": "console",
+   "path": "/cases/proveedor-abierto/definition",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  },
+  {
+   "file": "console-proveedor-abierto-watch-1280-dark.png",
+   "site": "console",
+   "path": "/watch",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  },
+  {
+   "file": "console-proveedor-abierto-run-40fb8f2e7282-pages-1280-dark.png",
+   "site": "console",
+   "path": "/cases/proveedor-abierto/pages?run=run-40fb8f2e7282",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  },
+  {
+   "file": "console-proveedor-abierto-run-40fb8f2e7282-summary-1280-dark.png",
+   "site": "console",
+   "path": "/cases/proveedor-abierto/summary?run=run-40fb8f2e7282",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  },
+  {
+   "file": "console-proveedor-abierto-run-7b2949d8bbb0-discovery-1280-dark.png",
+   "site": "console",
+   "path": "/cases/proveedor-abierto/discovery?run=run-7b2949d8bbb0",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  },
+  {
+   "file": "console-proveedor-abierto-run-9c120dd56edd-run-1280-dark.png",
+   "site": "console",
+   "path": "/cases/proveedor-abierto/runs/run-9c120dd56edd",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  },
+  {
+   "file": "console-proveedor-abierto-run-9c120dd56edd-failures-1280-dark.png",
+   "site": "console",
+   "path": "/cases/proveedor-abierto/failures?run=run-9c120dd56edd",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  },
+  {
+   "file": "console-proveedor-abierto-run-087eb59cbbc8-failures-1280-dark.png",
+   "site": "console",
+   "path": "/cases/proveedor-abierto/failures?run=run-087eb59cbbc8",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark"
+  }
+ ],
+ "redactions": 0,
+ "product": false,
+ "console": true,
+ "targets": [
+  "proveedor-abierto",
+  "proveedor-abierto:run-40fb8f2e7282",
+  "proveedor-abierto:run-7b2949d8bbb0",
+  "proveedor-abierto:run-9c120dd56edd",
+  "proveedor-abierto:run-087eb59cbbc8"
+ ]
+}
