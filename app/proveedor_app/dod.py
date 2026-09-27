@@ -165,14 +165,18 @@ def evaluate_query(query: dict, entities: list[dict], domain: Domain, relation: 
         as_share = query.get("measure") == "share" or (
             query.get("measure") is None and isinstance(target, (int, float)) and target < 1)
         if as_share:  # the share of linked entities (e.g. suppliers with a contract) that meet the ratio
-            rel = query.get("relation_id") or relation
+            # a legacy query (no measure) falls back to the case's relation; an explicit share without one covers all
+            rel = query.get("relation_id") or (relation if query.get("measure") is None else None)
             linked = [e for e in pool if _linked(e, rel)] if rel else pool
             return round(sum(share(e) >= ratio - 1e-9 for e in linked) / len(linked), 3) if linked else 0.0
         return sum(share(e) >= ratio - 1e-9 for e in pool)
     if agg == "count_entities":
         return len(pool)
     if agg == "count_entities_with_relation":
-        return sum(_linked(e, query.get("relation_id")) for e in pool)
+        linked = sum(_linked(e, query.get("relation_id")) for e in pool)
+        if query.get("measure") == "share":  # the share of the counted class that carries the relation
+            return linked / len(pool) if pool else 0.0
+        return linked
     if agg == "count_entities_with_properties":
         return sum(all(is_filled((e.get("properties") or {}).get(p)) for p in query.get("properties") or [])
                    for e in pool)

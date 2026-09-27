@@ -43,3 +43,12 @@ def test_an_unknown_aggregate_is_not_evaluable_not_a_crash():
     rows = dod.criteria({}, {}, DOMAIN, queries=[{"criterion_id": "d9", "aggregate": "made_up", "target": 1}],
                         entities=ENTS)
     assert rows[0]["actual"] is None and rows[0]["met"] is None and "not evaluable" in rows[0]["note"]
+
+
+def test_explicit_share_and_relation_share_follow_the_engine_export():
+    q = {"aggregate": "entities_meeting_completeness", "class": "supplier", "properties": "dod", "min_ratio": 1.0,
+         "measure": "share", "target": 1}
+    assert dod.evaluate_query(q, ENTS, DOMAIN, "awarded") == 0.667  # explicit share, no relation: 2 of all 3
+    rel = {"aggregate": "count_entities_with_relation", "class_id": "supplier", "relation_id": "awarded",
+           "measure": "share"}
+    assert abs(dod.evaluate_query(rel, ENTS, DOMAIN) - 2 / 3) < 1e-9
