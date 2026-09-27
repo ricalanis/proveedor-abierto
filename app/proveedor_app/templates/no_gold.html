@@ -4,6 +4,7 @@
 <section class="page-head">
   <h1>{{ _("Nothing published yet") }}</h1>
   <p class="lede">{{ _("This case has not published its data yet, or this site is not connected to it. Please come back later.") }}</p>
+  <p>{{ _("Meanwhile, you can see how the data is being made:") }} <a href="/como-se-hizo">{{ _("How this was made") }}</a>{% if console_tour %} · <a href="{{ console_tour }}" rel="noopener">{{ _("the engine at work (console tour; sign-in required)") }}</a>{% endif %} · <a href="/como-leer">{{ _("How to read a profile") }}</a></p>
   <details><summary>{{ _("Technical reason") }}</summary><pre class="record">{{ reason }}</pre></details>
 </section>
 {% endblock %}

@@ -515,6 +515,14 @@ ES: dict[str, str] = {
         'Más sobre disputas',
     'All the sources':
         'Todas las fuentes',
+    'Meanwhile, you can see how the data is being made:':
+        'Mientras tanto, puedes ver cómo se están produciendo los datos:',
+    'the engine at work (console tour; sign-in required)':
+        'el motor trabajando (recorrido en la consola; requiere iniciar sesión)',
+    'Console tour':
+        'Recorrido en la consola',
+    "the engine's own view of this run, question by question (sign-in required).":
+        'la vista del propio motor sobre esta corrida, pregunta por pregunta (requiere iniciar sesión).',
     # no gold / case file
     "Nothing published yet": "Aún no hay nada publicado",
     "This case has not published its data yet, or this site is not connected to it. Please come back later.":

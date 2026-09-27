@@ -44,6 +44,25 @@ def _fixtures(args: argparse.Namespace) -> int:
     return 0
 
 
+def _screens(args: argparse.Namespace) -> int:
+    from datetime import UTC, datetime
+
+    from . import screens
+
+    product = args.product or screens.PRODUCT_URL
+    console = args.console or screens.CONSOLE_URL
+    state = Path(args.state)
+    if args.login:
+        saved = screens.login(args.login, product if args.login == "product" else console, state)
+        print(f"saved the {args.login} session to {saved} (keep it out of git)")
+        return 0
+    out = Path(args.out) if args.out else REPO_ROOT / "docs" / "evidence" / "screens" / datetime.now(UTC).strftime("%Y-%m-%d")
+    m = screens.capture(out, product=product, console=console, targets=args.target, state=state, only=args.only)
+    bad = [f for f in m["files"] if f["status"] and f["status"] >= 400]
+    print(f"{len(m['files'])} screenshots in {out} · {m['redactions']} redactions · {len(bad)} non-200 pages")
+    return 1 if bad else 0
+
+
 def _dod(args: argparse.Namespace) -> int:
     store = GoldStore(LocalSource(args.gold_dir)) if args.gold_dir else load_store(REPO_ROOT)
     run = store.run(args.run_id)
@@ -94,6 +113,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--layout", choices=("entities", "legacy"), default="entities",
                    help="legacy: the pre-§11 suppliers.jsonl/contracts.jsonl export the adapter reads")
     p.set_defaults(fn=_fixtures)
+
+    p = sub.add_parser("screens", help="capture the demo screenshots (product + console) at 1280/390, light and dark")
+    p.add_argument("--product", default=None, help="product base URL (default: the live NetBird URL)")
+    p.add_argument("--console", default=None, help="console base URL (default: the live NetBird URL)")
+    p.add_argument("--target", action="append", default=[], help="console case[:run] (repeatable; default library-demo)")
+    p.add_argument("--only", choices=("product", "console"))
+    p.add_argument("--out", default=None, help="output folder (default docs/evidence/screens/<UTC date>)")
+    p.add_argument("--state", default=str(REPO_ROOT / ".cache" / "screens"), help="saved sign-in sessions (not in git)")
+    p.add_argument("--login", choices=("product", "console"), help="open a browser to sign in once and save the session")
+    p.set_defaults(fn=_screens)
 
     p = sub.add_parser("dod", help="recompute the DoD keys from gold and cross-check metrics.json")
     p.add_argument("--gold-dir", help="local export root (default: PA_GOLD_DIR or lake.yaml)")

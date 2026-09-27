@@ -84,6 +84,7 @@
   <h2 id="more-h">{{ _("Check it yourself") }}</h2>
   <ul class="plain-list">
     <li><a href="/journal">{{ _("Case journal") }}</a>: {{ _("any value, traced step by step back to the question.") }}</li>
+    {% if console_tour %}<li><a href="{{ console_tour }}" rel="noopener">{{ _("Console tour") }}</a>: {{ _("the engine's own view of this run, question by question (sign-in required).") }}</li>{% endif %}
     <li><a href="{{ m.engine_repo }}" rel="noopener">github.com/ricalanis/ontofill</a>: {{ _("the open-source engine that did the work; it runs any question, not only this one.") }}</li>
     <li><a href="{{ m.case_repo }}" rel="noopener">github.com/ricalanis/proveedor-abierto</a>: {{ _("this case (question, definition, sources, rules) and this site, ready to fork.") }}</li>
   </ul>

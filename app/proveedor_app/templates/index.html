@@ -61,7 +61,7 @@
   </nav>
   {% endif %}
   {% elif not stats.total %}
-  <p class="empty">{{ _("No {plural} have been published yet. The collection is still under way; this page fills in as values are confirmed.", plural=plural|lower) }} <a href="/como-se-hizo">{{ _("How this was made") }}</a></p>
+  <p class="empty">{{ _("No {plural} have been published yet. The collection is still under way; this page fills in as values are confirmed.", plural=plural|lower) }} <a href="/como-se-hizo">{{ _("How this was made") }}</a>{% if console_tour %} · <a href="{{ console_tour }}" rel="noopener">{{ _("the engine at work (console tour; sign-in required)") }}</a>{% endif %}</p>
   {% else %}
   <p class="empty">{{ _("Nothing matches. Check the spelling, try the {idlabel}, or clear the filter.", idlabel=domain.prop_label(id_prop) if id_prop else _("identifier")) }} <a href="/">{{ _("Show everything") }}</a></p>
   {% endif %}

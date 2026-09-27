@@ -114,6 +114,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     env = templates.env
     env.globals.update(
         host_of=host_of,
+        console_tour=(os.environ.get("PA_CONSOLE_URL", "").rstrip("/") + "/tour") if os.environ.get("PA_CONSOLE_URL") else None,
         WHERE_LABELS=WHERE_LABELS,
         TIER_WORDS=TIER_WORDS,
         safe_url=safe_url,
