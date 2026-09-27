@@ -132,17 +132,19 @@ won public contracts, quickly and with evidence they can cite.
 4. **Trace any value back to the brief** (`/journal/<value_id>`): capture step, technical definition, objective,
    ontology, PRD, brief.
 
-**What the agent does to get there** (five phases, two of them approved by a person):
+**What the agent does to get there** (five phases; a person approves the PRD, the factors and the ontology, reviews
+any unknown publisher, and must approve any action beyond reading):
 
 ```mermaid
 flowchart LR
   B["brief.md<br/>one question"] --> P1["1 Scope<br/>personas, jobs, PRD + DoD"]
-  P1 -->|approver signs off| P2["2 Ontology<br/>factors → taxonomies → schema + SHACL"]
-  P2 -->|approver signs off| P3["3 Fan out<br/>discover sources, rank objectives"]
-  P3 --> P4["4 Local scoping<br/>technical definition per source"]
-  P4 --> P5["5 Execute<br/>D0 → D1 → S1 → S2 in sandbox pods"]
+  P1 -->|person approves the PRD| P2["2 Ontology<br/>factors → taxonomies → schema<br/>rules = red-flag patterns<br/>DoD compiled to queries"]
+  P2 -->|person approves factors + ontology| P3["3 Fan out<br/>discover sources, rank objectives"]
+  P3 -->|unknown publisher: person reviews the source| P4["4 Local scoping<br/>technical definition per source"]
+  P4 --> P5["5 Execute in gVisor cells<br/>D0 → D1 → S1 → S2<br/>beyond a read-only GET: person approves"]
   P5 --> L[("lake<br/>bronze → silver → gold")]
-  L --> A["app: dossier · signals · relationships<br/>journal · live run · completeness"]
+  L --> A["Product: dossier · signals · connections<br/>journal · completeness"]
+  L --> C["Ontofill Console: runs · approvals<br/>inference · failures · sandbox proof"]
   A -.->|gold gap reopens fan-out| P3
 ```
 
@@ -163,26 +165,37 @@ or device names: [`docs/reference/vultr-netbird-usage.md`](docs/reference/vultr-
 A control plane that plans on Vultr models and dispatches disposable sandboxes. The full, canonical description is
 [`docs/planning/03-technical-architecture.md`](docs/planning/03-technical-architecture.md).
 
-```
-                 Judges / users ──HTTPS──▶ NetBird reverse proxy (PIN: investigator · SSO: approver)
-                                                  │ WireGuard (zero open ports)
- ┌──────────── VX1 #1 · CONTROL PLANE ────────────▼─────────────────────────────────┐
- │ Proveedor Abierto app (reads gold export; dossier, run view, journal, approvals) │
- │ Ontofill engine: P1 scope → P2 ontology → P3 fan-out → P4 local scoping → P5 exec│
- │   ├─ decision interface ─▶ Inference gateway ─▶ Vultr Serverless Inference      │
- │   │                          (only real key · per-session tokens · Jev + safety) │
- │   ├─ Controller (MCP): sessions, cell pool, native loop / Skyvern backends       │
- │   ├─ Refiner: silver → SHACL → gold · metrics · DoD                             │
- │   └─ Postgres + Oxigraph (silver/gold graphs)                                    │
- └──────────────────────────┬───────────────────────────────────────────────────────┘
-          CDP / cell API (control → sandbox only, NetBird + VPC)
- ┌──────────── VX1 #2 · SANDBOX HOST (zero secrets) ▼───────────────────────────────┐
- │ cell-1 [Skyvern brain? ─CDP─ gVisor Chromium hands ─ egress allowlist proxy]     │
- │ cell-N  … caps: mem/cpu/pids/timeout · destroyed after every session             │
- │ (optional: a throwaway VX1 per high-risk cell)                                   │
- └──────────────────────────┬───────────────────────────────────────────────────────┘
-                            ▼
-              Vultr Object Storage = bronze (raw captures, content-addressed)
+```mermaid
+flowchart TB
+  people["People"] -->|HTTPS| nb["NetBird reverse proxy · zero inbound ports<br/>product: password · judges console: password, read-only<br/>approvers console: SSO, approvers group"]
+  nb -->|WireGuard| cp
+  subgraph cp["VX1 1 · control plane"]
+    prod["Proveedor Abierto product<br/>reads a gold export: dossier · signals · connections · journal<br/>two instances: engine gold · harness-assisted, labelled on every page"]
+    con["Ontofill Console<br/>runs · approvals · inference · failures · sandbox proof"]
+    run["Runner<br/>self-sustaining runs · pause · kill switch"]
+    eng["Ontofill engine<br/>P1 scope → P2 ontology → P3 fan-out → P4 local scoping → P5 execute"]
+    gw["Inference gateway<br/>only real key · per-session tokens · Jev + content-safety screen"]
+    ctl["Controller (MCP)<br/>sessions · cell pool · native loop or Skyvern"]
+    ref["Refiner<br/>silver → SHACL → gold · rule flags · DoD metrics"]
+    db[("Postgres + Oxigraph<br/>silver · gold graphs")]
+    run --> eng
+    con -->|approvals bound to the file's sha256| eng
+    eng --> gw
+    eng --> ctl
+    eng --> ref --> db
+  end
+  gw -->|every model call| vsi["Vultr Serverless Inference"]
+  ctl -->|cell API over NetBird · control → sandbox only| sb
+  eng -->|capture + parse jobs · control → sandbox only| sb
+  subgraph sb["VX1 2 · sandbox host · zero secrets"]
+    cell["gVisor runsc cell<br/>Chromium hands · optional Skyvern brain with a session token<br/>mem · CPU · pids · time caps · destroyed after every job"]
+    proxy["Egress allowlist proxy<br/>GET only · approved publishers and their own sibling hosts<br/>third parties blocked"]
+    cell --> proxy
+  end
+  proxy --> web["Public web"]
+  eng -->|raw captures| lake[("Vultr Object Storage<br/>bronze captures, content-addressed · gold exports")]
+  ref -->|gold export| lake
+  lake -->|gold + the captures behind each receipt| prod
 ```
 
 - **Control plane (VX1 #1):** the engine plans each phase on Vultr models, this app reads the gold export and the
