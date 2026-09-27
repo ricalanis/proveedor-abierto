@@ -1,0 +1,30 @@
+{
+  "source_id": "source-link-de1976924b192b1131ac",
+  "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SociosComCert.xls",
+  "title": "Socios comerciales certificados",
+  "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+  "provider": "sandbox_page_link",
+  "providers": [
+    "sandbox_page_link"
+  ],
+  "capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "The document host is linked by a trusted source but is not in the approved source policy.",
+  "fingerprint": "d7966d246c0601455e998996e6b285a14f0f6a6385ace0a848ba154554e7d7c5",
+  "link_provenance": {
+    "parent_source_id": "source-16d6e359e403",
+    "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+    "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+    "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SociosComCert.xls",
+    "link_text": "Socios comerciales certificados",
+    "link_index": 24,
+    "step_id": "step:5fc2f12971194cd5a39b6e1a1de2cbca"
+  },
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T11:30:46.143162+00:00"
+  },
+  "screenshot_key": "sha256:129ce6d541ae53adfc95840590978d14855f6aab43b42c7d9f4dadbfb5f3ccf5"
+}

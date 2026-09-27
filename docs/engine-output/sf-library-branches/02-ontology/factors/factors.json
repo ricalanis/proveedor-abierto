@@ -1,0 +1,111 @@
+{
+  "factors": [
+    {
+      "id": "branch_coverage",
+      "label": "Branch coverage completeness",
+      "description": "Whether every SFPL branch is listed with all required values, per the completion requirement.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Completion requires every branch listed with all three values evidenced.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Use only public, read-only sources; jurisdiction San Francisco, California, USA; completion when every branch has all three values evidenced.",
+            "record_id": "requirement:r4",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "value_evidence",
+      "label": "Per-value evidence citation",
+      "description": "Whether each address, weekly hours, and Wi-Fi value carries a cited source.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Each value must have a cited source.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "List every SFPL branch with address, weekly opening hours, and free Wi-Fi yes/no, each value with a cited source.",
+            "record_id": "requirement:r1",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "publisher_authority",
+      "label": "Publisher authority tiering",
+      "description": "Whether values come from the primary publisher (sfpl.org) or need secondary cross-check (data.sfgov.org addresses).",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "sfpl.org is primary; its values need no second source.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Treat sfpl.org as the primary publisher for branches, hours, and Wi-Fi; its values need no second source.",
+            "record_id": "requirement:r2",
+            "type": "case_file"
+          }
+        },
+        {
+          "description": "Addresses cross-checked against data.sfgov.org.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Cross-check branch addresses against data.sfgov.org as a secondary publisher; flag mismatches for review.",
+            "record_id": "requirement:r3",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "source_legality",
+      "label": "Source legality and jurisdiction",
+      "description": "Whether sources are public and read-only within the San Francisco jurisdiction.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Only public, read-only sources; SF jurisdiction.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Use only public, read-only sources; jurisdiction San Francisco, California, USA; completion when every branch has all three values evidenced.",
+            "record_id": "requirement:r4",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "user_finding_task",
+      "label": "Nearby open branch with Wi-Fi",
+      "description": "Whether the output serves a user finding a nearby branch open now with free Wi-Fi.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Job: find a nearby open branch with free Wi-Fi.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Find an SFPL branch near me that is open now and offers free Wi-Fi.",
+            "record_id": "job:j1",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "run_feasibility",
+      "label": "Run budget and feasibility",
+      "description": "Whether the run stays within budget and time constraints; no listed PRD record covers this, so conceptual.",
+      "kind": "conceptual",
+      "evidence": []
+    }
+  ],
+  "revisions": [],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "minimax-m3",
+    "at": "2026-09-27T17:08:05.512101+00:00"
+  }
+}

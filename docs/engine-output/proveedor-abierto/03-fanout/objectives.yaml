@@ -1,0 +1,37 @@
+ontology_version: '1'
+prd_path: 01-scope/prd.json
+generated_by:
+  backend: vultr
+  model: glm-5.3-flash
+  at: '2026-09-27T11:21:30.837556+00:00'
+objectives:
+- id: objective-28a3354be397
+  source_id: source-16d6e359e403
+  source_url: https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html
+  source_type: sat
+  source_fingerprint: 3043ed3c438cb2dcd3e3d11fd6a11663d03ebe7d74aaed10fefdd787c211a6d2
+  discovery_provider: tavily
+  discovered_by:
+    provider: tavily
+    at: '2026-09-27T10:05:27.264643+00:00'
+    query: site:sat.gob.mx consulta RFC proveedor SAT México padrón contribuyentes
+      empresas
+    evidence_key: sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19
+  target_fields:
+  - supplier_rfc
+  - supplier_name
+  priority: 1
+  expected_contribution: 0.167
+  authority_tier: primary
+  confirmed_bronze_key: sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19
+  access_path:
+    supplier_rfc:
+      kind: download
+      url: https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/AvisosAntRFC.xls
+      capture_key: sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19
+      access_path_quote: Avisos de inscripción, suspensión y cancelación
+      authority_verdict: authoritative
+      critic_reason: SAT open-data padron page captures direct .xls download links
+        (e.g., AvisosAntRFC.xls) tied to RFC registration records; SAT is primary
+        authority for RFC.
+      link_index: 27

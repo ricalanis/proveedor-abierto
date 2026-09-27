@@ -1,0 +1,7 @@
+{
+  "approver": "ricalanis (decision relayed by the orchestrator)",
+  "date": "2026-09-26",
+  "checkpoint": "prd",
+  "decision": "deny",
+  "reason": "DoD must be the case's: >=50 suppliers linked to real public contracts; >=80% of them with a complete core profile (identity, address, founding date, tax-list status, sanction status); 0 values without evidence; >=4 source classes. Keep US sanctions/registry lists as secondary cross-checks."
+}

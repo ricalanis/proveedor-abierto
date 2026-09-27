@@ -1,0 +1,48 @@
+{
+  "source_id": "source-16d6e359e403",
+  "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+  "title": "Datos abiertos SAT",
+  "snippet": "Padrón ### Por situación ante el RFC Por entidad federativa Por régimen Por sector de actividad económica Por tipo de contribuyente Contadores Públicos Inscritos (CPIs) que emitieron dictámenes Empresas certificadas OEA Socios comerciales certificados Empresas certificadas en materia de IVA e IEPS ### Avisos ante el RFC",
+  "provider": "tavily",
+  "providers": [
+    "tavily"
+  ],
+  "discovered_by": {
+    "provider": "tavily",
+    "at": "2026-09-27T10:05:27.264643+00:00",
+    "query": "site:sat.gob.mx consulta RFC proveedor SAT México padrón contribuyentes empresas",
+    "evidence_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19"
+  },
+  "capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+  "screenshot_key": "sha256:129ce6d541ae53adfc95840590978d14855f6aab43b42c7d9f4dadbfb5f3ccf5",
+  "artifact_kind": "html",
+  "access_path": {
+    "supplier_rfc": {
+      "kind": "download",
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/AvisosAntRFC.xls",
+      "capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+      "access_path_quote": "Avisos de inscripción, suspensión y cancelación",
+      "authority_verdict": "authoritative",
+      "critic_reason": "SAT open-data padron page captures direct .xls download links (e.g., AvisosAntRFC.xls) tied to RFC registration records; SAT is primary authority for RFC.",
+      "link_index": 27
+    }
+  },
+  "source_type": "sat",
+  "authority": "auto",
+  "authority_tier": "primary",
+  "authority_reason": "approved publisher kind: Mexican tax authority incl. lista 69-B (SAT)",
+  "fingerprint": "3043ed3c438cb2dcd3e3d11fd6a11663d03ebe7d74aaed10fefdd787c211a6d2",
+  "covers": [
+    "supplier_rfc"
+  ],
+  "landing_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+  "redirect_chain": [
+    "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html"
+  ],
+  "property_evidence": {},
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3",
+    "at": "2026-09-27T10:05:27.262697+00:00"
+  }
+}

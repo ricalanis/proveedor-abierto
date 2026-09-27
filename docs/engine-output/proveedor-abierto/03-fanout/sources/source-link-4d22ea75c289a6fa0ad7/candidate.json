@@ -1,0 +1,30 @@
+{
+  "source_id": "source-link-4d22ea75c289a6fa0ad7",
+  "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PadronPorRegimen2.xls",
+  "title": "Por régimen",
+  "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+  "provider": "sandbox_page_link",
+  "providers": [
+    "sandbox_page_link"
+  ],
+  "capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "The document host is linked by a trusted source but is not in the approved source policy.",
+  "fingerprint": "a6c84c8e33d57ff3c37862bd686e88ce387b1857b245a3ac14a98d804caa3c91",
+  "link_provenance": {
+    "parent_source_id": "source-16d6e359e403",
+    "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+    "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+    "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PadronPorRegimen2.xls",
+    "link_text": "Por régimen",
+    "link_index": 19,
+    "step_id": "step:3f635ff0b0784089bec3e58a818eb344"
+  },
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T11:06:21.568563+00:00"
+  },
+  "screenshot_key": "sha256:129ce6d541ae53adfc95840590978d14855f6aab43b42c7d9f4dadbfb5f3ccf5"
+}

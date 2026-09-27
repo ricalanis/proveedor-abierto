@@ -1,0 +1,30 @@
+{
+  "source_id": "source-link-96a0d2a39d27fc9e20be",
+  "url": "https://www.gob.mx/sat/archivo/prensa",
+  "title": "Prensa Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+  "snippet": "Document link observed on https://www.sat.gob.mx/portal/public/home",
+  "provider": "sandbox_page_link",
+  "providers": [
+    "sandbox_page_link"
+  ],
+  "capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "The document host is linked by a trusted source but is not in the approved source policy.",
+  "fingerprint": "0ea368ab8f9835521aa10a80f034969b6c5318bdab8497e8423a1d55dea966dd",
+  "link_provenance": {
+    "parent_source_id": "source-d887ba175514",
+    "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+    "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+    "link_url": "https://www.gob.mx/sat/archivo/prensa",
+    "link_text": "Prensa Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+    "link_index": 59,
+    "step_id": "step:77d0ebfd9ecb40b2b4c5d0573e12c509"
+  },
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T18:25:27.306484+00:00"
+  },
+  "screenshot_key": "sha256:36ddf6e0ab394512cc7089157ccdd535f6ef1301d2fa1997cbba2cef1c0556a3"
+}

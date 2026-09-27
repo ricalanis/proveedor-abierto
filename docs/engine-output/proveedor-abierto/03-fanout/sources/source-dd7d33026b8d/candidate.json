@@ -1,0 +1,26 @@
+{
+  "source_id": "source-dd7d33026b8d",
+  "url": "https://www.gob.pe/satlima",
+  "title": "Redirect destination at www.gob.pe",
+  "snippet": "Public URL observed in a browser redirect chain.",
+  "provider": "sandbox_redirect",
+  "providers": [
+    "sandbox_redirect"
+  ],
+  "capture_key": null,
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "publisher authority needs human review",
+  "fingerprint": "58a2e54b4222c1fbb0c55468354534537055333c042b13f6190c9530cb27ca80",
+  "redirect_chain": [
+    "https://www.sat.gob.pe/",
+    "https://www.sat.gob.pe/Websitev9",
+    "https://www.sat.gob.pe/Websitev9/",
+    "https://www.gob.pe/satlima"
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T09:52:02.462216+00:00"
+  }
+}

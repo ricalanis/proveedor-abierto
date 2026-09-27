@@ -1,0 +1,40 @@
+{
+  "queries": [
+    {
+      "criterion_id": "dod1",
+      "aggregate": "count_entities_with_relation",
+      "class_id": "supplier",
+      "relation_id": "supplier_awarded_contract",
+      "target": 50,
+      "operator": ">="
+    },
+    {
+      "criterion_id": "dod2",
+      "aggregate": "entities_meeting_completeness",
+      "class": "supplier",
+      "properties": "dod",
+      "min_ratio": 0.8,
+      "target": 0.8,
+      "operator": ">="
+    },
+    {
+      "criterion_id": "dod3",
+      "aggregate": "count_values_without_evidence",
+      "target": 0,
+      "operator": "<="
+    },
+    {
+      "criterion_id": "dod4",
+      "aggregate": "count_distinct_source_classes",
+      "target": 4,
+      "operator": ">="
+    }
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "qwen3.8-flash-next",
+    "at": "2026-09-27T07:39:21.940853+00:00"
+  },
+  "prd_path": "01-scope/prd.json",
+  "ontology_version": "1"
+}

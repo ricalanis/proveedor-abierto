@@ -1,0 +1,4799 @@
+{
+  "schema_version": "1.0.3",
+  "bronze_key": "sha256:9991793e063ccab8e3d83bba55cd63c57f6cff3a65ec375527f557f763cb4f75",
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T11:23:31.530208+00:00"
+  },
+  "graph": {
+    "source_id": "source-16d6e359e403",
+    "source_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+    "source_fingerprint": "3043ed3c438cb2dcd3e3d11fd6a11663d03ebe7d74aaed10fefdd787c211a6d2",
+    "ontology_version": "1",
+    "run_id": "run-9c120dd56edd",
+    "job_ids": [
+      "job:bbfcece19c6b43cda7b0eae030d50385"
+    ],
+    "crawl": {
+      "same_registrable_domain": true,
+      "max_depth": 2,
+      "page_cap": 30,
+      "delay_seconds": 1.0,
+      "attempted_pages": 16,
+      "fetched_pages": 16,
+      "stop_reason": "depth_limit",
+      "robots": [
+        {
+          "origin": "https://www.sat.gob.mx",
+          "url": "https://www.sat.gob.mx/robots.txt",
+          "http_status": 403,
+          "decision": "allow",
+          "crawl_delay_seconds": null,
+          "bronze_key": "sha256:9bb4cf6c8e1664f36312e0b264f2af7e45a00388f360fde5d75cffb82afbca9a",
+          "robots_status": "unavailable"
+        }
+      ]
+    },
+    "types": [
+      {
+        "type_id": "type-a3c9c478c2d13b6f2a1a4c06",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/auditoria.html",
+        "dom_skeleton_hash": "f01d00f878b58498653d1ca0ffb8ace98786ba366661a4747e872de6219b1dcb",
+        "label": {
+          "kind": "other"
+        },
+        "sample_instance_ids": [
+          "page-b181d0f059544867fc8c1901"
+        ],
+        "property_hints": []
+      },
+      {
+        "type_id": "type-ec34550715f1864a24aff331",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/cobranza.html",
+        "dom_skeleton_hash": "400da019edc5ca449f4dd8c26a2c67d6d6e9f598a50e5ce37662ff527627869e",
+        "label": {
+          "kind": "download"
+        },
+        "sample_instance_ids": [
+          "page-3d111afc8c9126c73a6dc9d4"
+        ],
+        "property_hints": [
+          {
+            "property_id": "evidence_label",
+            "sample_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+            "evidence_quote": "Número de adeudos en la cartera del SAT"
+          }
+        ]
+      },
+      {
+        "type_id": "type-02fb55c79ffbd1496d490fc7",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+        "dom_skeleton_hash": "448708b95ba10f4b005ee5fe2f1d800f26a0b748a4dcb95124afeceeee4a43a4",
+        "label": {
+          "kind": "listing"
+        },
+        "sample_instance_ids": [
+          "page-ae901ea4eda35f5c71b4c395"
+        ],
+        "property_hints": [
+          {
+            "property_id": "tax_list_status",
+            "sample_instance_id": "page-ae901ea4eda35f5c71b4c395",
+            "evidence_quote": "Listado de contribuyentes (Artículo 69 del Código Fiscal de la Federación)"
+          }
+        ]
+      },
+      {
+        "type_id": "type-c7a3e139532b60b4914a4e09",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/controversia.html",
+        "dom_skeleton_hash": "4f8856d9e93c655e01a047c6abc48e0b6f7a4897605b6f949c8d21d72a48c8c8",
+        "label": {
+          "kind": "other"
+        },
+        "sample_instance_ids": [
+          "page-e8a4ed2d3237a0ada499c7d9"
+        ],
+        "property_hints": []
+      },
+      {
+        "type_id": "type-00fb5f8424d1bc40a9fcafbe",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/devoluciones.html",
+        "dom_skeleton_hash": "1859f451ef4bdc217d8e9f4c4813e74c5ce769b91e21e6e2b99255c4a289128b",
+        "label": {
+          "kind": "download"
+        },
+        "sample_instance_ids": [
+          "page-41fc1b0520f306def6caf611"
+        ],
+        "property_hints": []
+      },
+      {
+        "type_id": "type-8f034176fc7ebbeea5a80fb9",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/documentos.html",
+        "dom_skeleton_hash": "3e9596a5c7e5127bf904f47859c078425ce1bcc614c111849c9353c780cce057",
+        "label": {
+          "kind": "listing"
+        },
+        "sample_instance_ids": [
+          "page-81f78107fe3b0e1b371e0905"
+        ],
+        "property_hints": [
+          {
+            "property_id": "evidence_label",
+            "sample_instance_id": "page-81f78107fe3b0e1b371e0905",
+            "evidence_quote": "Documentos de referencia Estudios de Evasión y Elusión del SAT"
+          }
+        ]
+      },
+      {
+        "type_id": "type-63a744a6c7e4d59451eb6643",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/dyp.html",
+        "dom_skeleton_hash": "336aaa1dcc6fdba00ee7c732a557c2be97d452503a6b174b3c5c1f1e53bfe0ab",
+        "label": {
+          "kind": "download"
+        },
+        "sample_instance_ids": [
+          "page-d06464c77630e5cde9d07544"
+        ],
+        "property_hints": [
+          {
+            "property_id": "evidence_label",
+            "sample_instance_id": "page-d06464c77630e5cde9d07544",
+            "evidence_quote": "Reporte de Pedimentos de Importación"
+          }
+        ]
+      },
+      {
+        "type_id": "type-c14f3eb3ae1c39f99cc2f28e",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/factura.html",
+        "dom_skeleton_hash": "f24b64c6c83b398766fbc4cab7e7dced56d60b82f9e08012b41f903153a6810e",
+        "label": {
+          "kind": "listing"
+        },
+        "sample_instance_ids": [
+          "page-5cc5ef50363df7e724262fd8"
+        ],
+        "property_hints": []
+      },
+      {
+        "type_id": "type-0fea451de9748f9fd689d073",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "dom_skeleton_hash": "81a8a448ccad1ad539f6f6de2278314f4fd9b6022b3fc9dd1c2f7d07d0c33dbd",
+        "label": {
+          "kind": "listing"
+        },
+        "sample_instance_ids": [
+          "page-9e4ba9b766dd2ac426390503"
+        ],
+        "property_hints": [
+          {
+            "property_id": "source_class",
+            "sample_instance_id": "page-9e4ba9b766dd2ac426390503",
+            "evidence_quote": "Datos abiertos SAT"
+          }
+        ]
+      },
+      {
+        "type_id": "type-30dde8e9728d3833914862b3",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/informes.html",
+        "dom_skeleton_hash": "c1407a247ab577c6721429964c970d1c230317f3c97bff8352fb9e2f9746b3c3",
+        "label": {
+          "kind": "listing"
+        },
+        "sample_instance_ids": [
+          "page-b7e47da065c2bb36d39bea87"
+        ],
+        "property_hints": [
+          {
+            "property_id": "evidence_label",
+            "sample_instance_id": "page-b7e47da065c2bb36d39bea87",
+            "evidence_quote": "Reportes de Donatarias Autorizadas (2008-2025)"
+          }
+        ]
+      },
+      {
+        "type_id": "type-e45a537a6f53c2a9c2a7e77f",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "dom_skeleton_hash": "d84e7ef6a4d39752364751560d1f605a74998664fa5b2b5990289c337b422f44",
+        "label": {
+          "kind": "listing"
+        },
+        "sample_instance_ids": [
+          "page-ce033af290b60cecc9dd93c9"
+        ],
+        "property_hints": [
+          {
+            "property_id": "evidence_label",
+            "sample_instance_id": "page-ce033af290b60cecc9dd93c9",
+            "evidence_quote": "Padrón Por situación ante el RFC Por entidad federativa Por régimen Por sector de actividad económica"
+          }
+        ]
+      },
+      {
+        "type_id": "type-92ebb4bed2583bb71c2366b1",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/proyectos_sat.html",
+        "dom_skeleton_hash": "aaf5eb035cdc0ae14a81f2b9c47bb479187e880d4d8e66419941b0dd5f174528",
+        "label": {
+          "kind": "listing"
+        },
+        "sample_instance_ids": [
+          "page-ae54ac4478f7b41d9a115c29"
+        ],
+        "property_hints": [
+          {
+            "property_id": "evidence_label",
+            "sample_instance_id": "page-ae54ac4478f7b41d9a115c29",
+            "evidence_quote": "Portafolio de proyectos financiados con el Fideicomiso de Administración y Pago (FAPA)"
+          }
+        ]
+      },
+      {
+        "type_id": "type-8dda3f4445a269c443c1f089",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/recaudacion.html",
+        "dom_skeleton_hash": "386951440d829105850b57c377facc546ce00dd586ae02e5fa44438e292ce567",
+        "label": {
+          "kind": "other"
+        },
+        "sample_instance_ids": [
+          "page-d4580464a8c06aef1c0a037f"
+        ],
+        "property_hints": []
+      },
+      {
+        "type_id": "type-31a98ab45d47eedbfded0739",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/sat_mas_abierto.html",
+        "dom_skeleton_hash": "0e5640e91f0f303c80f3dfee078ffdf095d837c0f99c9a82556e75718d80e9ac",
+        "label": {
+          "kind": "download"
+        },
+        "sample_instance_ids": [
+          "page-88325cf0d7db2d23f0872eae"
+        ],
+        "property_hints": [
+          {
+            "property_id": "evidence_label",
+            "sample_instance_id": "page-88325cf0d7db2d23f0872eae",
+            "evidence_quote": "SAT más abierto Datos Anonimizados (Art. Décimo Noveno Transitorio de la LIF para 2017)"
+          }
+        ]
+      },
+      {
+        "type_id": "type-1a945758bee1f5557806c689",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/solicitudes.html",
+        "dom_skeleton_hash": "efe63adfa939719a6f7ad0c479300f1cbe8a88c097b70e53ace6d86ea7064de7",
+        "label": {
+          "kind": "download"
+        },
+        "sample_instance_ids": [
+          "page-fb20de8cc1bd056f7ca72628"
+        ],
+        "property_hints": []
+      },
+      {
+        "type_id": "type-3574c8aef64ebf8d104bd556",
+        "url_template": "https://www.sat.gob.mx/minisitio/DatosAbiertos/vigilancia.html",
+        "dom_skeleton_hash": "ceb7af07da64f9037f5d38a864f6988d8e56b27e8f1a7a44ff4f47abce38786e",
+        "label": {
+          "kind": "other"
+        },
+        "sample_instance_ids": [
+          "page-ff0401d74d12fac2cd45cca7"
+        ],
+        "property_hints": []
+      }
+    ],
+    "instances": [
+      {
+        "instance_id": "page-ce033af290b60cecc9dd93c9",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html"
+        ],
+        "depth": 0,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-e45a537a6f53c2a9c2a7e77f",
+        "bronze_key": "sha256:cd4bf6d1f177e257002692ef9b071c44bc2ad37064cd87a698c32272ca522221",
+        "trace_step_id": "step:a37b029c8c174c7bb2b1a3bc995c3d8e",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": null
+      },
+      {
+        "instance_id": "page-9e4ba9b766dd2ac426390503",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html"
+        ],
+        "depth": 1,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-0fea451de9748f9fd689d073",
+        "bronze_key": "sha256:57ff378d194361ea6edb91b8c7b573eb9b564da84a1bc21f954542544ed78ee5",
+        "trace_step_id": "step:8c2d6fb96dbe48b1a9712edaab414d1e",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-ce033af290b60cecc9dd93c9"
+      },
+      {
+        "instance_id": "page-88325cf0d7db2d23f0872eae",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/sat_mas_abierto.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/sat_mas_abierto.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-31a98ab45d47eedbfded0739",
+        "bronze_key": "sha256:bef6a41595b1cc84976ffbf97e8115650847ff79658842981d2c90397316995b",
+        "trace_step_id": "step:eeeda1e6a423427eaffd5a7eaab6f8de",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-d06464c77630e5cde9d07544",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/dyp.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/dyp.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-63a744a6c7e4d59451eb6643",
+        "bronze_key": "sha256:811bcb50f064c0a72fb503650f96f41b25aac9ac0af4ec701734696bfa58028e",
+        "trace_step_id": "step:63aab00aa6ee48cebb3fceaa059c7508",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-5cc5ef50363df7e724262fd8",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/factura.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/factura.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-c14f3eb3ae1c39f99cc2f28e",
+        "bronze_key": "sha256:a4767ceb2a80f3f6cf50ce1b8b2ec335dc9ee19e7947d1483ae3d7c3be472c2c",
+        "trace_step_id": "step:c9b645d6dc834e6685786ca529afb1be",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-41fc1b0520f306def6caf611",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/devoluciones.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/devoluciones.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-00fb5f8424d1bc40a9fcafbe",
+        "bronze_key": "sha256:84aebe58b56a0861a216210315600d3d7508d920215c4e3dc24ec7af03b8f0c0",
+        "trace_step_id": "step:06fab2b7c7ac46bead08b7179d7ffb75",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-ff0401d74d12fac2cd45cca7",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/vigilancia.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/vigilancia.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-3574c8aef64ebf8d104bd556",
+        "bronze_key": "sha256:b7c6a43c03dcfffe3a6404f2527a1437e52c476bd161076310b097685f24f472",
+        "trace_step_id": "step:ff139564ce6543fba7324cf7761c4cee",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/controversia.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/controversia.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-c7a3e139532b60b4914a4e09",
+        "bronze_key": "sha256:eba6231357a0329997950a076926e959d5dca3b784fa78977bfc470c7469c1a6",
+        "trace_step_id": "step:1bdbde4c6ddb4a8a95ef633363ccb30e",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-b181d0f059544867fc8c1901",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/auditoria.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/auditoria.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-a3c9c478c2d13b6f2a1a4c06",
+        "bronze_key": "sha256:2052b4564dcf9db30077d37e0da9f0707ba0f32a5aaa241377e7f7a0a2c318a3",
+        "trace_step_id": "step:051cde8705124c1896cb4bfc1c7dd816",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/cobranza.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/cobranza.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-ec34550715f1864a24aff331",
+        "bronze_key": "sha256:78140f8fe82c0dc68dcb24d07ee2c78c22fb97cf524a137f314c118bd7890139",
+        "trace_step_id": "step:701d5e58b4294f9782f859695a2df699",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-d4580464a8c06aef1c0a037f",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/recaudacion.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/recaudacion.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-8dda3f4445a269c443c1f089",
+        "bronze_key": "sha256:483d276070ab8c1b54e5674ec613571a1a7b98d8fe108c05d1269731c42dc370",
+        "trace_step_id": "step:51f2002249184363913a61afcaa477d1",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-02fb55c79ffbd1496d490fc7",
+        "bronze_key": "sha256:19ec2cb40e045dc23e2f5e9ba0ff0c0c22088554b5f5694125b19391a035d702",
+        "trace_step_id": "step:56c7d3004e264893a9069231b4f50cd2",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/proyectos_sat.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/proyectos_sat.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-92ebb4bed2583bb71c2366b1",
+        "bronze_key": "sha256:4e06935a7deaf3ec2b1695b110bada185a748c941992957f4dbd1e9597f6d280",
+        "trace_step_id": "step:6e33daf54a65490ebbad1c571f62d73e",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-b7e47da065c2bb36d39bea87",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/informes.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/informes.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-30dde8e9728d3833914862b3",
+        "bronze_key": "sha256:cc2357d17af4d3768a63f9e51b8d19658215b5bb7bf805ff994cdf5fa4c382c5",
+        "trace_step_id": "step:415070d81f304822b9ef9ec478eed75c",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-81f78107fe3b0e1b371e0905",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/documentos.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/documentos.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-8f034176fc7ebbeea5a80fb9",
+        "bronze_key": "sha256:6f0050eec156f4c87fda1543e4637f943ecd47a5276cf4174ec544dd75bcc945",
+        "trace_step_id": "step:eaa70367f001435d8d0203b2d423fd35",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      },
+      {
+        "instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/solicitudes.html",
+        "redirect_chain": [
+          "https://www.sat.gob.mx/minisitio/DatosAbiertos/solicitudes.html"
+        ],
+        "depth": 2,
+        "http_status": 200,
+        "content_type": "text/html",
+        "link_kind": "navigate",
+        "type_id": "type-1a945758bee1f5557806c689",
+        "bronze_key": "sha256:8f18f46111e4662eef81f78c39067ac647650a6aeeced4b76b7cb85623641ae7",
+        "trace_step_id": "step:37d0a6035a1545759b2f24e8dc012247",
+        "job_id": "job:bbfcece19c6b43cda7b0eae030d50385",
+        "parent_instance_id": "page-9e4ba9b766dd2ac426390503"
+      }
+    ],
+    "edges": [
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorEntFed.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PadronPorRegimen2.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SectorActEco.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorTipoContribuyente.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/F1_FORMATO_G_CPR.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_38_EmpCer.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SociosComCert.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/EmpresasCertIVAeIEPS.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "to_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "already_queued"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/AvisosAntRFC.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/InscTipContRFC.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SusTipContRFC.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/CancTipContRFC.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "already_queued"
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/sat_mas_abierto.html",
+        "to_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "to_instance_id": "page-ce033af290b60cecc9dd93c9",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "already_queued"
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/dyp.html",
+        "to_instance_id": "page-d06464c77630e5cde9d07544",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/factura.html",
+        "to_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/devoluciones.html",
+        "to_instance_id": "page-41fc1b0520f306def6caf611",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/vigilancia.html",
+        "to_instance_id": "page-ff0401d74d12fac2cd45cca7",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/controversia.html",
+        "to_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/auditoria.html",
+        "to_instance_id": "page-b181d0f059544867fc8c1901",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/cobranza.html",
+        "to_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/recaudacion.html",
+        "to_instance_id": "page-d4580464a8c06aef1c0a037f",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+        "to_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/proyectos_sat.html",
+        "to_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/informes.html",
+        "to_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/documentos.html",
+        "to_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/solicitudes.html",
+        "to_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": true,
+        "reason": null
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/sat_mas_abierto.html",
+        "to_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Lineamientos_art%C3%ADculo19LIF.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/DiccionarioDatosPM_anonimizados_2010-2015.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PM_2010.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PM_2011.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PM_2012.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PM_2013.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PM_2014.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PM_2015.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Catalogo_RFCs_PM.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/DiccionarioDatosPF_anonimizados_2010-2015.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PF_2010.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PF_2011.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PF_2012.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PF_2013.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PF_2014.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Anuales_ISR_PF_2015.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Catalogo_RFCs_PF.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/DiccionarioDatosDIM.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "https://wu1aqauatsta003.blob.core.windows.net/lineamientosarticulo19lif/agp/DIM/F30a1/2013/F30a1_2013.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "https://wu1aqauatsta003.blob.core.windows.net/lineamientosarticulo19lif/agp/DIM/F30a1/2014/F30a1_2014.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-88325cf0d7db2d23f0872eae",
+        "to_url": "https://wu1aqauatsta003.blob.core.windows.net/lineamientosarticulo19lif/agp/DIM/F30a1/2015/F30a1_2015.zip",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-d06464c77630e5cde9d07544",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-d06464c77630e5cde9d07544",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/DecAnuaTipCon.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-d06464c77630e5cde9d07544",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/NumPagosMedRec.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-d06464c77630e5cde9d07544",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/NumPagTipCon.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-d06464c77630e5cde9d07544",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/dyp.html",
+        "to_instance_id": "page-d06464c77630e5cde9d07544",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-d06464c77630e5cde9d07544",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_43_ImpNum.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-d06464c77630e5cde9d07544",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_44_ExpNum.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-d06464c77630e5cde9d07544",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_59_RecDerImp.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/factura.html",
+        "to_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FacEleNumEmi.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FacEleNumCom.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "to_url": "http://omawww.sat.gob.mx/tramitesyservicios/Paginas/proveedores_autorizados_certificacion.htm",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FirEleNumcontri.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-5cc5ef50363df7e724262fd8",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FirEleNumcert.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-41fc1b0520f306def6caf611",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-41fc1b0520f306def6caf611",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_9_Impuesto.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-41fc1b0520f306def6caf611",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/devoluciones.html",
+        "to_instance_id": "page-41fc1b0520f306def6caf611",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-41fc1b0520f306def6caf611",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_10_numopesol.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-41fc1b0520f306def6caf611",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/ImporteAuto.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ff0401d74d12fac2cd45cca7",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-ff0401d74d12fac2cd45cca7",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/NumActPorCont.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ff0401d74d12fac2cd45cca7",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/RecaDerVigObl.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/controversia.html",
+        "to_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_16_DFsentenciasDefiniNotifi.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_17_DFsentenciasDefiniFavo.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_18_DFmontodisputa.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_19_DFmontofavorable.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-e8a4ed2d3237a0ada499c7d9",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_20_SentenciasCondenatorias.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b181d0f059544867fc8c1901",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b181d0f059544867fc8c1901",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/auditoria.html",
+        "to_instance_id": "page-b181d0f059544867fc8c1901",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b181d0f059544867fc8c1901",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_15_ActFisc.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b181d0f059544867fc8c1901",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_57_RecDerAud.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b181d0f059544867fc8c1901",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/FORMATO_45_PAMA.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b181d0f059544867fc8c1901",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/FORMATO_46_ValMerEmb.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b181d0f059544867fc8c1901",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_45_PAMACE.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b181d0f059544867fc8c1901",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_46_ValMerEmbCE.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/cobranza.html",
+        "to_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/NumDeAdeuPorAnti.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/NumAdeuEnLaCarDelSAT.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/MonPorAnt2.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/ImporteAdeudosAlta.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-3d111afc8c9126c73a6dc9d4",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/RecaDerCaobAF.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-d4580464a8c06aef1c0a037f",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-d4580464a8c06aef1c0a037f",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/IngresosTributarios.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/AGR/03_02_26/FORMATO_32_ContribIncumplidos.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+        "to_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/causasymotivos.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGR/Cancelados.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGR/ReduccionArt74CFF.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Condonadosart146BCFF.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Condonadosart21CFF.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/CondonadosporDecreto.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Condonados_07_15.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Cancelados_07_15.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Retornoinversiones.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGR/Exigibles.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGR/Firmes.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGR/No_localizados.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGR/Sentencias.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGR/CSDsinefectos.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGR/EntespublicosydeGobiernoomisos.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Listado_completo_69-B.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Definitivos.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Desvirtuados.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Presuntos.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/SentenciasFavorables.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGGC/Listado_69_B_Bis_Completo.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGGC/Listado_69_B_Bis_Definitivo.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGGC/Listado_69_B_Bis_SentenciaFa.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Inf_combate_ilegalidad_23122013.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Inf_combate_ilegalidad_07042015.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Inf_combate_ilegalidad_2015.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Inf_combate_ilegalidad_2016.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Inf_combate_ilegalidad_2017.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae901ea4eda35f5c71b4c395",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Inf_combate_ilegalidad_2018.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/proyectos_sat.html",
+        "to_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_37_resecntie2.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2014.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2015.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2016.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2017.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2018.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2019.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2020.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2021.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2022.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2023.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ProyFinanPEF2024.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/ProyFinanPEF2025.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-ae54ac4478f7b41d9a115c29",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/ProyFinanPEF2026.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/informes.html",
+        "to_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://finanzaspublicas.hacienda.gob.mx/es/Finanzas_Publicas/Estadisticas_Oportunas_de_Finanzas_Publicas",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://finanzaspublicas.hacienda.gob.mx/es/Finanzas_Publicas/Informes_al_Congreso_de_la_Union",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/Diccionario_RDA_2008-2025.docx",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2025_datos_2024.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2024_datos_2023.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2023_datos_2022.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2022_datos_2021.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2021_datos_2020.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2020_datos_2019.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2019_datos_2018.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2018_datos_2017.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2017_datos_2016.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2016_datos_2015.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2015_datos_2014.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2014_datos_2013.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2013_datos_2012.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2012_datos_2011.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2011_datos_2010.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2010_datos_2009.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2010_datos_2008.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2009_datos_2007.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/reporte_donatarias_2008_datos_2006.csv",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www.transparenciapresupuestaria.gob.mx/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2024_1T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2024_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2023_1T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2023_2T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2023_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2022_1T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2022_2T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2022_3T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2022_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2021_1T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2021_1S.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2021_3T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2021_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%201er%20semestre%202020.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2020_3T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2020_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%201er%20trimestre%202019.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%202do%20trimestre%202019.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%203er%20trimestre%202019.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%204to%20trimestre%202019.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%201er%20trimestre%202018.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%202do%20trimestre%202018.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%203er%20trimestre%202018.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%204to%20trimestre%202018.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG%20IT%202017_170428.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2do_trimestre%202017_170728.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_3er_trimestre2017_171031def.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_4to_trimestre%202017_180202%20.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_T1_2016.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_T2_2016.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_T3_2016%20Final_161031.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_T4_2016.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2015t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_T2_2015.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_T3_2015.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_T4_2015.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2014t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2014t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2014t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2014_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2013t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2013t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2013t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2013_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2012t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2012t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2012t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2012_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2011t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2011t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2011t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ITG_2011_4T.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2010t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2010t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2010t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2010t4/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2009t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2009t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2009t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2009t4/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2008t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2008t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2008t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2008t4/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2007t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2007t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2007t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/informe2007t4/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/reporte_anual_2006_t1/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/reporte_anual_2006_t2/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/reporte_anual_2006_t3/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://www2.sat.gob.mx/sitio_internet/informe_tributario/reporte_anual_2006_t4/",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2026_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2025_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2025_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2025_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2025_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2024_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2024_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2024_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2024_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2023_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2023_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2023_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2023_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2022_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2022_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2022_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2022_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2021_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2021_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2021_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2021_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2020_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2020_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2020_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2020_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2019_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2019_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2019_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2019_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2018_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2018_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2018_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2018_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2017_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2017_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2017_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2017_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2016_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2016_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2016_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2016_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2015_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2015_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2015_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2015_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2014_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2014_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2014_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2014_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2013_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2013_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2013_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2013_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2012_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2012_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2012_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2012_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2011_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2011_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2011_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2011_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2010_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2010_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2010_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2010_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2009_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2009_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2009_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2009_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2008_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2008_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2008_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2008_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2007_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2007_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2007_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2007_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2006_01.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2006_02.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2006_03.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PAMC_2006_04.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "http://omawww.sat.gob.mx/gobmxtransparencia/Paginas/Transparencia/indicadores.html",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://www.gob.mx/sat/documentos/evaluaciones-externas-a-los-programas-presupuestarios-del-sat",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://nptp.hacienda.gob.mx/programas/jsp/programas/fichaPrograma.jsp?id=06E026",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://www.cuentapublica.hacienda.gob.mx/es/CP/Informacion_Programatica-2023",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Reporte%20Anual%202017%20y%20Retos%202018.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Reporte%20Anual%202016%20y%20Retos%202017.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ReporteAnual2015_Retos2016.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporteanual2014.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporteanual2013.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporteanual2012.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporteanual.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporteanual2010.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporte2009.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporte2008.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporte2007.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporte07.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/reporteanual2005.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/IGG%202018-2024%20SAT.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Plan_Estrategico_al_2024.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Plan_Estrategico_2014-2018.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PESAT_2012-2013.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/PESAT_2007_2012_MapaDefOE.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/ResencCostCum.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/Resecntram.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/RestramServSol.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/NumVisitasMod.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/ImagenDeInst.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/IndHonExpServ.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PerEfiPAra.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PercRiesContri.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/CasosCorrupcion.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/ConocimientoMediosDenuncia.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/MediosUtilizados.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-b7e47da065c2bb36d39bea87",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SugerenMejoraRecau.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/documentos.html",
+        "to_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/13enero2026/Documentos%20de%20referencias/Evasion_sectores_comercio_vehiculos_combustibles_lubricantes.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/13enero2026/Documentos%20de%20referencias/Evasion_sectores_comercio_tiendas%20autoservicio_departamentales.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2024_Evasion_sectores_construccion_servicios_inmobiliario.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2024_Evasion_sectores_servicios_profesionales_corporativos_apoyo_a_negocios.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/An%C3%A1lisis_de_la_evoluci%C3%B3n_de_la_contribuci%C3%B3n_efectiva_de_IVA.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3n_en_la_Industria_Manufacturera.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3n_por_contrabando_en_Miner%C3%ADa.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3n_por_contrabando_en_Textil.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3n_secto_financiero.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3n_sector_de_miner%C3%ADa.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3n_en_sueldosysalarios_redes_de_patrones_Chapingo.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2020_Evasion_tributaria_analisis_de_redes_UNAM.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3nenIVA_An%C3%A1lisisdeRedes.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Pr%C3%A1cticasdeevasi%C3%B3ndelISRensueldosysalarios.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3nenactividadesprofesionales.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3nenSueldosySalarios.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasi%C3%B3n%20Global%202017.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasio%CC%81n%20por%20Subfacturacio%CC%81n%20y%20Subdeclaracio%CC%81n.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/IVAISRDEFINITIVO.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/ImpactoCFDISAT.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/evasion_industria_reciclaje.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Impactofiscal_softwareilegal.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/evasion_art58.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/evasion_carrusel.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/introilegal_UNACH.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Evasion%20Global%20de%20Impuestos.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/Conductual.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/eva_fis_efec_2012.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/eva_fis_subv_2012.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/EstudioFiscalsectorconst.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/EstudioEvasionrepecos.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2010_eva_fis_der_dis_esque_fac.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2010_eva_pago_isr_nom_terceros.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2009_efic_reca_def_est_incid_eva.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2009_eva_glob_imp_isr_iva_ieps.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2008_est_eva_fis_gen_ind_textil.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2008_eva_fis_gen_trans_terres.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2007_eva_fis_gen_com_amb.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2007_eva_fis_tran_efec.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2006_med_eva_fis_mex.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2006_eva_fis_IEPS.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2005_eva_fis_isr_pf_ing_arren.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2005_eva_fis_isr_pm.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2004_eva_fis_isr_ret_sal.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2004_eva_fis_isr_pf.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2003_tam_sec_inf_pot_rec_mex.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/2003_eva_fis_mex_iva.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-81f78107fe3b0e1b371e0905",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Indef/LoteriaFiscalvsMonederosElectr%C3%B3nicos.pdf",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/index.html",
+        "to_instance_id": "page-9e4ba9b766dd2ac426390503",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/Inai.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/Inaiaten.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/solicitudes.html",
+        "to_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/RespPub2015.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/RespPub2016.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/RespPub2017.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/RespPub2018.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/RespPub2019.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/RespPub2020.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "http://omawww.sat.gob.mx/cifras_sat/Documents/RespPub2021.xls",
+        "to_instance_id": null,
+        "kind": "download",
+        "method": "GET",
+        "risk_tier": "SAFE",
+        "followed": false,
+        "reason": "depth_limit"
+      },
+      {
+        "from_instance_id": "page-fb20de8cc1bd056f7ca72628",
+        "to_url": "https://www.plataformadetransparencia.org.mx/Inicio",
+        "to_instance_id": null,
+        "kind": "navigate",
+        "method": "GET",
+        "risk_tier": "LOW",
+        "followed": false,
+        "reason": "cross_registrable_domain"
+      }
+    ],
+    "coverage": {
+      "target_property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "hinted_property_ids": [
+        "evidence_label",
+        "source_class",
+        "tax_list_status"
+      ],
+      "uncovered_property_ids": [
+        "founding_date",
+        "registered_address",
+        "sanction_status",
+        "supplier_name",
+        "supplier_rfc"
+      ]
+    }
+  }
+}

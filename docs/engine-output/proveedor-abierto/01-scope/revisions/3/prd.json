@@ -1,0 +1,171 @@
+{
+  "version": "1",
+  "brief_path": "brief.md",
+  "personas": [
+    {
+      "id": "p1",
+      "description": "Investigative analyst mapping Mexican public contract recipients and verifying their legitimacy."
+    },
+    {
+      "id": "p2",
+      "description": "Oversight stakeholder needing evidence-backed supplier profiles to assess public spending integrity."
+    }
+  ],
+  "jobs_to_be_done": [
+    {
+      "id": "j1",
+      "persona_id": "p1",
+      "description": "Identify suppliers receiving Mexican public contract money and link them to real public contracts."
+    },
+    {
+      "id": "j2",
+      "persona_id": "p1",
+      "description": "Build complete core profiles (identity, address, founding date, tax-list status, sanction status) for each linked supplier."
+    },
+    {
+      "id": "j3",
+      "persona_id": "p2",
+      "description": "Cross-check supplier legitimacy against sanctions and registry lists with traceable evidence."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "job_id": "j1",
+      "description": "Link at least 50 suppliers to real public contracts from official Mexican procurement sources (CompraNet/compras públicas), treated as primary authorities."
+    },
+    {
+      "id": "r2",
+      "job_id": "j2",
+      "description": "At least 80% of linked suppliers must have a complete core profile: identity, address, founding date, tax-list status (SAT incl. lista 69-B), and sanction status."
+    },
+    {
+      "id": "r3",
+      "job_id": "j2",
+      "description": "Every recorded value must carry source evidence; 0 values without evidence. Use at least 4 distinct source classes."
+    },
+    {
+      "id": "r4",
+      "job_id": "j3",
+      "description": "Use US sanctions and registry lists only as secondary cross-checks; Mexican public registries (registros públicos) are primary. Unknown domains go to human review."
+    }
+  ],
+  "constraints": [
+    "Run budget is USD 2.0; scope must fit within it, and elapsed run time is unknown until execution, so targets must be feasible under both limits.",
+    "Only public, read-only sources may be used; no paywalled or private data.",
+    "Mexican official sources (CompraNet/compras públicas, SAT incl. lista 69-B, registros públicos) are primary authorities.",
+    "US sanctions and registry lists serve only as secondary cross-checks, never primary authority.",
+    "Every recorded value must carry traceable source evidence; unknown domains require human review."
+  ],
+  "non_goals": [
+    "No investigation of suppliers outside Mexican public contract recipients.",
+    "No private, paywalled, or leaked data sources.",
+    "No legal adjudication of supplier legitimacy; only evidence-backed profiles.",
+    "No real-time monitoring or continuous updates beyond the one-time run."
+  ],
+  "authority_policy": {
+    "jurisdiction": "Mexico",
+    "trusted_publishers": [
+      {
+        "kind": "Mexican federal procurement authority (CompraNet/compras públicas)",
+        "domains": [
+          "compranet.hacienda.gob.mx",
+          "compras.gob.mx"
+        ],
+        "rationale": "Official Mexican public procurement records; primary source for contract-supplier links per human revision 2. Domains are proposed hypotheses pending human confirmation of exact hostnames."
+      },
+      {
+        "kind": "Mexican tax authority (SAT, incl. lista 69-B)",
+        "domains": [
+          "sat.gob.mx"
+        ],
+        "rationale": "Official tax-list and 69-B status; primary for tax-list status per human revision 2."
+      },
+      {
+        "kind": "Mexican public registries (registros públicos)",
+        "domains": [
+          "gob.mx"
+        ],
+        "rationale": "Official public registries; primary for identity, address, and founding date per human revision 2. Broad domain is a hypothesis for human review."
+      },
+      {
+        "kind": "US sanctions and registry lists",
+        "domains": [
+          "ofac.treas.gov",
+          "sam.gov"
+        ],
+        "rationale": "Human revision 1: US sanctions/registry lists are secondary cross-checks only, never auto authority.",
+        "tier": "secondary"
+      }
+    ],
+    "unknown_source_action": "review"
+  },
+  "definition_of_done": [
+    {
+      "id": "dod1",
+      "metric": "Suppliers linked to real public contracts from official Mexican procurement sources",
+      "operator": ">=",
+      "target": 50,
+      "basis": "human",
+      "basis_quote": ">=50 suppliers linked to real public contracts",
+      "rationale": "Human revision 1 sets the minimum linked-supplier count.",
+      "feasibility": "Feasible within USD 2.0 using free public CompraNet records; elapsed run time unknown, so batch queries are planned."
+    },
+    {
+      "id": "dod2",
+      "metric": "Linked suppliers with complete core profile (identity, address, founding date, tax-list status, sanction status)",
+      "operator": ">=",
+      "target": 80,
+      "min_ratio": 0.8,
+      "basis": "proposed",
+      "rationale": "The stated numeric threshold lacks a matching brief or human quote.",
+      "feasibility": "At $2.00, feasibility and elapsed run time need validation after source discovery."
+    },
+    {
+      "id": "dod3",
+      "metric": "Recorded values without source evidence",
+      "operator": "<=",
+      "target": 0,
+      "basis": "human",
+      "basis_quote": "0 values without evidence",
+      "rationale": "Human revision 1 requires full evidence traceability.",
+      "feasibility": "Feasible at no extra cost; enforced by requiring a source citation for every stored value."
+    },
+    {
+      "id": "dod4",
+      "metric": "Distinct source classes used",
+      "operator": ">=",
+      "target": 4,
+      "basis": "human",
+      "basis_quote": ">=4 source classes",
+      "rationale": "Human revision 1 requires at least four distinct source classes.",
+      "feasibility": "Feasible within USD 2.0: procurement, tax, registry, and sanctions sources are all public and free; run time unknown, so queries are batched."
+    }
+  ],
+  "revisions": [
+    {
+      "n": 1,
+      "decision": "deny",
+      "reason": "DoD must be the case's: >=50 suppliers linked to real public contracts; >=80% of them with a complete core profile (identity, address, founding date, tax-list status, sanction status); 0 values without evidence; >=4 source classes. Keep US sanctions/registry lists as secondary cross-checks.",
+      "approver": "ricalanis (decision relayed by the orchestrator)",
+      "date": "2026-09-26"
+    },
+    {
+      "n": 2,
+      "decision": "deny",
+      "reason": "Las fuentes oficiales mexicanas (CompraNet/compras públicas, SAT incl. lista 69-B, registros públicos) son PRIMARIAS y deben listar sus dominios; las listas de sanciones y registros de EE. UU. son SECUNDARIAS (verificación cruzada); quitar la entrada duplicada de verificación cruzada. Mantener las 4 metas del DoD tal como están.",
+      "approver": "ricalanis (decision relayed by the orchestrator)",
+      "date": "2026-09-26"
+    }
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3",
+    "at": "2026-09-27T00:34:24.584240+00:00"
+  },
+  "open_issues": [
+    "Material defects found in DoD2: (1) Basis is marked \"proposed\" with rationale claiming \"the stated numeric threshold lacks a matching brief or human quote,\" but human revision 1 explicitly states \">=80% of them with a complete core profile (identity, address, founding date, tax-list status, sanction status).\" The basis must be \"human\" with the corresponding basis_quote; the artifact contradicts the trusted human direction. (2) Feasibility for DoD2 is inadequate: it states \"feasibility and elapsed run time need validation after source discovery,\" which does not confirm feasibility against the USD 2.0 budget and unknown elapsed run time as required by the constraints. Additionally, the metric is internally inconsistent — target=80 with min_ratio=0.8 is ambiguous (count vs. percentage) and should be expressed as a single coherent threshold (e.g., ratio >=0.8) to match the human revision's \">=80%\". Other criteria pass: DoD1, DoD3, DoD4 correctly cite human revision 1; authority_policy correctly lists domains for Mexican primary sources (CompraNet, SAT, registros públicos) and marks US sanctions/registry lists as secondary tier per human revision 2; no duplicate cross-check entry is present; brief coverage and per-entity core property requirements are addressed. Reject solely on the DoD2 basis/feasibility defects.",
+    "Authority policy needs a primary publisher in the case jurisdiction",
+    "Human secondary cross-check lacks a named publisher/domain: son SECUNDARIAS (verificación cruzada)"
+  ]
+}

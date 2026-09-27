@@ -1,0 +1,582 @@
+{
+  "version": "1",
+  "prd_path": "01-scope/prd.json",
+  "factors": [
+    {
+      "id": "contract_linkage",
+      "label": "Supplier-contract linkage",
+      "description": "Whether a supplier can be linked to a real public contract in Mexican official procurement records (CompraNet/compras publicas).",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "identity_legitimacy",
+      "label": "Corporate identity legitimacy",
+      "description": "Whether the supplier is a legitimate registered company, verified via Mexican public commercial registries (identity, founding date).",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "tax_list_status",
+      "label": "Tax-list status (SAT lista 69-B)",
+      "description": "The supplier's status on the Mexican tax authority's lists, including lista 69-B, as a primary Mexican source.",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "sanction_status",
+      "label": "Sanction status",
+      "description": "Whether the supplier appears on sanctions lists, checked via US sanctions lists (OFAC) as secondary cross-checks only.",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "address_verification",
+      "label": "Address verification",
+      "description": "Completeness and verifiability of the supplier's registered address as one of the five core profile fields.",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "source_authority_tier",
+      "label": "Source authority tier",
+      "description": "Distinction between primary Mexican official sources and secondary US cross-check sources; Mexican sources are the primary authority.",
+      "kind": "conceptual",
+      "evidence": []
+    },
+    {
+      "id": "evidence_citation",
+      "label": "Evidence citation completeness",
+      "description": "Every recorded value must cite evidence; no unsourced values are permitted, and at least 4 distinct source classes must be used.",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "profile_completeness",
+      "label": "Core profile completeness",
+      "description": "Whether a linked supplier has a complete core profile across all five fields (identity, address, founding date, tax-list status, sanction status), targeted at >=80% of linked suppliers.",
+      "kind": "grounded",
+      "evidence": []
+    }
+  ],
+  "taxonomies": [
+    {
+      "factor_id": "contract_linkage",
+      "root_label": "Supplier-contract linkage",
+      "children": [
+        {
+          "id": "compranet_contract_award",
+          "label": "CompraNet contract award record",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "contract_awarding_agency",
+          "label": "Awarding agency / dependency",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "contract_value_and_date",
+          "label": "Contract value and date",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "supplier_rfc_on_contract",
+          "label": "Supplier RFC identifier on contract",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "identity_legitimacy",
+      "root_label": "Corporate identity legitimacy",
+      "children": [
+        {
+          "id": "legal_name_registration",
+          "label": "Legal name and registration record",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "founding_date_record",
+          "label": "Founding date record",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "public_commercial_registry_entry",
+          "label": "Public commercial registry entry",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        },
+        {
+          "id": "us_registry_cross_check",
+          "label": "US registry cross-check (secondary)",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "tax_list_status",
+      "root_label": "Tax-list status (SAT lista 69-B)",
+      "children": [
+        {
+          "id": "sat_lista_69b_status",
+          "label": "SAT lista 69-B listing status",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "sat_rfc_verification",
+          "label": "SAT RFC verification",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "sat_listing_date_and_reason",
+          "label": "Listing date and reason",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "sanction_status",
+      "root_label": "Sanction status",
+      "children": [
+        {
+          "id": "ofac_sdn_list_status",
+          "label": "OFAC SDN list status (secondary)",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "ofac_name_matching",
+          "label": "Name-matching confidence",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        },
+        {
+          "id": "mexican_primary_confirmation",
+          "label": "Mexican primary-source confirmation",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "address_verification",
+      "root_label": "Address verification",
+      "children": [
+        {
+          "id": "registered_address_record",
+          "label": "Registered address record",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "address_source_citation",
+          "label": "Address source citation",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "address_cross_check",
+          "label": "Cross-check against secondary sources",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "source_authority_tier",
+      "root_label": "Source authority tier",
+      "children": [
+        {
+          "id": "primary_mexican_source",
+          "label": "Primary Mexican official source",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "secondary_us_cross_check",
+          "label": "Secondary US cross-check source",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "review_tier_source",
+          "label": "Review-tier / unknown source",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "evidence_citation",
+      "root_label": "Evidence citation completeness",
+      "children": [
+        {
+          "id": "per_value_evidence_citation",
+          "label": "Per-value evidence citation",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "unsourced_value_absence",
+          "label": "Absence of unsourced values",
+          "level": 1,
+          "critic_label": "Redundant"
+        },
+        {
+          "id": "source_class_diversity",
+          "label": "Distinct source classes used",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 0.6666666666666666,
+      "coverage": null
+    },
+    {
+      "factor_id": "profile_completeness",
+      "root_label": "Core profile completeness",
+      "children": [
+        {
+          "id": "identity_field_present",
+          "label": "Identity field present",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "address_field_present",
+          "label": "Address field present",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "founding_date_field_present",
+          "label": "Founding date field present",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "tax_list_status_field_present",
+          "label": "Tax-list status field present",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "sanction_status_field_present",
+          "label": "Sanction status field present",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    }
+  ],
+  "primary_class": "supplier",
+  "classes": [
+    {
+      "id": "supplier",
+      "label": "Supplier",
+      "label_plural": "Suppliers",
+      "description": "Company receiving public money through a Mexican government contract; carries the five core profile fields (identity, address, founding date, tax-list status, sanction status) as DoD properties.",
+      "title_property": "supplier_name",
+      "identifier_property": "supplier_rfc",
+      "aligned_to": null
+    },
+    {
+      "id": "public_contract",
+      "label": "Public Contract",
+      "label_plural": "Public Contracts",
+      "description": "Award record from Mexican official procurement sources (CompraNet / compras publicas) linking an awarding agency, value and date to a supplier RFC.",
+      "title_property": "contract_title",
+      "identifier_property": "contract_id",
+      "aligned_to": null
+    },
+    {
+      "id": "evidence_record",
+      "label": "Evidence Record",
+      "label_plural": "Evidence Records",
+      "description": "Citation backing a recorded value, tagged with its source class and authority tier (primary Mexican vs secondary US cross-check).",
+      "title_property": "evidence_label",
+      "identifier_property": "evidence_id",
+      "aligned_to": null
+    }
+  ],
+  "properties": [
+    {
+      "id": "supplier_name",
+      "label": "Legal name",
+      "domain": "supplier",
+      "datatype": "string",
+      "dod": true,
+      "order": 0,
+      "description": "Registered legal name of the company (core profile: identity).",
+      "aligned_to": null
+    },
+    {
+      "id": "supplier_rfc",
+      "label": "RFC",
+      "domain": "supplier",
+      "datatype": "string",
+      "dod": true,
+      "order": 1,
+      "description": "Mexican tax identifier (RFC) used to match the supplier on contracts and SAT records.",
+      "aligned_to": null
+    },
+    {
+      "id": "registered_address",
+      "label": "Registered address",
+      "domain": "supplier",
+      "datatype": "string",
+      "dod": true,
+      "order": 2,
+      "description": "Registered address of the company (core profile: address).",
+      "aligned_to": null
+    },
+    {
+      "id": "founding_date",
+      "label": "Founding date",
+      "domain": "supplier",
+      "datatype": "date",
+      "dod": true,
+      "order": 3,
+      "description": "Date the company was founded / registered (core profile: founding date).",
+      "aligned_to": null
+    },
+    {
+      "id": "tax_list_status",
+      "label": "SAT 69-B status",
+      "domain": "supplier",
+      "datatype": "string",
+      "dod": true,
+      "order": 4,
+      "description": "Status on the SAT lista 69-B tax-authority lists (core profile: tax-list status).",
+      "aligned_to": null
+    },
+    {
+      "id": "sanction_status",
+      "label": "Sanction status",
+      "domain": "supplier",
+      "datatype": "string",
+      "dod": true,
+      "order": 5,
+      "description": "Result of sanctions screening, e.g. OFAC SDN as a secondary cross-check (core profile: sanction status).",
+      "aligned_to": null
+    },
+    {
+      "id": "contract_id",
+      "label": "Contract ID",
+      "domain": "public_contract",
+      "datatype": "string",
+      "dod": false,
+      "order": 6,
+      "description": "Official identifier of the procurement award record.",
+      "aligned_to": null
+    },
+    {
+      "id": "contract_title",
+      "label": "Contract title",
+      "domain": "public_contract",
+      "datatype": "string",
+      "dod": false,
+      "order": 7,
+      "description": "Title or object of the awarded contract.",
+      "aligned_to": null
+    },
+    {
+      "id": "contract_rfc",
+      "label": "Supplier RFC on contract",
+      "domain": "public_contract",
+      "datatype": "string",
+      "dod": false,
+      "order": 8,
+      "description": "RFC of the awarded supplier as recorded on the contract.",
+      "aligned_to": null
+    },
+    {
+      "id": "awarding_agency",
+      "label": "Awarding agency",
+      "domain": "public_contract",
+      "datatype": "string",
+      "dod": false,
+      "order": 9,
+      "description": "Government dependency or agency that awarded the contract.",
+      "aligned_to": null
+    },
+    {
+      "id": "contract_value",
+      "label": "Contract value",
+      "domain": "public_contract",
+      "datatype": "number",
+      "dod": false,
+      "order": 10,
+      "description": "Monetary value of the award in MXN.",
+      "aligned_to": null
+    },
+    {
+      "id": "award_date",
+      "label": "Award date",
+      "domain": "public_contract",
+      "datatype": "date",
+      "dod": false,
+      "order": 11,
+      "description": "Date the contract was awarded.",
+      "aligned_to": null
+    },
+    {
+      "id": "evidence_id",
+      "label": "Evidence ID",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 12,
+      "description": "Stable identifier of the evidence citation.",
+      "aligned_to": null
+    },
+    {
+      "id": "evidence_label",
+      "label": "Evidence label",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 13,
+      "description": "Human-readable description of the cited evidence.",
+      "aligned_to": null
+    },
+    {
+      "id": "source_class",
+      "label": "Source class",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 14,
+      "description": "Distinct source class of the evidence (e.g. compranet, sat, registro_publico_comercio, ofac).",
+      "aligned_to": null
+    },
+    {
+      "id": "authority_tier",
+      "label": "Authority tier",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 15,
+      "description": "Authority tier of the source: primary_mexican_source, secondary_us_cross_check or review_tier.",
+      "aligned_to": null
+    },
+    {
+      "id": "source_url",
+      "label": "Source URL",
+      "domain": "evidence_record",
+      "datatype": "uri",
+      "dod": false,
+      "order": 16,
+      "description": "Resolvable URL of the cited source.",
+      "aligned_to": null
+    },
+    {
+      "id": "retrieved_at",
+      "label": "Retrieved at",
+      "domain": "evidence_record",
+      "datatype": "datetime",
+      "dod": false,
+      "order": 17,
+      "description": "Timestamp when the evidence was retrieved.",
+      "aligned_to": null
+    }
+  ],
+  "relations": [
+    {
+      "id": "supplier_awarded_contract",
+      "label": "is awarded",
+      "domain": "supplier",
+      "range": "public_contract",
+      "symmetric": false,
+      "match": {
+        "op": "same_value",
+        "domain_property": "supplier_rfc",
+        "range_property": "contract_rfc"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "id": "r_primary_authority",
+      "label": "Mexican official sources are primary authority",
+      "checks": "r4: US sanctions and registry lists are used only as secondary cross-checks.",
+      "verify": [
+        "Confirm that primary claims rest on Mexican official sources; US lists appear only as secondary cross-checks."
+      ],
+      "predicate": {
+        "all": [
+          {
+            "op": "equals",
+            "property": "authority_tier",
+            "value": "primary_mexican_source"
+          }
+        ]
+      }
+    }
+  ],
+  "source_classes": [
+    {
+      "id": "compranet",
+      "label": "CompraNet / Compras Públicas (primary MX procurement)"
+    },
+    {
+      "id": "sat",
+      "label": "SAT RFC & lista 69-B (primary MX tax authority)"
+    },
+    {
+      "id": "registro_publico_comercio",
+      "label": "Registro Público de Comercio (primary MX commercial registry)"
+    },
+    {
+      "id": "ofac",
+      "label": "OFAC SDN list (secondary US cross-check)"
+    }
+  ],
+  "shacl_path": "02-ontology/shapes.ttl",
+  "dod_queries_path": "02-ontology/dod-queries.json",
+  "generated_by": {
+    "backend": "vultr",
+    "model": "qwen3.8-flash-next",
+    "at": "2026-09-27T07:39:21.010682+00:00"
+  },
+  "revisions": [
+    {
+      "n": 1,
+      "decision": "deny",
+      "reason": "Three defects against the approved PRD. (1) The five core profile fields (identity, registered address, founding date, tax-list status, sanction status) sit on a separate core_profile class, but dod2 measures completeness on the primary class supplier, which then has no DoD properties, so dod2 can never be met. Make them properties of supplier (dod: true) and drop core_profile; keep evidence per value. (2) dod1 counts public_contract entities; the PRD says >=50 SUPPLIERS linked to real public contracts, so count suppliers with at least one awarded contract. (3) Rule r_dod4_source_class_diversity's predicate (authority_tier = primary_mexican_source) does not express its label (>=4 distinct source classes); fix or drop it, since dod4 is already measured by its query. Keep everything else. [Delegated decision by the orchestrator agent under the user's criteria, coord/briefs/approval-delegation.md]",
+      "approver": "group:approvers",
+      "date": "2026-09-27"
+    },
+    {
+      "n": 2,
+      "decision": "deny",
+      "reason": "Classes, properties, the relation and the DoD queries are now right; keep them exactly. Only the rules are wrong: r_dod1_contract_linkage, r_dod3_no_unsourced_values and r_dod4_source_class_diversity compare a property with itself (always true), and r_dod2_core_profile_complete tests 'not listed and not sanctioned', which is not completeness. Remove these four rules; the DoD is measured by dod-queries. Keep r_primary_authority. [Delegated decision by the orchestrator agent under the user's criteria, coord/briefs/approval-delegation.md]",
+      "approver": "group:approvers",
+      "date": "2026-09-27"
+    }
+  ]
+}

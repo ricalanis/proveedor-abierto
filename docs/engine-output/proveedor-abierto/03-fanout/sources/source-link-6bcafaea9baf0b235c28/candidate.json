@@ -1,0 +1,30 @@
+{
+  "source_id": "source-link-6bcafaea9baf0b235c28",
+  "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls",
+  "title": "Por situación ante el RFC",
+  "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+  "provider": "sandbox_page_link",
+  "providers": [
+    "sandbox_page_link"
+  ],
+  "capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "The document host is linked by a trusted source but is not in the approved source policy.",
+  "fingerprint": "49f0a47b1c628fb7c1f415684eab64e99c5b75725dfe64c1ecd992552096cd41",
+  "link_provenance": {
+    "parent_source_id": "source-16d6e359e403",
+    "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+    "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+    "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls",
+    "link_text": "Por situación ante el RFC",
+    "link_index": 17,
+    "step_id": "step:3f635ff0b0784089bec3e58a818eb344"
+  },
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T11:06:21.568563+00:00"
+  },
+  "screenshot_key": "sha256:129ce6d541ae53adfc95840590978d14855f6aab43b42c7d9f4dadbfb5f3ccf5"
+}

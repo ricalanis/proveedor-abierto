@@ -1,0 +1,42 @@
+# generated_by: {"at": "2026-09-27T07:36:07.080217+00:00", "backend": "vultr", "model": "qwen3.8-flash-next"}
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix onto: <https://ontofill.dev/ontology/> .
+
+onto:supplierShape a sh:NodeShape ;
+    sh:targetClass onto:supplier
+    ; sh:property [ sh:path onto:rfc ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:supplier_name ; sh:datatype xsd:string ]
+    .
+
+onto:public_contractShape a sh:NodeShape ;
+    sh:targetClass onto:public_contract
+    ; sh:property [ sh:path onto:contract_id ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:contract_title ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:award_date ; sh:datatype xsd:date ]
+    ; sh:property [ sh:path onto:award_amount ; sh:datatype xsd:decimal ]
+    ; sh:property [ sh:path onto:contracting_agency ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:supplier_rfc ; sh:datatype xsd:string ]
+    .
+
+onto:core_profileShape a sh:NodeShape ;
+    sh:targetClass onto:core_profile
+    ; sh:property [ sh:path onto:profile_id ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:profile_supplier_rfc ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:identity_status ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:registered_address ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:founding_date ; sh:datatype xsd:date ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:tax_list_status ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:sanction_status ; sh:datatype xsd:string ; sh:minCount 1 ]
+    .
+
+onto:evidence_recordShape a sh:NodeShape ;
+    sh:targetClass onto:evidence_record
+    ; sh:property [ sh:path onto:evidence_id ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:evidence_profile_id ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:field_name ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:source_uri ; sh:datatype xsd:anyURI ]
+    ; sh:property [ sh:path onto:source_class ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:authority_tier ; sh:datatype xsd:string ]
+    .
+

@@ -1,0 +1,38 @@
+{
+  "source_id": "source-16d6e359e403",
+  "objective_id": "objective-28a3354be397",
+  "global_prd_path": "01-scope/prd.json",
+  "global_requirement_ids": [
+    "r1",
+    "r2",
+    "r3",
+    "r4"
+  ],
+  "target_fields": [
+    "supplier_rfc",
+    "supplier_name"
+  ],
+  "local_definition_of_done": [
+    {
+      "metric": "supplier_rfc values captured with evidence from SAT padron downloads",
+      "operator": ">=",
+      "target": 60
+    },
+    {
+      "metric": "Captured supplier_rfc/supplier_name values without evidence citation",
+      "operator": "<=",
+      "target": 0
+    },
+    {
+      "metric": "Distinct source classes used in this local scope",
+      "operator": ">=",
+      "target": 1
+    }
+  ],
+  "ontology_recommendations": [],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T11:24:25.106220+00:00"
+  }
+}

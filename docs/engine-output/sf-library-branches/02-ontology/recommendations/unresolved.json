@@ -1,0 +1,123 @@
+{
+  "schema_version": "1",
+  "ontology_path": "02-ontology/ontology.json",
+  "generated_by": {
+    "backend": "vultr",
+    "model": "qwen3.8-flash-next",
+    "at": "2026-09-27T18:33:45.732789+00:00"
+  },
+  "unresolved": [
+    {
+      "kind": "rule",
+      "id": "address_mismatch",
+      "reason": "rule `address_mismatch` is invalid: all rule predicate properties must belong to one class; this rule references classes `address_record`, `library_branch`. Allowed rule predicates: use nonempty `predicate.all` with `same_value` (`left_property`, `right_property`), `equals` (`property`, `value`), or `date_before` (`earlier_property`, `later_property`) terms. Every referenced property across one rule must belong to the same declared class. Split cross-class checks into separate class-local rules and use a declared typed relation to connect those classes; relation-path rule predicates are unsupported. Set aside after bounded P2 attempts; requires human review.",
+      "proposal": {
+        "id": "address_mismatch",
+        "label": "Branch address differs from secondary cross-check address",
+        "checks": [
+          "Compare the branch address against the data.sfgov.org cross-check address record."
+        ],
+        "verify": [
+          "Flag branches whose sfpl.org address does not match the secondary portal address for review."
+        ],
+        "predicate": {
+          "all": [
+            {
+              "op": "same_value",
+              "left_property": "address",
+              "right_property": "street_address"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "rule",
+      "id": "missing_address_evidence",
+      "reason": "rule `missing_address_evidence` is invalid: equals predicate literal does not match datatype uri. Allowed rule predicates: use nonempty `predicate.all` with `same_value` (`left_property`, `right_property`), `equals` (`property`, `value`), or `date_before` (`earlier_property`, `later_property`) terms. Every referenced property across one rule must belong to the same declared class. Split cross-class checks into separate class-local rules and use a declared typed relation to connect those classes; relation-path rule predicates are unsupported. Set aside after bounded P2 attempts; requires human review.",
+      "proposal": {
+        "id": "missing_address_evidence",
+        "label": "Branch address lacks a cited source",
+        "checks": [
+          "Check that the address value carries an evidence URL."
+        ],
+        "verify": [
+          "Flag branches whose address has no cited source URL."
+        ],
+        "predicate": {
+          "all": [
+            {
+              "op": "equals",
+              "property": "address_evidence_url",
+              "value": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "rule",
+      "id": "missing_hours_evidence",
+      "reason": "rule `missing_hours_evidence` is invalid: equals predicate literal does not match datatype uri. Allowed rule predicates: use nonempty `predicate.all` with `same_value` (`left_property`, `right_property`), `equals` (`property`, `value`), or `date_before` (`earlier_property`, `later_property`) terms. Every referenced property across one rule must belong to the same declared class. Split cross-class checks into separate class-local rules and use a declared typed relation to connect those classes; relation-path rule predicates are unsupported. Set aside after bounded P2 attempts; requires human review.",
+      "proposal": {
+        "id": "missing_hours_evidence",
+        "label": "Weekly opening hours lack a cited source",
+        "checks": [
+          "Check that the weekly hours value carries an evidence URL."
+        ],
+        "verify": [
+          "Flag branches whose weekly opening hours have no cited source URL."
+        ],
+        "predicate": {
+          "all": [
+            {
+              "op": "equals",
+              "property": "hours_evidence_url",
+              "value": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "rule",
+      "id": "missing_wifi_evidence",
+      "reason": "rule `missing_wifi_evidence` is invalid: equals predicate literal does not match datatype uri. Allowed rule predicates: use nonempty `predicate.all` with `same_value` (`left_property`, `right_property`), `equals` (`property`, `value`), or `date_before` (`earlier_property`, `later_property`) terms. Every referenced property across one rule must belong to the same declared class. Split cross-class checks into separate class-local rules and use a declared typed relation to connect those classes; relation-path rule predicates are unsupported. Set aside after bounded P2 attempts; requires human review.",
+      "proposal": {
+        "id": "missing_wifi_evidence",
+        "label": "Free Wi-Fi value lacks a cited source",
+        "checks": [
+          "Check that the Wi-Fi yes/no value carries an evidence URL."
+        ],
+        "verify": [
+          "Flag branches whose free Wi-Fi value has no cited source URL."
+        ],
+        "predicate": {
+          "all": [
+            {
+              "op": "equals",
+              "property": "wifi_evidence_url",
+              "value": ""
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "repairs": [],
+  "query_repairs": [
+    {
+      "criterion_id": "dod2",
+      "fields": [
+        "target",
+        "operator"
+      ],
+      "approved_values": {
+        "target": 1,
+        "operator": ">="
+      },
+      "reason": "Copied target and operator from the digest-verified approved PRD; min_ratio is retained only for the executable completeness aggregate."
+    }
+  ],
+  "unresolved_criteria": []
+}

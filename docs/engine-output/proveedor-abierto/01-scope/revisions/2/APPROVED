@@ -1,0 +1,7 @@
+{
+  "approver": "ricalanis (decision relayed by the orchestrator)",
+  "date": "2026-09-26",
+  "checkpoint": "prd",
+  "decision": "deny",
+  "reason": "Las fuentes oficiales mexicanas (CompraNet/compras públicas, SAT incl. lista 69-B, registros públicos) son PRIMARIAS y deben listar sus dominios; las listas de sanciones y registros de EE. UU. son SECUNDARIAS (verificación cruzada); quitar la entrada duplicada de verificación cruzada. Mantener las 4 metas del DoD tal como están."
+}

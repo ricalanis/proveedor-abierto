@@ -1,0 +1,30 @@
+{
+  "source_id": "source-link-d4c16b43fcde8340948a",
+  "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SectorActEco.xls",
+  "title": "Por sector de actividad económica",
+  "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+  "provider": "sandbox_page_link",
+  "providers": [
+    "sandbox_page_link"
+  ],
+  "capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "The document host is linked by a trusted source but is not in the approved source policy.",
+  "fingerprint": "98e07553223d781002e4a80faa9ce989c548863f11e312d1517c84f2a4caa8e8",
+  "link_provenance": {
+    "parent_source_id": "source-16d6e359e403",
+    "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+    "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+    "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SectorActEco.xls",
+    "link_text": "Por sector de actividad económica",
+    "link_index": 20,
+    "step_id": "step:1357652eb370496f9c5654106f2609be"
+  },
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T11:24:58.025651+00:00"
+  },
+  "screenshot_key": "sha256:129ce6d541ae53adfc95840590978d14855f6aab43b42c7d9f4dadbfb5f3ccf5"
+}

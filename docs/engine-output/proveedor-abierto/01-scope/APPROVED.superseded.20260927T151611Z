@@ -1,0 +1,1 @@
+{"approver": "group:approvers", "date": "2026-09-27", "checkpoint": "prd", "identity_source": "sso-group", "unverified_name": "Ricardo (delegated to orchestrator)", "verified": {"group": "approvers", "via": "NetBird SSO (x-netbird-groups)"}, "artifact_sha256": {"01-scope/prd.json": "ac38e8ae60552df971982dfb7895eb74fa452f4945e7b6e0a4a6aedbdb103787"}, "run_id": "run-7342d49e3706"}

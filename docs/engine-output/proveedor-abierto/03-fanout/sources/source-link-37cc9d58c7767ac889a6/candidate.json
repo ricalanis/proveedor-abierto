@@ -1,0 +1,30 @@
+{
+  "source_id": "source-link-37cc9d58c7767ac889a6",
+  "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorEntFed.xls",
+  "title": "Por entidad federativa",
+  "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+  "provider": "sandbox_page_link",
+  "providers": [
+    "sandbox_page_link"
+  ],
+  "capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "The document host is linked by a trusted source but is not in the approved source policy.",
+  "fingerprint": "bf5c2465b87cbee80889f4bac1d9cd2e418e071d0795e33013559e77a6bc65f8",
+  "link_provenance": {
+    "parent_source_id": "source-16d6e359e403",
+    "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+    "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+    "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorEntFed.xls",
+    "link_text": "Por entidad federativa",
+    "link_index": 18,
+    "step_id": "step:3f635ff0b0784089bec3e58a818eb344"
+  },
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T11:06:21.568563+00:00"
+  },
+  "screenshot_key": "sha256:129ce6d541ae53adfc95840590978d14855f6aab43b42c7d9f4dadbfb5f3ccf5"
+}

@@ -1,0 +1,111 @@
+{
+  "version": "1.0.0",
+  "brief_path": "brief.md",
+  "personas": [
+    {
+      "id": "p1",
+      "description": "Public-integrity journalist investigating Mexican government contract awards."
+    },
+    {
+      "id": "p2",
+      "description": "Compliance analyst screening suppliers for procurement due diligence."
+    }
+  ],
+  "jobs_to_be_done": [
+    {
+      "id": "j1",
+      "persona_id": "p1",
+      "description": "Identify who receives public money via Mexican government contracts."
+    },
+    {
+      "id": "j2",
+      "persona_id": "p2",
+      "description": "Assess whether a recipient is a legitimate, registered operating company."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "job_id": "j1",
+      "description": "Ingest public procurement award records (e.g., CompraNet) with contractor name, RFC, amount, and contracting entity."
+    },
+    {
+      "id": "r2",
+      "job_id": "j1",
+      "description": "Normalize and deduplicate contractor identities across sources into a single canonical entity record."
+    },
+    {
+      "id": "r3",
+      "job_id": "j2",
+      "description": "Attach authority-sourced legitimacy signals: RFC/SAT registration, SAT 69-B EFOS list status, and registry data."
+    },
+    {
+      "id": "r4",
+      "job_id": "j2",
+      "description": "Render a transparent legitimacy scorecard per entity with per-signal source citation and retrieval timestamp."
+    }
+  ],
+  "constraints": [
+    "Public read-only sources only; no authenticated scraping or paywalled data.",
+    "Mexican federal data-protection law (LFPDPPP) applies; process only publicly disclosed data.",
+    "Every claim must carry source URL, publisher, and retrieval timestamp.",
+    "No automated publication; human review required before any output is released.",
+    "Unknown or unverifiable source domains are quarantined for review, never used as evidence."
+  ],
+  "authority_policy": {
+    "jurisdiction": "Mexico (federal), with secondary cross-checks against United States public sanctions and corporate-registry data.",
+    "trusted_publishers": [
+      {
+        "kind": "official_procurement",
+        "domains": [
+          "gob.mx",
+          "compranet.gob.mx",
+          "datos.gob.mx"
+        ],
+        "rationale": "Primary source of record for federal contract awards and open procurement data."
+      },
+      {
+        "kind": "tax_and_sanctions_registry",
+        "domains": [
+          "sat.gob.mx",
+          "funcionpublica.sfp.gob.mx",
+          "treasury.gov",
+          "sanctionssearch.ofac.treas.gov"
+        ],
+        "rationale": "Authoritative for RFC validity, EFOS/DEOS lists, and international sanctions screening."
+      }
+    ],
+    "unknown_source_action": "review"
+  },
+  "non_goals": [
+    "Making or publishing legal accusations of wrongdoing against named parties.",
+    "Building paid, credentialed, or real-time data feeds.",
+    "Covering state or municipal procurement in the initial release.",
+    "Automated outreach, publication, or notification to third parties."
+  ],
+  "definition_of_done": [
+    {
+      "id": "d1",
+      "metric": "entities_with_canonical_record",
+      "operator": ">=",
+      "target": 1000
+    },
+    {
+      "id": "d2",
+      "metric": "percent_records_with_authoritative_source",
+      "operator": ">=",
+      "target": 95
+    },
+    {
+      "id": "d3",
+      "metric": "unresolved_unknown_source_quarantines",
+      "operator": "<=",
+      "target": 0
+    }
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "qwen3.8-flash-next",
+    "at": "2026-09-26T23:18:21.522098+00:00"
+  }
+}

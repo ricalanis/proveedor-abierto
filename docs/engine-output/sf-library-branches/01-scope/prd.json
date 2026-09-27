@@ -1,0 +1,141 @@
+{
+  "version": "1",
+  "brief_path": "brief.md",
+  "personas": [
+    {
+      "id": "p1",
+      "description": "SF resident or visitor seeking a library branch with free Wi-Fi and open hours."
+    },
+    {
+      "id": "p2",
+      "description": "Researcher compiling a verified dataset of SFPL branches with sourced values."
+    }
+  ],
+  "jobs_to_be_done": [
+    {
+      "id": "j1",
+      "persona_id": "p1",
+      "description": "Find an SFPL branch near me that is open now and offers free Wi-Fi."
+    },
+    {
+      "id": "j2",
+      "persona_id": "p2",
+      "description": "Compile every SFPL branch with address, weekly hours, and Wi-Fi status, each value evidenced."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "job_id": "j2",
+      "description": "List every SFPL branch with address, weekly opening hours, and free Wi-Fi yes/no, each value with a cited source."
+    },
+    {
+      "id": "r2",
+      "job_id": "j2",
+      "description": "Treat sfpl.org as the primary publisher for branches, hours, and Wi-Fi; its values need no second source."
+    },
+    {
+      "id": "r3",
+      "job_id": "j2",
+      "description": "Cross-check branch addresses against data.sfgov.org as a secondary publisher; flag mismatches for review."
+    },
+    {
+      "id": "r4",
+      "job_id": "j2",
+      "description": "Use only public, read-only sources; jurisdiction San Francisco, California, USA; completion when every branch has all three values evidenced."
+    }
+  ],
+  "constraints": [
+    "Public, read-only sources only; jurisdiction San Francisco, California, USA.",
+    "sfpl.org is primary for branches, hours, and Wi-Fi; its values need no second source.",
+    "data.sfgov.org is a secondary cross-check for branch addresses only.",
+    "Done means every branch listed with address, weekly hours, and Wi-Fi yes/no, each value with evidence.",
+    "Run budget USD 5.0; elapsed run time unknown until execution, so targets must be feasibility-checked."
+  ],
+  "non_goals": [
+    "No paid, private, or write-access sources.",
+    "No second source required for sfpl.org-published values.",
+    "No coverage beyond San Francisco Public Library branches.",
+    "No real-time occupancy or service-quality data."
+  ],
+  "authority_policy": {
+    "jurisdiction": "San Francisco, California, USA",
+    "trusted_publishers": [
+      {
+        "kind": "San Francisco Public Library official website",
+        "tier": "primary",
+        "jurisdiction": "San Francisco, California, USA",
+        "domains": [
+          "sfpl.org"
+        ],
+        "rationale": "Brief names sfpl.org as primary publisher for branches, hours, and Wi-Fi."
+      },
+      {
+        "kind": "San Francisco open data portal (branch addresses cross-check)",
+        "tier": "secondary",
+        "jurisdiction": "San Francisco, California, USA",
+        "domains": [
+          "data.sfgov.org"
+        ],
+        "rationale": "Brief names data.sfgov.org as secondary cross-check for branch addresses only."
+      }
+    ],
+    "unknown_source_action": "review"
+  },
+  "definition_of_done": [
+    {
+      "id": "dod1",
+      "metric": "Share of SFPL branches listed with address, weekly opening hours, and free Wi-Fi yes/no",
+      "operator": ">=",
+      "target": 1,
+      "min_ratio": 1,
+      "basis": "proposed",
+      "rationale": "The stated numeric threshold lacks a matching brief or human quote.",
+      "feasibility": "At $5.00, feasibility and elapsed run time need validation after source discovery."
+    },
+    {
+      "id": "dod2",
+      "metric": "Share of listed values (address, hours, Wi-Fi) with a cited source",
+      "operator": ">=",
+      "target": 1,
+      "min_ratio": 1,
+      "basis": "proposed",
+      "rationale": "The stated numeric threshold lacks a matching brief or human quote.",
+      "feasibility": "At $5.00, feasibility and elapsed run time need validation after source discovery."
+    },
+    {
+      "id": "dod3",
+      "metric": "Share of branch addresses cross-checked against data.sfgov.org",
+      "operator": ">=",
+      "target": 1,
+      "min_ratio": 1,
+      "basis": "proposed",
+      "rationale": "The stated numeric threshold lacks a matching brief or human quote.",
+      "feasibility": "At $5.00, feasibility and elapsed run time need validation after source discovery."
+    },
+    {
+      "id": "dod4",
+      "metric": "Share of values sourced from non-public or non-read-only sources",
+      "operator": "<=",
+      "target": 0,
+      "basis": "proposed",
+      "rationale": "The stated numeric threshold lacks a matching brief or human quote.",
+      "feasibility": "At $5.00, feasibility and elapsed run time need validation after source discovery."
+    },
+    {
+      "id": "dod5",
+      "metric": "Number of branches listed that are missing from the final output",
+      "operator": "<=",
+      "target": 0,
+      "basis": "proposed",
+      "rationale": "The stated numeric threshold lacks a matching brief or human quote.",
+      "feasibility": "At $5.00, feasibility and elapsed run time need validation after source discovery."
+    }
+  ],
+  "revisions": [],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3",
+    "at": "2026-09-27T17:05:52.159717+00:00"
+  }
+}

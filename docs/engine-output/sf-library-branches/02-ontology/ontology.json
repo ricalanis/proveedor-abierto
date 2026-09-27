@@ -1,0 +1,422 @@
+{
+  "version": "1",
+  "prd_path": "01-scope/prd.json",
+  "factors": [
+    {
+      "id": "branch_coverage",
+      "label": "Branch coverage completeness",
+      "description": "Whether every SFPL branch is listed with all required values, per the completion requirement.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Completion requires every branch listed with all three values evidenced.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Use only public, read-only sources; jurisdiction San Francisco, California, USA; completion when every branch has all three values evidenced.",
+            "record_id": "requirement:r4",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "value_evidence",
+      "label": "Per-value evidence citation",
+      "description": "Whether each address, weekly hours, and Wi-Fi value carries a cited source.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Each value must have a cited source.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "List every SFPL branch with address, weekly opening hours, and free Wi-Fi yes/no, each value with a cited source.",
+            "record_id": "requirement:r1",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "publisher_authority",
+      "label": "Publisher authority tiering",
+      "description": "Whether values come from the primary publisher (sfpl.org) or need secondary cross-check (data.sfgov.org addresses).",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "sfpl.org is primary; its values need no second source.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Treat sfpl.org as the primary publisher for branches, hours, and Wi-Fi; its values need no second source.",
+            "record_id": "requirement:r2",
+            "type": "case_file"
+          }
+        },
+        {
+          "description": "Addresses cross-checked against data.sfgov.org.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Cross-check branch addresses against data.sfgov.org as a secondary publisher; flag mismatches for review.",
+            "record_id": "requirement:r3",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "source_legality",
+      "label": "Source legality and jurisdiction",
+      "description": "Whether sources are public and read-only within the San Francisco jurisdiction.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Only public, read-only sources; SF jurisdiction.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Use only public, read-only sources; jurisdiction San Francisco, California, USA; completion when every branch has all three values evidenced.",
+            "record_id": "requirement:r4",
+            "type": "case_file"
+          }
+        }
+      ]
+    },
+    {
+      "id": "user_finding_task",
+      "label": "Nearby open branch with Wi-Fi",
+      "description": "Whether the output serves a user finding a nearby branch open now with free Wi-Fi.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Job: find a nearby open branch with free Wi-Fi.",
+          "source": {
+            "path": "01-scope/prd.json",
+            "quote": "Find an SFPL branch near me that is open now and offers free Wi-Fi.",
+            "record_id": "job:j1",
+            "type": "case_file"
+          }
+        }
+      ]
+    }
+  ],
+  "taxonomies": [
+    {
+      "factor_id": "branch_coverage",
+      "root_label": "Branch coverage completeness",
+      "children": [
+        {
+          "id": "branch_entity_completeness",
+          "label": "All library_branch entities listed",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "required_property_completeness",
+          "label": "All four required properties present per branch",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "missing_branch_gap",
+          "label": "Branches missing from final output",
+          "level": 1,
+          "critic_label": "Redundant"
+        }
+      ],
+      "soundness": 0.6666666666666666,
+      "coverage": null
+    },
+    {
+      "factor_id": "value_evidence",
+      "root_label": "Per-value evidence citation",
+      "children": [
+        {
+          "id": "address_evidence",
+          "label": "Address value carries cited source",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        },
+        {
+          "id": "hours_evidence",
+          "label": "Weekly opening hours value carries cited source",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        },
+        {
+          "id": "wifi_evidence",
+          "label": "Free Wi-Fi yes/no value carries cited source",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        },
+        {
+          "id": "evidence_url_present",
+          "label": "Evidence URL attached to each value",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "publisher_authority",
+      "root_label": "Publisher authority tiering",
+      "children": [
+        {
+          "id": "primary_publisher_use",
+          "label": "Values sourced from sfpl.org primary publisher",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "secondary_crosscheck",
+          "label": "Addresses cross-checked against data.sfgov.org",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "mismatch_flagging",
+          "label": "Address mismatches flagged for review",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "source_legality",
+      "root_label": "Source legality and jurisdiction",
+      "children": [
+        {
+          "id": "public_readonly_sources",
+          "label": "Sources are public and read-only",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "jurisdiction_scope",
+          "label": "Sources within San Francisco, California, USA jurisdiction",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "unknown_source_review",
+          "label": "Unknown sources routed to review",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "user_finding_task",
+      "root_label": "Nearby open branch with Wi-Fi",
+      "children": [
+        {
+          "id": "open_now_status",
+          "label": "Branch open-now status derivable",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "free_wifi_status",
+          "label": "Free Wi-Fi availability derivable",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "nearby_relevance",
+          "label": "Proximity/near-me relevance supported",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    }
+  ],
+  "primary_class": "library_branch",
+  "classes": [
+    {
+      "id": "library_branch",
+      "label": "Library Branch",
+      "label_plural": "Library Branches",
+      "description": "A San Francisco Public Library branch with address, weekly opening hours, and free Wi-Fi status, each value carrying its own evidence URL.",
+      "title_property": "branch_name",
+      "identifier_property": "branch_id",
+      "aligned_to": "https://schema.org/Library"
+    },
+    {
+      "id": "address_record",
+      "label": "Address Record",
+      "label_plural": "Address Records",
+      "description": "A branch street address as published by a source (sfpl.org primary, data.sfgov.org secondary cross-check).",
+      "title_property": "street_address",
+      "identifier_property": "address_id",
+      "aligned_to": "https://schema.org/PostalAddress"
+    }
+  ],
+  "properties": [
+    {
+      "id": "branch_id",
+      "label": "Branch ID",
+      "domain": "library_branch",
+      "datatype": "string",
+      "dod": false,
+      "order": 0,
+      "description": "Stable identifier for the SFPL branch.",
+      "aligned_to": null
+    },
+    {
+      "id": "branch_name",
+      "label": "Branch Name",
+      "domain": "library_branch",
+      "datatype": "string",
+      "dod": true,
+      "order": 1,
+      "description": "Name of the SFPL branch.",
+      "aligned_to": "https://schema.org/name"
+    },
+    {
+      "id": "address",
+      "label": "Address",
+      "domain": "library_branch",
+      "datatype": "string",
+      "dod": true,
+      "order": 2,
+      "description": "Street address of the branch as published by sfpl.org.",
+      "aligned_to": "https://schema.org/streetAddress"
+    },
+    {
+      "id": "address_evidence_url",
+      "label": "Address Evidence URL",
+      "domain": "library_branch",
+      "datatype": "uri",
+      "dod": false,
+      "order": 3,
+      "description": "Source URL citing the branch address value.",
+      "aligned_to": null
+    },
+    {
+      "id": "weekly_opening_hours",
+      "label": "Weekly Opening Hours",
+      "domain": "library_branch",
+      "datatype": "string",
+      "dod": true,
+      "order": 4,
+      "description": "Weekly opening hours text for the branch.",
+      "aligned_to": "https://schema.org/openingHours"
+    },
+    {
+      "id": "hours_evidence_url",
+      "label": "Hours Evidence URL",
+      "domain": "library_branch",
+      "datatype": "uri",
+      "dod": false,
+      "order": 5,
+      "description": "Source URL citing the weekly opening hours value.",
+      "aligned_to": null
+    },
+    {
+      "id": "has_free_wifi",
+      "label": "Has Free Wi-Fi",
+      "domain": "library_branch",
+      "datatype": "boolean",
+      "dod": true,
+      "order": 6,
+      "description": "Whether the branch offers free public Wi-Fi.",
+      "aligned_to": null
+    },
+    {
+      "id": "wifi_evidence_url",
+      "label": "Wi-Fi Evidence URL",
+      "domain": "library_branch",
+      "datatype": "uri",
+      "dod": false,
+      "order": 7,
+      "description": "Source URL citing the free Wi-Fi value.",
+      "aligned_to": null
+    },
+    {
+      "id": "address_id",
+      "label": "Address Record ID",
+      "domain": "address_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 0,
+      "description": "Stable identifier for the address record.",
+      "aligned_to": null
+    },
+    {
+      "id": "street_address",
+      "label": "Street Address",
+      "domain": "address_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 1,
+      "description": "Street address value as published by the source.",
+      "aligned_to": "https://schema.org/streetAddress"
+    },
+    {
+      "id": "publisher",
+      "label": "Publisher",
+      "domain": "address_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 2,
+      "description": "Publishing source of the address record (sfpl.org or data.sfgov.org).",
+      "aligned_to": null
+    },
+    {
+      "id": "record_evidence_url",
+      "label": "Record Evidence URL",
+      "domain": "address_record",
+      "datatype": "uri",
+      "dod": false,
+      "order": 3,
+      "description": "Source URL for the address record.",
+      "aligned_to": null
+    }
+  ],
+  "relations": [
+    {
+      "id": "address_cross_check",
+      "label": "address cross-check",
+      "domain": "library_branch",
+      "range": "address_record",
+      "symmetric": false,
+      "match": {
+        "op": "same_value",
+        "domain_property": "address",
+        "range_property": "street_address"
+      }
+    }
+  ],
+  "rules": [],
+  "source_classes": [
+    {
+      "id": "sfpl_branches",
+      "label": "SFPL Branch Pages (sfpl.org)"
+    },
+    {
+      "id": "sfgov_addresses",
+      "label": "SF Open Data Branch Addresses (data.sfgov.org)"
+    }
+  ],
+  "shacl_path": "02-ontology/shapes.ttl",
+  "dod_queries_path": "02-ontology/dod-queries.json",
+  "generated_by": {
+    "backend": "vultr",
+    "model": "qwen3.8-flash-next",
+    "at": "2026-09-27T18:33:45.732789+00:00"
+  },
+  "revisions": [
+    {
+      "n": 1,
+      "decision": "deny",
+      "reason": "Keep the class library_branch and its four DoD properties (branch_name, address, weekly_opening_hours, has_free_wifi) exactly. Fix the DoD compilation: (1) dod1 = entities_meeting_completeness over ALL library_branch entities, min_ratio 1, with no relation; (2) remove the sourced_from relation and the source_record class (each value already carries its own evidence URL); (3) compile dod2 as count_values_without_evidence <= 0; (4) dod4 and dod5 must not count branches: drop them from the compiled DoD rather than compiling 'count of branches <= 0', which is met only with zero branches. [Delegated decision under the user's criteria]",
+      "approver": "group:approvers",
+      "date": "2026-09-27"
+    }
+  ]
+}

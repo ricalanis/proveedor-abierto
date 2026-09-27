@@ -1,0 +1,25 @@
+# generated_by: {"at": "2026-09-27T18:33:45.732789+00:00", "backend": "vultr", "model": "qwen3.8-flash-next"}
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix onto: <https://ontofill.dev/ontology/> .
+
+onto:library_branchShape a sh:NodeShape ;
+    sh:targetClass onto:library_branch
+    ; sh:property [ sh:path onto:branch_id ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:branch_name ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:address ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:address_evidence_url ; sh:datatype xsd:anyURI ]
+    ; sh:property [ sh:path onto:weekly_opening_hours ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:hours_evidence_url ; sh:datatype xsd:anyURI ]
+    ; sh:property [ sh:path onto:has_free_wifi ; sh:datatype xsd:boolean ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:wifi_evidence_url ; sh:datatype xsd:anyURI ]
+    .
+
+onto:address_recordShape a sh:NodeShape ;
+    sh:targetClass onto:address_record
+    ; sh:property [ sh:path onto:address_id ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:street_address ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:publisher ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:record_evidence_url ; sh:datatype xsd:anyURI ]
+    .
+

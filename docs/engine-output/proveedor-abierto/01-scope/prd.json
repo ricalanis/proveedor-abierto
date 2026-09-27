@@ -1,0 +1,211 @@
+{
+  "version": "1",
+  "brief_path": "brief.md",
+  "personas": [
+    {
+      "id": "p1",
+      "description": "Investigative journalist examining who receives public money in Mexico via government contracts and whether they are legitimate companies."
+    },
+    {
+      "id": "p2",
+      "description": "Civic transparency researcher auditing supplier legitimacy, tax-list status, and sanction status."
+    }
+  ],
+  "jobs_to_be_done": [
+    {
+      "id": "j1",
+      "persona_id": "p1",
+      "description": "Identify suppliers receiving public money through Mexican government contracts and verify each is a legitimate company."
+    },
+    {
+      "id": "j2",
+      "persona_id": "p2",
+      "description": "Build a complete core profile per supplier (identity, address, founding date, tax-list status, sanction status) with evidence for every value."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "job_id": "j1",
+      "description": "Link at least 50 suppliers to real public contracts from Mexican official procurement sources (primary)."
+    },
+    {
+      "id": "r2",
+      "job_id": "j2",
+      "description": "At least 80% of linked suppliers must have a complete core profile covering identity, address, founding date, tax-list status, and sanction status."
+    },
+    {
+      "id": "r3",
+      "job_id": "j2",
+      "description": "Every recorded value must cite evidence; no unsourced values. Use at least 4 distinct source classes."
+    },
+    {
+      "id": "r4",
+      "job_id": "j2",
+      "description": "Use US sanctions and registry lists only as secondary cross-checks; Mexican official sources are primary authority."
+    }
+  ],
+  "constraints": [
+    "Public read-only sources only; no paywalled, private, or leaked data.",
+    "Run budget is USD 15.0; scope targets to fit this budget since elapsed run time is unknown until execution.",
+    "Mexican official sources (CompraNet/compras publicas, SAT incl. lista 69-B, public registries) are primary; US sanctions/registry lists are secondary cross-checks only.",
+    "Every recorded value must cite evidence; no unsourced values.",
+    "Proposed domains are hypotheses for human review, never captured evidence."
+  ],
+  "non_goals": [
+    "No investigation of suppliers outside Mexican public contracts.",
+    "No US sources as primary authority.",
+    "No private, leaked, or paywalled data.",
+    "No automated trust for secondary or review-tier publishers.",
+    "No profiling beyond the five core profile fields."
+  ],
+  "authority_policy": {
+    "jurisdiction": "Mexico",
+    "trusted_publishers": [
+      {
+        "kind": "Mexican public procurement records (CompraNet/compras publicas)",
+        "tier": "primary",
+        "jurisdiction": "Mexico",
+        "domains": [
+          "datos.gob.mx"
+        ],
+        "rationale": "Human revision 2 designates Mexican procurement records as primary; comprar.gob.mx hosts CompraNet contract data."
+      },
+      {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "tier": "primary",
+        "jurisdiction": "Mexico",
+        "domains": [
+          "sat.gob.mx"
+        ],
+        "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+      },
+      {
+        "kind": "Mexican public commercial registries (registros publicos)",
+        "tier": "primary",
+        "jurisdiction": "Mexico",
+        "domains": [
+          "economia.gob.mx"
+        ],
+        "rationale": "Human revision 2 designates public registries as primary; Registro Publico de Comercio sits under Secretaria de Economia."
+      },
+      {
+        "kind": "US sanctions lists (OFAC) cross-check",
+        "tier": "secondary",
+        "jurisdiction": "United States",
+        "domains": [
+          "treasury.gov"
+        ],
+        "rationale": "Human revisions 1-3 keep US sanctions lists as secondary cross-checks only."
+      },
+      {
+        "kind": "US company registry lists cross-check",
+        "tier": "secondary",
+        "jurisdiction": "United States",
+        "domains": [
+          "sec.gov"
+        ],
+        "rationale": "Human revisions keep US registry lists as secondary cross-checks only."
+      },
+      {
+        "kind": "ComprasMX / Buen Gobierno federal public-procurement publisher",
+        "tier": "primary",
+        "jurisdiction": "Mexico",
+        "domains": [
+          "comprasmx.buengobierno.gob.mx",
+          "historico-compranet.buengobierno.gob.mx"
+        ],
+        "rationale": "Human revision 5 names ComprasMX/Buen Gobierno as the federal procurement publisher for contract awards (supplier, RFC, agency, amount, date), replacing dead compranet.hacienda.gob.mx; historic CompraNet retained."
+      }
+    ],
+    "unknown_source_action": "review"
+  },
+  "definition_of_done": [
+    {
+      "id": "dod1",
+      "metric": "Suppliers linked to real public contracts from Mexican official procurement sources",
+      "operator": ">=",
+      "target": 50,
+      "basis": "human",
+      "basis_quote": ">=50 suppliers linked to real public contracts",
+      "rationale": "Human revision 1 sets the supplier-linkage target.",
+      "feasibility": "Achievable within USD 15 budget using public procurement records; elapsed run time unknown, so batch queries."
+    },
+    {
+      "id": "dod2",
+      "metric": "Ratio of linked suppliers with a complete core profile (identity, address, founding date, tax-list status, sanction status)",
+      "operator": ">=",
+      "target": 0.8,
+      "min_ratio": 0.8,
+      "basis": "human",
+      "basis_quote": ">=80% of them with a complete core profile",
+      "rationale": "Human revision 3 grounds the 80% ratio; target and min_ratio both express 0.8 consistently.",
+      "feasibility": "Feasible within USD 15 using primary Mexican sources plus US secondary cross-checks; run time unknown until execution."
+    },
+    {
+      "id": "dod3",
+      "metric": "Recorded values without evidence",
+      "operator": "<=",
+      "target": 0,
+      "basis": "human",
+      "basis_quote": "0 values without evidence",
+      "rationale": "Human revision 1 requires every value to cite evidence.",
+      "feasibility": "Enforced by validation; no extra budget impact."
+    },
+    {
+      "id": "dod4",
+      "metric": "Distinct source classes used",
+      "operator": ">=",
+      "target": 4,
+      "basis": "human",
+      "basis_quote": ">=4 source classes",
+      "rationale": "Human revision 1 requires at least four source classes.",
+      "feasibility": "Covered by primary Mexican sources plus US secondary cross-checks within budget."
+    }
+  ],
+  "revisions": [
+    {
+      "n": 1,
+      "decision": "deny",
+      "reason": "DoD must be the case's: >=50 suppliers linked to real public contracts; >=80% of them with a complete core profile (identity, address, founding date, tax-list status, sanction status); 0 values without evidence; >=4 source classes. Keep US sanctions/registry lists as secondary cross-checks.",
+      "approver": "ricalanis (decision relayed by the orchestrator)",
+      "date": "2026-09-26"
+    },
+    {
+      "n": 2,
+      "decision": "deny",
+      "reason": "Las fuentes oficiales mexicanas (CompraNet/compras públicas, SAT incl. lista 69-B, registros públicos) son PRIMARIAS y deben listar sus dominios; las listas de sanciones y registros de EE. UU. son SECUNDARIAS (verificación cruzada); quitar la entrada duplicada de verificación cruzada. Mantener las 4 metas del DoD tal como están.",
+      "approver": "ricalanis (decision relayed by the orchestrator)",
+      "date": "2026-09-26"
+    },
+    {
+      "n": 3,
+      "decision": "deny",
+      "reason": "The >=80% complete-profile target comes from my reason (basis human, quote '>=80% of them with a complete core profile'). Mexican official publishers (CompraNet/compras públicas, SAT incl. 69-B, public registries) are tier PRIMARY with their domains; US sanctions/registry lists are SECONDARY. [Delegated decision by the orchestrator agent under the user's criteria, coord/briefs/approval-delegation.md]",
+      "approver": "group:approvers",
+      "date": "2026-09-27"
+    },
+    {
+      "n": 4,
+      "decision": "deny",
+      "reason": "Keep dod1-dod4, the tiers and the secondary US publishers exactly as they are. One defect: the primary procurement publisher domain comprar.gob.mx does not exist (no DNS record), so no CompraNet/compras publicas source could ever match it. Replace it with the actual, resolvable domain(s) of Mexico's federal public procurement publisher. [Delegated decision by the orchestrator agent under the user's criteria, coord/briefs/approval-delegation.md]",
+      "approver": "group:approvers",
+      "date": "2026-09-27"
+    },
+    {
+      "n": 5,
+      "decision": "deny",
+      "reason": "The federal public-procurement publisher is now ComprasMX / Buen Gobierno: comprasmx.buengobierno.gob.mx (open data at /datos-abiertos) together with the historic CompraNet at historico-compranet.buengobierno.gob.mx; tier PRIMARY for contract awards (supplier name, RFC, contracting agency, amount, date). Replace the dead compranet.hacienda.gob.mx (no DNS). Keep dod1-dod4, the other publishers and tiers as they are. [User decision relayed by the orchestrator, Sun 08:10]",
+      "approver": "group:approvers",
+      "date": "2026-09-27"
+    }
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3",
+    "at": "2026-09-27T15:45:07.918983+00:00"
+  },
+  "open_issues": [
+    "Material defect in authority_policy.trusted_publishers[0]: the rationale states \"comprar.gob.mx hosts CompraNet contract data,\" but human revision 4 explicitly identified comprar.gob.mx as a dead domain (no DNS record), and human revision 5 replaced it with comprasmx.buengobierno.gob.mx / historico-compranet.buengobierno.gob.mx (already present as trusted_publishers[5]). The listed domain datos.gob.mx is the Mexican open-data portal, not the federal procurement publisher, so the rationale is both factually wrong (references a non-existent domain) and inconsistent with the domain actually listed. This entry is effectively a stale duplicate of the procurement tier already correctly captured by trusted_publishers[5] (ComprasMX/Buen Gobierno, tier primary, per revision 5). Fix: either remove trusted_publishers[0] entirely (it is the duplicate cross-check/procurement entry that revision 2 ordered removed and that revision 5 superseded), or repurpose it solely as the datos.gob.mx open-data channel with a corrected rationale that names datos.gob.mx and does not reference comprar.gob.mx. All DoD criteria (dod1-dod4) are correctly grounded with basis \"human\" and matching basis_quotes from revisions 1 and 3; feasibility notes appropriately flag the USD 15 budget and unknown elapsed time; per-entity completeness (identity, address, founding date, tax-list status, sanction status) is covered via j2/dod2; US sanctions/registry are correctly tiered secondary; and the prior open_issue on dod2 is resolved in the current artifact."
+  ]
+}

@@ -1,0 +1,623 @@
+{
+  "version": "1",
+  "prd_path": "01-scope/prd.json",
+  "factors": [
+    {
+      "id": "contract_linkage",
+      "label": "Supplier-contract linkage",
+      "description": "Whether a supplier can be linked to a real public contract in Mexican official procurement records (CompraNet/compras publicas).",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "identity_legitimacy",
+      "label": "Corporate identity legitimacy",
+      "description": "Whether the supplier is a legitimate registered company, verified via Mexican public commercial registries (identity, founding date).",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "tax_list_status",
+      "label": "Tax-list status (SAT lista 69-B)",
+      "description": "The supplier's status on the Mexican tax authority's lists, including lista 69-B, as a primary Mexican source.",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "sanction_status",
+      "label": "Sanction status",
+      "description": "Whether the supplier appears on sanctions lists, checked via US sanctions lists (OFAC) as secondary cross-checks only.",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "address_verification",
+      "label": "Address verification",
+      "description": "Completeness and verifiability of the supplier's registered address as one of the five core profile fields.",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "source_authority_tier",
+      "label": "Source authority tier",
+      "description": "Distinction between primary Mexican official sources and secondary US cross-check sources; Mexican sources are the primary authority.",
+      "kind": "conceptual",
+      "evidence": []
+    },
+    {
+      "id": "evidence_citation",
+      "label": "Evidence citation completeness",
+      "description": "Every recorded value must cite evidence; no unsourced values are permitted, and at least 4 distinct source classes must be used.",
+      "kind": "grounded",
+      "evidence": []
+    },
+    {
+      "id": "profile_completeness",
+      "label": "Core profile completeness",
+      "description": "Whether a linked supplier has a complete core profile across all five fields (identity, address, founding date, tax-list status, sanction status), targeted at >=80% of linked suppliers.",
+      "kind": "grounded",
+      "evidence": []
+    }
+  ],
+  "taxonomies": [
+    {
+      "factor_id": "contract_linkage",
+      "root_label": "Supplier-contract linkage",
+      "children": [
+        {
+          "id": "compranet_contract_match",
+          "label": "Matched to a CompraNet/compras publicas contract record",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "contract_award_details",
+          "label": "Contract award details present (amount, date, agency)",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        },
+        {
+          "id": "unlinked_supplier",
+          "label": "No contract linkage found in official records",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "identity_legitimacy",
+      "root_label": "Corporate identity legitimacy",
+      "children": [
+        {
+          "id": "registry_verified",
+          "label": "Verified in Mexican public commercial registry (Registro Publico de Comercio)",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "founding_date_confirmed",
+          "label": "Founding date confirmed from registry",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        },
+        {
+          "id": "identity_unverified",
+          "label": "Identity not verifiable in public registries",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "tax_list_status",
+      "root_label": "Tax-list status (SAT lista 69-B)",
+      "children": [
+        {
+          "id": "sat_active",
+          "label": "Active taxpayer per SAT",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "sat_69b_listed",
+          "label": "Listed on SAT lista 69-B (non-compliant)",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "sat_status_unknown",
+          "label": "SAT status not determinable",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "sanction_status",
+      "root_label": "Sanction status",
+      "children": [
+        {
+          "id": "ofac_clear",
+          "label": "No OFAC match (secondary cross-check)",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "ofac_match",
+          "label": "OFAC match found (secondary cross-check)",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "sanction_check_unresolved",
+          "label": "Sanction check inconclusive",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "address_verification",
+      "root_label": "Address verification",
+      "children": [
+        {
+          "id": "address_complete",
+          "label": "Registered address complete and verifiable",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "address_partial",
+          "label": "Address partially recorded or unverifiable",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "address_missing",
+          "label": "Address missing",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "source_authority_tier",
+      "root_label": "Source authority tier",
+      "children": [
+        {
+          "id": "primary_mexican_source",
+          "label": "Primary Mexican official source (CompraNet, SAT, registries)",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "secondary_us_crosscheck",
+          "label": "Secondary US cross-check source (OFAC, SEC)",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "review_tier_source",
+          "label": "Review-tier / unclassified source",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "evidence_citation",
+      "root_label": "Evidence citation completeness",
+      "children": [
+        {
+          "id": "value_cited",
+          "label": "Value cites evidence",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "value_uncited",
+          "label": "Value lacks evidence citation",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "source_class_diversity",
+          "label": "Distinct source classes used (target >=4)",
+          "level": 1,
+          "critic_label": "Good-Overlapping"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    },
+    {
+      "factor_id": "profile_completeness",
+      "root_label": "Core profile completeness",
+      "children": [
+        {
+          "id": "profile_complete",
+          "label": "All five core fields present with evidence",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "profile_partial",
+          "label": "Some core fields missing or uncited",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        },
+        {
+          "id": "profile_empty",
+          "label": "No core profile fields recorded",
+          "level": 1,
+          "critic_label": "Good-Exclusive"
+        }
+      ],
+      "soundness": 1.0,
+      "coverage": null
+    }
+  ],
+  "primary_class": "supplier",
+  "classes": [
+    {
+      "id": "supplier",
+      "label": "Supplier",
+      "label_plural": "Suppliers",
+      "description": "A company that receives public money through Mexican government contracts.",
+      "title_property": "supplier_name",
+      "identifier_property": "rfc",
+      "aligned_to": null
+    },
+    {
+      "id": "public_contract",
+      "label": "Public Contract",
+      "label_plural": "Public Contracts",
+      "description": "A government procurement contract from Mexican official sources (CompraNet / compras publicas).",
+      "title_property": "contract_title",
+      "identifier_property": "contract_id",
+      "aligned_to": null
+    },
+    {
+      "id": "core_profile",
+      "label": "Core Profile",
+      "label_plural": "Core Profiles",
+      "description": "The five-field legitimacy profile (identity, address, founding date, tax-list status, sanction status) for a supplier.",
+      "title_property": "profile_id",
+      "identifier_property": "profile_id",
+      "aligned_to": null
+    },
+    {
+      "id": "evidence_record",
+      "label": "Evidence Record",
+      "label_plural": "Evidence Records",
+      "description": "A citation backing a recorded value, tagged with its source authority tier.",
+      "title_property": "evidence_id",
+      "identifier_property": "evidence_id",
+      "aligned_to": null
+    }
+  ],
+  "properties": [
+    {
+      "id": "rfc",
+      "label": "RFC",
+      "domain": "supplier",
+      "datatype": "string",
+      "dod": false,
+      "order": 0,
+      "description": "Mexican tax registration key (RFC) uniquely identifying the supplier.",
+      "aligned_to": null
+    },
+    {
+      "id": "supplier_name",
+      "label": "Supplier Name",
+      "domain": "supplier",
+      "datatype": "string",
+      "dod": false,
+      "order": 1,
+      "description": "Registered commercial name of the supplier.",
+      "aligned_to": null
+    },
+    {
+      "id": "contract_id",
+      "label": "Contract ID",
+      "domain": "public_contract",
+      "datatype": "string",
+      "dod": false,
+      "order": 0,
+      "description": "Official identifier of the procurement contract.",
+      "aligned_to": null
+    },
+    {
+      "id": "contract_title",
+      "label": "Contract Title",
+      "domain": "public_contract",
+      "datatype": "string",
+      "dod": false,
+      "order": 1,
+      "description": "Title or description of the contract.",
+      "aligned_to": null
+    },
+    {
+      "id": "award_date",
+      "label": "Award Date",
+      "domain": "public_contract",
+      "datatype": "date",
+      "dod": false,
+      "order": 2,
+      "description": "Date the contract was awarded.",
+      "aligned_to": null
+    },
+    {
+      "id": "award_amount",
+      "label": "Award Amount",
+      "domain": "public_contract",
+      "datatype": "number",
+      "dod": false,
+      "order": 3,
+      "description": "Monetary value of the contract award.",
+      "aligned_to": null
+    },
+    {
+      "id": "contracting_agency",
+      "label": "Contracting Agency",
+      "domain": "public_contract",
+      "datatype": "string",
+      "dod": false,
+      "order": 4,
+      "description": "Mexican government agency that awarded the contract.",
+      "aligned_to": null
+    },
+    {
+      "id": "supplier_rfc",
+      "label": "Supplier RFC",
+      "domain": "public_contract",
+      "datatype": "string",
+      "dod": false,
+      "order": 5,
+      "description": "RFC of the supplier awarded the contract, used to link contract to supplier.",
+      "aligned_to": null
+    },
+    {
+      "id": "profile_id",
+      "label": "Profile ID",
+      "domain": "core_profile",
+      "datatype": "string",
+      "dod": false,
+      "order": 0,
+      "description": "Identifier of the core profile record.",
+      "aligned_to": null
+    },
+    {
+      "id": "profile_supplier_rfc",
+      "label": "Profile Supplier RFC",
+      "domain": "core_profile",
+      "datatype": "string",
+      "dod": false,
+      "order": 1,
+      "description": "RFC of the supplier this profile describes.",
+      "aligned_to": null
+    },
+    {
+      "id": "identity_status",
+      "label": "Identity Status",
+      "domain": "core_profile",
+      "datatype": "string",
+      "dod": true,
+      "order": 2,
+      "description": "Corporate identity legitimacy per Mexican public commercial registry.",
+      "aligned_to": null
+    },
+    {
+      "id": "registered_address",
+      "label": "Registered Address",
+      "domain": "core_profile",
+      "datatype": "string",
+      "dod": true,
+      "order": 3,
+      "description": "Registered address of the supplier.",
+      "aligned_to": null
+    },
+    {
+      "id": "founding_date",
+      "label": "Founding Date",
+      "domain": "core_profile",
+      "datatype": "date",
+      "dod": true,
+      "order": 4,
+      "description": "Company founding date confirmed from the registry.",
+      "aligned_to": null
+    },
+    {
+      "id": "tax_list_status",
+      "label": "Tax-List Status",
+      "domain": "core_profile",
+      "datatype": "string",
+      "dod": true,
+      "order": 5,
+      "description": "Status on SAT lists including lista 69-B.",
+      "aligned_to": null
+    },
+    {
+      "id": "sanction_status",
+      "label": "Sanction Status",
+      "domain": "core_profile",
+      "datatype": "string",
+      "dod": true,
+      "order": 6,
+      "description": "Result of the OFAC sanctions cross-check.",
+      "aligned_to": null
+    },
+    {
+      "id": "evidence_id",
+      "label": "Evidence ID",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 0,
+      "description": "Identifier of the evidence record.",
+      "aligned_to": null
+    },
+    {
+      "id": "evidence_profile_id",
+      "label": "Evidence Profile ID",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 1,
+      "description": "Profile identifier this evidence supports.",
+      "aligned_to": null
+    },
+    {
+      "id": "field_name",
+      "label": "Field Name",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 2,
+      "description": "Name of the profile field the evidence supports.",
+      "aligned_to": null
+    },
+    {
+      "id": "source_uri",
+      "label": "Source URI",
+      "domain": "evidence_record",
+      "datatype": "uri",
+      "dod": false,
+      "order": 3,
+      "description": "URI of the source backing the value.",
+      "aligned_to": null
+    },
+    {
+      "id": "source_class",
+      "label": "Source Class",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 4,
+      "description": "Source class of the evidence (e.g., CompraNet, SAT, RPC, OFAC).",
+      "aligned_to": null
+    },
+    {
+      "id": "authority_tier",
+      "label": "Authority Tier",
+      "domain": "evidence_record",
+      "datatype": "string",
+      "dod": false,
+      "order": 5,
+      "description": "Authority tier: primary_mexican_source or secondary_us_crosscheck.",
+      "aligned_to": null
+    }
+  ],
+  "relations": [
+    {
+      "id": "awarded_to",
+      "label": "awarded to",
+      "domain": "public_contract",
+      "range": "supplier",
+      "symmetric": false,
+      "match": {
+        "op": "same_value",
+        "domain_property": "supplier_rfc",
+        "range_property": "rfc"
+      }
+    },
+    {
+      "id": "describes",
+      "label": "describes",
+      "domain": "core_profile",
+      "range": "supplier",
+      "symmetric": false,
+      "match": {
+        "op": "same_value",
+        "domain_property": "profile_supplier_rfc",
+        "range_property": "rfc"
+      }
+    },
+    {
+      "id": "supports",
+      "label": "supports",
+      "domain": "evidence_record",
+      "range": "core_profile",
+      "symmetric": false,
+      "match": {
+        "op": "same_value",
+        "domain_property": "evidence_profile_id",
+        "range_property": "profile_id"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "id": "r_dod4_source_class_diversity",
+      "label": "At least four distinct source classes used",
+      "checks": "Evidence records span at least four distinct source classes.",
+      "verify": [
+        "Count distinct source_class values; target >= 4."
+      ],
+      "predicate": {
+        "all": [
+          {
+            "op": "equals",
+            "property": "authority_tier",
+            "value": "primary_mexican_source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "r_sanction_secondary_only",
+      "label": "Sanction checks are secondary cross-checks",
+      "checks": "Sanction status evidence must come from a secondary US cross-check source.",
+      "verify": [
+        "Flag sanction_status evidence not tagged as secondary_us_crosscheck."
+      ],
+      "predicate": {
+        "all": [
+          {
+            "op": "equals",
+            "property": "authority_tier",
+            "value": "secondary_us_crosscheck"
+          }
+        ]
+      }
+    }
+  ],
+  "source_classes": [
+    {
+      "id": "compranet",
+      "label": "CompraNet / Compras Publicas"
+    },
+    {
+      "id": "sat",
+      "label": "SAT (incl. lista 69-B)"
+    },
+    {
+      "id": "registro_publico_comercio",
+      "label": "Registro Publico de Comercio"
+    },
+    {
+      "id": "ofac",
+      "label": "OFAC Sanctions Lists"
+    }
+  ],
+  "shacl_path": "02-ontology/shapes.ttl",
+  "dod_queries_path": "02-ontology/dod-queries.json",
+  "generated_by": {
+    "backend": "vultr",
+    "model": "qwen3.8-flash-next",
+    "at": "2026-09-27T07:36:07.080217+00:00"
+  },
+  "revisions": []
+}

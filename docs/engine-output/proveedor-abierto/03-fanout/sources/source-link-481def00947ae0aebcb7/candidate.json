@@ -1,0 +1,30 @@
+{
+  "source_id": "source-link-481def00947ae0aebcb7",
+  "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Listado_completo_69-B.csv",
+  "title": "Listado completo Listado completo Listado completo",
+  "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+  "provider": "sandbox_page_link",
+  "providers": [
+    "sandbox_page_link"
+  ],
+  "capture_key": "sha256:e807abc2bfe773af6f5462b432108dea2cd69a389513c8ec9556224529f9f8f3",
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "The document host is linked by a trusted source but is not in the approved source policy.",
+  "fingerprint": "a12275b7d2e7b7930e5b60cb55fb078994bbe4b19868def655257777d7dbf52f",
+  "link_provenance": {
+    "parent_source_id": "source-8c5c823c9953",
+    "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+    "parent_capture_key": "sha256:e807abc2bfe773af6f5462b432108dea2cd69a389513c8ec9556224529f9f8f3",
+    "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Listado_completo_69-B.csv",
+    "link_text": "Listado completo Listado completo Listado completo",
+    "link_index": 37,
+    "step_id": "step:95201f00fa0c4d78a8d05bbfe19f86a5"
+  },
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T16:46:21.719110+00:00"
+  },
+  "screenshot_key": "sha256:98a9ef1b309f563f84583a1027a5c057b226e2e6feccb98570a4385e3d7c9779"
+}

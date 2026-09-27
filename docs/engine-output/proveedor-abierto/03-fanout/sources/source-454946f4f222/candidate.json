@@ -1,0 +1,24 @@
+{
+  "source_id": "source-454946f4f222",
+  "url": "http://www.gob.mx/se/",
+  "title": "Redirect destination at www.gob.mx",
+  "snippet": "Public URL observed in a browser redirect chain.",
+  "provider": "sandbox_redirect",
+  "providers": [
+    "sandbox_redirect"
+  ],
+  "capture_key": null,
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "publisher authority needs human review",
+  "fingerprint": "343c4284091672255dfdb62bdedc9847abe51f4b75cfc512cf33f4abd02f920d",
+  "redirect_chain": [
+    "https://economia.gob.mx/",
+    "http://www.gob.mx/se/"
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T08:55:02.342534+00:00"
+  }
+}

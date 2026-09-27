@@ -1,0 +1,111 @@
+{
+  "factors": [
+    {
+      "id": "supplier_contract_linkage",
+      "label": "Supplier-to-contract linkage",
+      "description": "Whether and how many suppliers are linked to real Mexican public contracts from official procurement sources.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Requirement r1 sets the linkage target from Mexican official procurement sources.",
+          "source": {
+            "type": "case_file",
+            "path": "01-scope/prd.json",
+            "record_id": "requirement:r1",
+            "quote": "Link at least 50 suppliers to real public contracts from Mexican official procurement sources (primary)."
+          }
+        }
+      ]
+    },
+    {
+      "id": "profile_completeness",
+      "label": "Core profile completeness",
+      "description": "Degree to which each linked supplier has a complete profile across identity, address, founding date, tax-list status, and sanction status.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Job j2 defines the per-supplier core profile fields.",
+          "source": {
+            "type": "case_file",
+            "path": "01-scope/prd.json",
+            "record_id": "job:j2",
+            "quote": "Build a complete core profile per supplier (identity, address, founding date, tax-list status, sanction status) with evidence for every value."
+          }
+        }
+      ]
+    },
+    {
+      "id": "evidence_citation",
+      "label": "Evidence citation coverage",
+      "description": "Whether every recorded value carries cited evidence and how many distinct source classes are used.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Requirement r3 mandates evidence for every value and at least four source classes.",
+          "source": {
+            "type": "case_file",
+            "path": "01-scope/prd.json",
+            "record_id": "requirement:r3",
+            "quote": "Every recorded value must cite evidence; no unsourced values. Use at least 4 distinct source classes."
+          }
+        }
+      ]
+    },
+    {
+      "id": "source_authority_tiering",
+      "label": "Source authority tiering",
+      "description": "Which sources are treated as primary Mexican authority versus secondary US cross-checks.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Requirement r4 fixes the primary/secondary authority split.",
+          "source": {
+            "type": "case_file",
+            "path": "01-scope/prd.json",
+            "record_id": "requirement:r4",
+            "quote": "Use US sanctions and registry lists only as secondary cross-checks; Mexican official sources are primary authority."
+          }
+        }
+      ]
+    },
+    {
+      "id": "budget_scope_fit",
+      "label": "Budget and scope fit",
+      "description": "How the scope of suppliers and queries is sized to fit the run budget given unknown elapsed run time.",
+      "kind": "conceptual",
+      "evidence": []
+    },
+    {
+      "id": "audience_purpose",
+      "label": "Audience and investigative purpose",
+      "description": "Whether the output serves journalistic investigation of public-money recipients or civic transparency auditing of legitimacy, tax, and sanction status.",
+      "kind": "grounded",
+      "evidence": [
+        {
+          "description": "Persona p1 frames the journalistic angle.",
+          "source": {
+            "type": "case_file",
+            "path": "01-scope/prd.json",
+            "record_id": "persona:p1",
+            "quote": "Investigative journalist examining who receives public money in Mexico via government contracts and whether they are legitimate companies."
+          }
+        },
+        {
+          "description": "Persona p2 frames the auditing angle.",
+          "source": {
+            "type": "case_file",
+            "path": "01-scope/prd.json",
+            "record_id": "persona:p2",
+            "quote": "Civic transparency researcher auditing supplier legitimacy, tax-list status, and sanction status."
+          }
+        }
+      ]
+    }
+  ],
+  "revisions": [],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "minimax-m3",
+    "at": "2026-09-27T08:53:44.847207+00:00"
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "version": "1",
+  "brief_path": "brief.md",
+  "personas": [
+    {
+      "id": "p1",
+      "description": "Investigative analyst researching recipients of Mexican public contracts and their legitimacy."
+    },
+    {
+      "id": "p2",
+      "description": "Oversight stakeholder verifying supplier integrity against registries and sanctions lists."
+    }
+  ],
+  "jobs_to_be_done": [
+    {
+      "id": "j1",
+      "persona_id": "p1",
+      "description": "Identify who receives public money in Mexico through government contracts."
+    },
+    {
+      "id": "j2",
+      "persona_id": "p1",
+      "description": "Assess whether contract recipients are legitimate companies using public evidence."
+    },
+    {
+      "id": "j3",
+      "persona_id": "p2",
+      "description": "Cross-check supplier profiles against registries and sanctions lists."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "job_id": "j1",
+      "description": "Link at least 50 suppliers to real public contracts, each with evidence-backed contract references."
+    },
+    {
+      "id": "r2",
+      "job_id": "j2",
+      "description": "Build a core profile per supplier: identity, address, founding date, tax-list status, sanction status."
+    },
+    {
+      "id": "r3",
+      "job_id": "j2",
+      "description": "Ensure at least 80% of linked suppliers have a complete core profile."
+    },
+    {
+      "id": "r4",
+      "job_id": "j3",
+      "description": "Use US sanctions and registry lists only as secondary cross-checks, never as primary authority."
+    },
+    {
+      "id": "r5",
+      "job_id": "j2",
+      "description": "Record zero profile values without evidence; every field must cite a source."
+    },
+    {
+      "id": "r6",
+      "job_id": "j2",
+      "description": "Draw evidence from at least 4 distinct source classes (e.g., contracts, registries, sanctions, news)."
+    }
+  ],
+  "constraints": [
+    "Public read-only sources only; no paywalled or private data.",
+    "Run budget: USD 2.0; scope must fit this budget.",
+    "Elapsed run time unknown until execution; targets must not assume fixed runtime.",
+    "Every profile value must carry evidence; no unsourced values.",
+    "US sanctions/registry lists used only as secondary cross-checks.",
+    "Proposed domains are hypotheses for human review, never captured evidence."
+  ],
+  "non_goals": [
+    "No private, leaked, or paywalled data sources.",
+    "No primary reliance on US sanctions/registry lists for legitimacy judgments.",
+    "No exhaustive coverage of all Mexican contract recipients.",
+    "No legal determinations of fraud or wrongdoing; evidence assembly only.",
+    "No runtime or performance guarantees before execution."
+  ],
+  "authority_policy": {
+    "jurisdiction": "Mexico",
+    "trusted_publishers": [
+      {
+        "kind": "Mexican government contracting platforms (e.g., CompraNet)",
+        "tier": "secondary",
+        "domains": [],
+        "rationale": "Official Mexican public contract records; authoritative source for contract links."
+      },
+      {
+        "kind": "Mexican business registries and tax authority (e.g., SAT, REPSE)",
+        "tier": "secondary",
+        "domains": [],
+        "rationale": "Official registries authoritative for identity, address, founding date, tax-list status."
+      },
+      {
+        "kind": "US sanctions and registry lists (e.g., OFAC)",
+        "tier": "secondary",
+        "domains": [],
+        "rationale": "Human revision: secondary cross-checks only, never primary authority."
+      },
+      {
+        "kind": "Reputable news and civil-society oversight outlets",
+        "tier": "review",
+        "domains": [],
+        "rationale": "Supplementary context; uncertain authority, requires human review."
+      },
+      {
+        "kind": "Human-requested cross-check lists",
+        "tier": "secondary",
+        "domains": [],
+        "rationale": "Supplementary cross-checks requested by human revision; never auto authority."
+      },
+      {
+        "kind": "Human-requested cross-check",
+        "tier": "secondary",
+        "domains": [],
+        "rationale": "DoD must be the case's: >=50 suppliers linked to real public contracts; >=80% of them with a complete core profile (identity, address, founding date, tax-list status, sanction status); 0 values without evidence; >=4 source classes. Keep US sanctions/registry lists as secondary cross-checks."
+      }
+    ],
+    "unknown_source_action": "review"
+  },
+  "definition_of_done": [
+    {
+      "id": "dod1",
+      "metric": "Suppliers linked to real public contracts with evidence-backed contract references",
+      "operator": ">=",
+      "target": 50,
+      "basis": "human",
+      "basis_quote": ">=50 suppliers linked to real public contracts",
+      "rationale": "Human revision sets explicit threshold of 50 linked suppliers.",
+      "feasibility": "Achievable within USD 2.0 using public Mexican contracting data; runtime unknown but query count is bounded."
+    },
+    {
+      "id": "dod2",
+      "metric": "Linked suppliers with complete core profile (identity, address, founding date, tax-list status, sanction status)",
+      "operator": ">=",
+      "target": 0.8,
+      "min_ratio": 0.8,
+      "basis": "human",
+      "basis_quote": ">=80% of them with a complete core profile (identity, address, founding date, tax-list status, sanction status)",
+      "rationale": "Human revision requires 80% completeness ratio across linked suppliers.",
+      "feasibility": "Feasible with public registries; some suppliers may lack public data, 80% allows margin."
+    },
+    {
+      "id": "dod3",
+      "metric": "Profile values without evidence",
+      "operator": "<=",
+      "target": 0,
+      "basis": "human",
+      "basis_quote": "0 values without evidence",
+      "rationale": "Human revision requires zero unsourced values.",
+      "feasibility": "Enforceable by validation; no budget impact."
+    },
+    {
+      "id": "dod4",
+      "metric": "Distinct source classes used for evidence",
+      "operator": ">=",
+      "target": 4,
+      "basis": "human",
+      "basis_quote": ">=4 source classes",
+      "rationale": "Human revision requires at least four distinct source classes.",
+      "feasibility": "Contracts, registries, sanctions, and news are all public and free; fits USD 2.0."
+    }
+  ],
+  "revisions": [
+    {
+      "n": 1,
+      "decision": "deny",
+      "reason": "DoD must be the case's: >=50 suppliers linked to real public contracts; >=80% of them with a complete core profile (identity, address, founding date, tax-list status, sanction status); 0 values without evidence; >=4 source classes. Keep US sanctions/registry lists as secondary cross-checks.",
+      "approver": "ricalanis (decision relayed by the orchestrator)",
+      "date": "2026-09-26"
+    }
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3",
+    "at": "2026-09-27T00:02:13.811703+00:00"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": "1",
+  "status": "rejected",
+  "attempts": 3,
+  "reason": "DoD criterion `dod2` has approved min_ratio=1, but aggregate `count_entities_with_relation` cannot evaluate per-entity completeness; DoD criterion `dod3` has approved min_ratio=1, but aggregate `count_entities_with_relation` cannot evaluate per-entity completeness",
+  "queries": [
+    {
+      "criterion_id": "dod1",
+      "aggregate": "entities_meeting_completeness",
+      "class": "library_branch",
+      "relation_id": "sourced_from",
+      "measure": "share",
+      "properties": "dod",
+      "target": 1,
+      "operator": ">=",
+      "min_ratio": 1
+    },
+    {
+      "criterion_id": "dod2",
+      "aggregate": "count_entities_with_relation",
+      "class_id": "library_branch",
+      "relation_id": "sourced_from",
+      "target": 1,
+      "operator": ">="
+    },
+    {
+      "criterion_id": "dod3",
+      "aggregate": "count_entities_with_relation",
+      "class_id": "library_branch",
+      "relation_id": "sourced_from",
+      "target": 1,
+      "operator": ">="
+    },
+    {
+      "criterion_id": "dod4",
+      "aggregate": "count_entities_with_relation",
+      "class_id": "library_branch",
+      "relation_id": "sourced_from",
+      "target": 0,
+      "operator": "<="
+    },
+    {
+      "criterion_id": "dod5",
+      "aggregate": "count_entities",
+      "class_id": "library_branch",
+      "target": 0,
+      "operator": "<="
+    }
+  ]
+}

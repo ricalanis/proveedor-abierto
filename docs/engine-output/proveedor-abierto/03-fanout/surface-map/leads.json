@@ -1,0 +1,2143 @@
+{
+  "run_id": "run-efc9be56964b",
+  "written_at": "2026-09-27T18:41:22.701709+00:00",
+  "note": "Leads are never evidence; only captured, authority-checked candidates become objectives.",
+  "leads": [
+    {
+      "url": "https://www.gob.pe/satlima",
+      "title": "Redirect destination at www.gob.pe",
+      "snippet": "Public URL observed in a browser redirect chain.",
+      "discovered_by": "sandbox_redirect",
+      "query": "redirect from https://www.sat.gob.pe/",
+      "property_ids": [
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "sandbox_redirect"
+      ],
+      "iteration": 3,
+      "redirect_chain": [
+        "https://www.sat.gob.pe/",
+        "https://www.sat.gob.pe/Websitev9",
+        "https://www.sat.gob.pe/Websitev9/",
+        "https://www.gob.pe/satlima"
+      ],
+      "redirect_review_required": true,
+      "review_source_id": "source-dd7d33026b8d",
+      "review_fingerprint": "58a2e54b4222c1fbb0c55468354534537055333c042b13f6190c9530cb27ca80",
+      "authority_tier": "unknown"
+    },
+    {
+      "url": "https://www.inadem.gob.mx/",
+      "title": "Redirect destination at www.inadem.gob.mx",
+      "snippet": "Public URL observed in a browser redirect chain.",
+      "discovered_by": "sandbox_redirect",
+      "query": "redirect from http://www.inadem.gob.mx/",
+      "property_ids": [
+        "founding_date"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "sandbox_redirect"
+      ],
+      "iteration": 4,
+      "redirect_chain": [
+        "http://www.inadem.gob.mx/",
+        "https://www.inadem.gob.mx/"
+      ],
+      "redirect_review_required": true,
+      "review_source_id": "source-6712777e589f",
+      "review_fingerprint": "546ff44b14a7fe5ae18287fd925085fbdc6820ae2ae056b2cedbb34fd14ce37a",
+      "authority_tier": "unknown"
+    },
+    {
+      "url": "http://www.gob.mx/se/",
+      "title": "Redirect destination at www.gob.mx",
+      "snippet": "Public URL observed in a browser redirect chain.",
+      "discovered_by": "approved_source",
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "approved_source"
+      ],
+      "iteration": 0,
+      "source_review_required": true,
+      "review_source_id": "source-454946f4f222",
+      "review_fingerprint": "343c4284091672255dfdb62bdedc9847abe51f4b75cfc512cf33f4abd02f920d",
+      "parent_capture_key": null,
+      "redirect_chain": [
+        "https://economia.gob.mx/",
+        "http://www.gob.mx/se/"
+      ],
+      "redirect_review_required": true
+    },
+    {
+      "url": "https://www.cnbv.gob.mx/",
+      "title": "Redirect destination at www.cnbv.gob.mx",
+      "snippet": "Public URL observed in a browser redirect chain.",
+      "discovered_by": "approved_source",
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "approved_source"
+      ],
+      "iteration": 0,
+      "source_review_required": true,
+      "review_source_id": "source-480cb2d2014e",
+      "review_fingerprint": "627bffb9e32f0b0916b4a619eecb91bdf71be4825d996c56bb4faddf482e93e6",
+      "parent_capture_key": null
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Listado_completo_69-B.csv",
+      "title": "Listado completo Listado completo Listado completo",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+      "discovered_by": "approved_source",
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "approved_source"
+      ],
+      "iteration": 0,
+      "source_review_required": true,
+      "review_source_id": "source-link-481def00947ae0aebcb7",
+      "review_fingerprint": "a12275b7d2e7b7930e5b60cb55fb078994bbe4b19868def655257777d7dbf52f",
+      "parent_capture_key": "sha256:e807abc2bfe773af6f5462b432108dea2cd69a389513c8ec9556224529f9f8f3",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-8c5c823c9953",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+        "parent_capture_key": "sha256:e807abc2bfe773af6f5462b432108dea2cd69a389513c8ec9556224529f9f8f3",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Listado_completo_69-B.csv",
+        "link_text": "Listado completo Listado completo Listado completo",
+        "link_index": 37,
+        "step_id": "step:95201f00fa0c4d78a8d05bbfe19f86a5"
+      }
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls",
+      "title": "Por situación ante el RFC",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+      "discovered_by": "approved_source",
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "approved_source"
+      ],
+      "iteration": 0,
+      "source_review_required": true,
+      "review_source_id": "source-link-6bcafaea9baf0b235c28",
+      "review_fingerprint": "49f0a47b1c628fb7c1f415684eab64e99c5b75725dfe64c1ecd992552096cd41",
+      "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-16d6e359e403",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls",
+        "link_text": "Por situación ante el RFC",
+        "link_index": 17,
+        "step_id": "step:3f635ff0b0784089bec3e58a818eb344"
+      }
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_38_EmpCer.xls",
+      "title": "Empresas certificadas OEA",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+      "discovered_by": "approved_source",
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "approved_source"
+      ],
+      "iteration": 0,
+      "source_review_required": true,
+      "review_source_id": "source-link-72b98c3e7f7c5545a35b",
+      "review_fingerprint": "d0f1a3eca3577968eddf806671bb11913ed9555e9ba02660a78c188165dff346",
+      "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-16d6e359e403",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_38_EmpCer.xls",
+        "link_text": "Empresas certificadas OEA",
+        "link_index": 23,
+        "step_id": "step:5fc2f12971194cd5a39b6e1a1de2cbca"
+      }
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGGC/Listado_69_B_Bis_Completo.csv",
+      "title": "Listado completo Listado completo Listado completo",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+      "discovered_by": "approved_source",
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "approved_source"
+      ],
+      "iteration": 0,
+      "source_review_required": true,
+      "review_source_id": "source-link-849a11fe6f9d125a33fe",
+      "review_fingerprint": "59940dd273ae3e437ca2e72963b6409427a13684c3527701d904d989d5c24c56",
+      "parent_capture_key": "sha256:e807abc2bfe773af6f5462b432108dea2cd69a389513c8ec9556224529f9f8f3",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-8c5c823c9953",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+        "parent_capture_key": "sha256:e807abc2bfe773af6f5462b432108dea2cd69a389513c8ec9556224529f9f8f3",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGGC/Listado_69_B_Bis_Completo.csv",
+        "link_text": "Listado completo Listado completo Listado completo",
+        "link_index": 44,
+        "step_id": "step:95201f00fa0c4d78a8d05bbfe19f86a5"
+      }
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/EmpresasCertIVAeIEPS.xls",
+      "title": "Empresas certificadas en materia de IVA e IEPS",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+      "discovered_by": "approved_source",
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "approved_source"
+      ],
+      "iteration": 0,
+      "source_review_required": true,
+      "review_source_id": "source-link-b1382083a8e3f57e2f66",
+      "review_fingerprint": "2f313bb02f5d91eeeac242dbaf32ee1d921990971c4c66faec83159cfaf14fee",
+      "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-16d6e359e403",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/EmpresasCertIVAeIEPS.xls",
+        "link_text": "Empresas certificadas en materia de IVA e IEPS",
+        "link_index": 25,
+        "step_id": "step:5fc2f12971194cd5a39b6e1a1de2cbca"
+      }
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SociosComCert.xls",
+      "title": "Socios comerciales certificados",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+      "discovered_by": "approved_source",
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "approved_source"
+      ],
+      "iteration": 0,
+      "source_review_required": true,
+      "review_source_id": "source-link-de1976924b192b1131ac",
+      "review_fingerprint": "d7966d246c0601455e998996e6b285a14f0f6a6385ace0a848ba154554e7d7c5",
+      "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-16d6e359e403",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/SociosComCert.xls",
+        "link_text": "Socios comerciales certificados",
+        "link_index": 24,
+        "step_id": "step:5fc2f12971194cd5a39b6e1a1de2cbca"
+      }
+    },
+    {
+      "url": "https://compranet.hacienda.gob.mx",
+      "title": "Secretaría de Administración y Finanzas / CompraNet",
+      "snippet": "government procurement platform",
+      "discovered_by": "model",
+      "query": "Compranet proveedores contratos públicos nombre razón social datos abiertos CompraNet OCDS Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Secretaría de Administración y Finanzas / CompraNet",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://www.inai.org.mx",
+      "title": "Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales",
+      "snippet": "transparency and open data body",
+      "discovered_by": "model",
+      "query": "Compranet proveedores contratos públicos nombre razón social datos abiertos CompraNet OCDS Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://www.sat.gob.mx",
+      "title": "Servicio de Administración Tributaria",
+      "snippet": "tax administration",
+      "discovered_by": "model",
+      "query": "Compranet proveedores contratos públicos nombre razón social datos abiertos CompraNet OCDS Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": "Servicio de Administración Tributaria",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://home.inai.org.mx/",
+      "title": "National Institute of Transparency, Access to Information, and Protection of Personal Data",
+      "snippet": "Official website (Wikidata P856) of National Institute of Transparency, Access to Information, and Protection of Personal Data (Q5917324)",
+      "discovered_by": "wikidata",
+      "query": "Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales",
+      "lead_only": true,
+      "providers": [
+        "wikidata"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://www.sat.gob.mx/",
+      "title": "Internal Revenue Service",
+      "snippet": "Official website (Wikidata P856) of Internal Revenue Service (Q6126093)",
+      "discovered_by": "wikidata",
+      "query": "Servicio de Administración Tributaria",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Servicio de Administración Tributaria",
+      "lead_only": true,
+      "providers": [
+        "wikidata"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://www.sat.gob.pe/",
+      "title": "Q76197617",
+      "snippet": "Official website (Wikidata P856) of Q76197617 (Q76197617)",
+      "discovered_by": "wikidata",
+      "query": "Servicio de Administración Tributaria",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Servicio de Administración Tributaria",
+      "lead_only": true,
+      "providers": [
+        "wikidata"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://datos.gob.mx/",
+      "title": "Publisher root at datos.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for Mexican public procurement records (CompraNet/compras publicas).",
+      "discovered_by": "authority_policy",
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "authority_policy"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://sat.gob.mx/",
+      "title": "Publisher root at sat.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for Mexican tax authority incl. lista 69-B (SAT).",
+      "discovered_by": "authority_policy",
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "authority_policy"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://economia.gob.mx/",
+      "title": "Publisher root at economia.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for Mexican public commercial registries (registros publicos).",
+      "discovered_by": "authority_policy",
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "authority_policy"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://treasury.gov/",
+      "title": "Publisher root at treasury.gov",
+      "snippet": "Domain root listed in the approved authority policy for US sanctions lists (OFAC) cross-check.",
+      "discovered_by": "authority_policy",
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "authority_policy"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://sec.gov/",
+      "title": "Publisher root at sec.gov",
+      "snippet": "Domain root listed in the approved authority policy for US company registry lists cross-check.",
+      "discovered_by": "authority_policy",
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "authority_policy"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/",
+      "title": "Publisher root at comprasmx.buengobierno.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for ComprasMX / Buen Gobierno federal public-procurement publisher.",
+      "discovered_by": "authority_policy",
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "authority_policy"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://historico-compranet.buengobierno.gob.mx/",
+      "title": "Publisher root at historico-compranet.buengobierno.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for ComprasMX / Buen Gobierno federal public-procurement publisher.",
+      "discovered_by": "authority_policy",
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "authority_policy"
+      ],
+      "iteration": 1
+    },
+    {
+      "url": "https://www.gob.mx/sat/archivo/prensa",
+      "title": "Prensa Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "snippet": "Document link observed on https://www.sat.gob.mx/portal/public/home",
+      "discovered_by": "sandbox_page_link",
+      "query": "dataset link from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "sandbox_page_link"
+      ],
+      "iteration": 1,
+      "source_review_required": true,
+      "review_source_id": "source-link-96a0d2a39d27fc9e20be",
+      "review_fingerprint": "0ea368ab8f9835521aa10a80f034969b6c5318bdab8497e8423a1d55dea966dd",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.gob.mx/sat/archivo/prensa",
+        "link_text": "Prensa Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 59,
+        "step_id": "step:77d0ebfd9ecb40b2b4c5d0573e12c509"
+      },
+      "source_state": "denied"
+    },
+    {
+      "url": "https://www.sat.gob.mx/portal/public/tramites/quejas-o-denuncias",
+      "title": "Quejas o denuncias",
+      "snippet": "Quejas o denuncias Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 1,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://www.sat.gob.mx/portal/public/home",
+      "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.sat.gob.mx/portal/public/tramites/quejas-o-denuncias",
+        "link_text": "Quejas o denuncias Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 66,
+        "step_id": "step:12e87601d1004c939815f23d002d2a82"
+      }
+    },
+    {
+      "url": "https://www.sat.gob.mx/minisitio/BuscadorCorreosFalsos/buscador.html",
+      "title": "Buscador de correos falsos",
+      "snippet": "Buscador de correos falsos Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 1,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://www.sat.gob.mx/portal/public/home",
+      "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.sat.gob.mx/minisitio/BuscadorCorreosFalsos/buscador.html",
+        "link_text": "Buscador de correos falsos Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 65,
+        "step_id": "step:12e87601d1004c939815f23d002d2a82"
+      }
+    },
+    {
+      "url": "https://www.sat.gob.mx/portal/public/aviso-de-privacidad",
+      "title": "Aviso de privacidad",
+      "snippet": "Aviso de privacidad Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 1,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://www.sat.gob.mx/portal/public/home",
+      "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.sat.gob.mx/portal/public/aviso-de-privacidad",
+        "link_text": "Aviso de privacidad Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 62,
+        "step_id": "step:12e87601d1004c939815f23d002d2a82"
+      }
+    },
+    {
+      "url": "https://www.sat.gob.mx/portal/public/tramites/derechos-del-contribuyente",
+      "title": "Derechos del Contribuyente",
+      "snippet": "Derechos del Contribuyente Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 1,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://www.sat.gob.mx/portal/public/home",
+      "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.sat.gob.mx/portal/public/tramites/derechos-del-contribuyente",
+        "link_text": "Derechos del Contribuyente Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 60,
+        "step_id": "step:12e87601d1004c939815f23d002d2a82"
+      }
+    },
+    {
+      "url": "https://www.sat.gob.mx/consultas/91363-consulta-del-padron-de-contribuyentes",
+      "title": "Sistema Público de Consulta de Padrones del RFC",
+      "snippet": "tax registry public catalog",
+      "discovered_by": "model",
+      "query": "site:datos.gob.mx Mexican public procurement records (CompraNet/compras publicas) list Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Sistema Público de Consulta de Padrones del RFC",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://www.gob.mx/shcp",
+      "title": "Secretaría de Hacienda y Crédito Público",
+      "snippet": "finance ministry / tax registry owner",
+      "discovered_by": "model",
+      "query": "site:sat.gob.mx Mexican tax authority incl. lista 69-B (SAT) list Supplier RFC",
+      "property_ids": [
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": "Secretaría de Hacienda y Crédito Público",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://www.plataformadigitalnacional.org",
+      "title": "Plataforma Digital Nacional",
+      "snippet": "open data platform",
+      "discovered_by": "model",
+      "query": "site:sat.gob.mx Mexican tax authority incl. lista 69-B (SAT) list Supplier RFC",
+      "property_ids": [
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": "Plataforma Digital Nacional",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://rpc.economia.gob.mx",
+      "title": "Public Register of Companies (Mexico)",
+      "snippet": "Official website (Wikidata P856) of Public Register of Companies (Mexico) (Q6104088)",
+      "discovered_by": "wikidata",
+      "query": "Registro Público de Comercio",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Registro Público de Comercio",
+      "lead_only": true,
+      "providers": [
+        "wikidata"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "http://www.shcp.gob.mx/",
+      "title": "Secretariat of Finance and Public Credit",
+      "snippet": "Official website (Wikidata P856) of Secretariat of Finance and Public Credit (Q1506364)",
+      "discovered_by": "wikidata",
+      "query": "Secretaría de Hacienda y Crédito Público",
+      "property_ids": [
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": "Secretaría de Hacienda y Crédito Público",
+      "lead_only": true,
+      "providers": [
+        "wikidata"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://rpc.economia.gob.mx/siger2/resources/docs/DIRECTORIO%20DE%20OFICINAS%20REGISTRALES.pdf",
+      "title": "[PDF] Directorio de Oficinas Registrales del Registro Público de Comercio",
+      "snippet": "Tel: (981) 811 92 00, Ext: 31901. Cd. del Carmen y Palizada. Escárcega. Av. Héctor Pérez Martínez entre calles 27 y 25 Col. Centro, Escárcega, Campeche, C.P. 24350. Tel: (982) 824 06 03. Escárcega y Candelaria. Página 7 de 58 CIUDAD DE MÉXICO Registro Público de la Propiedad y de Comercio de la Ciudad de México. Sitio web: Dirección: Calz. Manuel Villalongín No. 15, Col. Cuauhtémoc, Alcaldía Cuauhtémoc, Ciudad de México, C.P. 06500. Tel: (55) 5140 17 00. (Registro centralizado) COAHUILA DE [...] 9 Chihuahua .......................................................................................",
+      "discovered_by": "tavily",
+      "query": "site:economia.gob.mx Mexican public commercial registries (registros publicos) list Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.3699755,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://rpc.economia.gob.mx/siger2/resources/docs/Manual_Usuario/Manual_Usuario-Personal_Entrega_SIGER.pdf",
+      "title": "Manual de Usuario del Sistema Integral de Gestión Registral ...",
+      "snippet": "o se presente algún documento que haga falta. RPC Registro Público de Comercio SIGER Sistema Integral de Gestión Registral Solicitante El ciudadano que solicita la inscripción o certificación ante el RPC. Página 18 de 18 5. Contacto Correo electrónico: siger2.0@economía.gob.mx. Teléfono: (55) 5229-6100, extensiones 33508, 33525, 33553, 33565 y 33590. Fecha de última actualización: 28 de abril de 2023. [...] Contacto 18 Página 3 de 18 1. Introducción El Registro Público de Comercio (RPC), a cargo de la Secretaría de Economía (SE), es la institución que se encarga de brindar seguridad y certeza ",
+      "discovered_by": "tavily",
+      "query": "site:economia.gob.mx Mexican public commercial registries (registros publicos) list Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.24678329,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://www.economia.gob.mx/files/transparencia/PBFPYMEXPROY.pdf",
+      "title": "Listado de empresas apoyadas Fondo PYME con montos",
+      "snippet": "Organismo Intem Proyecto CURP o RFC Nombres ESTADO Proyecto FP2004-3365 CENTRO PYME Organismo CENTRO PYME DE SAN LUIS POTOSI, A.C. Monto Apo 380000 No. Organismo Intem Proyecto CURP o RFC Nombres ESTADO 78654 CENTRO PYME FP2004-3365: CEEDP990325DF9 ENVASADORA Y DISTRIBUIDORA LA PERLA, S.A. DE C.V. San Luis Potosi 78655 CENTRO PYME FP2004-3365: CENFL980415DQO 9 FLOWERS, S.A. DE C.V. San Luis Potosi 78656 CENTRO PYME FP2004-3365: CEVAL971215GU9 COMPAÑIA VINICOLA ALFA, S.A. DE C.V. [...] Organismo Intem Proyecto CURP o RFC Nombres ESTADO Proyecto FP2004-3243 PROGRAMA PARA EL DESARROLLO DE PROYECT",
+      "discovered_by": "tavily",
+      "query": "site:economia.gob.mx Mexican public commercial registries (registros publicos) list Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.2299417,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://rpc.economia.gob.mx/siger2/xhtml/login/login.xhtml",
+      "title": "Registro Público de Comercio - RPC - SIGER",
+      "snippet": "# Registro Público de Comercio # Registro Público de Comercio ## SIGER 2.0 ## SIGER 2.0 ## ¿Qué es el Registro Público de Comercio? Es la institución que se encarga de brindar seguridad y certeza jurídica a través de la publicidad de los actos jurídicos mercantiles relacionados con los comerciantes y que, conforme a la ley, lo requieran para surtir efectos contra terceros. [...] Beneficios del SIGER 2.0 ¿Qué se inscribe en el SIGER 2.0? ## Fedatarios públicos ## Fedatarios públicos ¿Cómo realizo el trámite? ## Contacto Calle Pachuca No. 189, Col. Condesa, Demarcación Territorial Cuauhtémoc, 06",
+      "discovered_by": "tavily",
+      "query": "site:economia.gob.mx Mexican public commercial registries (registros publicos) list Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.2188283,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://rpc.economia.gob.mx/siger2/resources/docs/Preguntas_Frecuentes_RPC.pdf",
+      "title": "Preguntas frecuentes del Registro Público de Comercio (RPC).",
+      "snippet": "Preguntas frecuentes del Registro Público de Comercio (RPC). Página 2 de 6 1. ¿Qué es el Registro Público de Comercio (RPC)? Es la institución que se encarga de brindar seguridad y certeza jurídica, a través de la publicidad de los actos jurídicos mercantiles relacionados con los comerciantes y que conforme a la Ley lo requieran para surtir efectos contra terceros. 2. ¿Qué se inscribe en el RPC? De conformidad con el artículo 18 del Código de Comercio, sólo se registran actos jurídicos de [...] actos jurídicos de naturaleza mercantil, así como aquellos que se relacionan con los comerciantes y ",
+      "discovered_by": "tavily",
+      "query": "site:economia.gob.mx Mexican public commercial registries (registros publicos) list Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.1755808,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://home.treasury.gov/system/files/246/GENIUS-Act-Illicit-Finance-Innovation-Congressional-Report-March-2026.pdf",
+      "title": "GENIUS-Act-Illicit-Finance-Innovation- ...",
+      "snippet": "and streamline the exchange of machine-readable data across government and non-governmental platforms. OFAC has established the Sanctions List Service (SLS), a machine-readable data platform that supports API-based retrieval of sanctions information.76 The SLS provides financial institutions and the public with structured data feeds, enabling the automatic ingestion of sanctions lists and real-time updates. OFAC is leveraging APIs to facilitate the increased automation of sanctions screening [...] below focus on fostering common technical standards, leveraging public-private coordination, and ",
+      "discovered_by": "tavily",
+      "query": "site:treasury.gov US sanctions lists (OFAC) cross-check list Supplier RFC",
+      "property_ids": [
+        "supplier_rfc"
+      ],
+      "score": 0.21792817,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://oig.treasury.gov/system/files/2022-11/OIG-23-007.pdf",
+      "title": "Audit Report - Treasury Inspector General",
+      "snippet": "and Effective Death Penalty Act of 1996 Sanctions violation 1996 2022 The greater of $87,361 or twice the amount of which a financial institution was required to retain possession or control DO (OFAC) Same as above 21 USC 1906(b) Foreign Narcotics Kingpin Designation Act, Section 807 Sanctions violation 1999 2022 $1,644,396 DO (OFAC) Same as above 19 USC 3901‐3913 Clean Diamond Trade Act Sanctions violation 2003 2022 $14,950 DO (OFAC) Same as above 50 USC 1701 ‐ 1706 International Emergency [...] Update Details 50 USC App. 16(b)(1) Trading with the Enemy Act, Section 16(b) Sanctions violation ",
+      "discovered_by": "tavily",
+      "query": "site:treasury.gov US sanctions lists (OFAC) cross-check list Supplier RFC",
+      "property_ids": [
+        "supplier_rfc"
+      ],
+      "score": 0.13807808,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 2
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/rupc",
+      "title": "Registro Único de Proveedores y Contratistas",
+      "snippet": "Registro Único de Proveedores y Contratistas Registro Único de Proveedores y Contratistas Registro Único de Proveedores y Contratistas",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://comprasmx.buengobierno.gob.mx/",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 2,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://comprasmx.buengobierno.gob.mx/",
+      "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+      "link_provenance": {
+        "parent_source_id": "source-067911656758",
+        "parent_page_url": "https://comprasmx.buengobierno.gob.mx/",
+        "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+        "link_url": "https://comprasmx.buengobierno.gob.mx/rupc",
+        "link_text": "Registro Único de Proveedores y Contratistas Registro Único de Proveedores y Contratistas Registro Único de Proveedores y Contratistas",
+        "link_index": 20,
+        "step_id": "step:ac1f2c95bebf4a41b031c4fa37a8e0e2"
+      }
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/compras-mx",
+      "title": "¿Qué es Compras MX?",
+      "snippet": "¿Qué es Compras MX? ¿Qué es Compras MX? ¿Qué es Compras MX?",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://comprasmx.buengobierno.gob.mx/",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 2,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://comprasmx.buengobierno.gob.mx/",
+      "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+      "link_provenance": {
+        "parent_source_id": "source-067911656758",
+        "parent_page_url": "https://comprasmx.buengobierno.gob.mx/",
+        "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+        "link_url": "https://comprasmx.buengobierno.gob.mx/compras-mx",
+        "link_text": "¿Qué es Compras MX? ¿Qué es Compras MX? ¿Qué es Compras MX?",
+        "link_index": 11,
+        "step_id": "step:ac1f2c95bebf4a41b031c4fa37a8e0e2"
+      }
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/registro-uc",
+      "title": "Registro de Dependencias y Entidades en Compras MX",
+      "snippet": "Registro de Dependencias y Entidades en Compras MX Registro de Dependencias y Entidades en Compras MX Registro de Dependencias y Entidades en Compras MX",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://comprasmx.buengobierno.gob.mx/",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 2,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://comprasmx.buengobierno.gob.mx/",
+      "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+      "link_provenance": {
+        "parent_source_id": "source-067911656758",
+        "parent_page_url": "https://comprasmx.buengobierno.gob.mx/",
+        "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+        "link_url": "https://comprasmx.buengobierno.gob.mx/registro-uc",
+        "link_text": "Registro de Dependencias y Entidades en Compras MX Registro de Dependencias y Entidades en Compras MX Registro de Dependencias y Entidades en Compras MX",
+        "link_index": 39,
+        "step_id": "step:ac1f2c95bebf4a41b031c4fa37a8e0e2"
+      }
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/registro-empresas",
+      "title": "Registro de Licitantes, Proveedores y Contratistas en Compras MX",
+      "snippet": "Registro de Licitantes, Proveedores y Contratistas en Compras MX Registro de Licitantes, Proveedores y Contratistas en Compras MX Registro de Licitantes, Proveedores y Contratistas en Compras MX",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://comprasmx.buengobierno.gob.mx/",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 2,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://comprasmx.buengobierno.gob.mx/",
+      "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+      "link_provenance": {
+        "parent_source_id": "source-067911656758",
+        "parent_page_url": "https://comprasmx.buengobierno.gob.mx/",
+        "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+        "link_url": "https://comprasmx.buengobierno.gob.mx/registro-empresas",
+        "link_text": "Registro de Licitantes, Proveedores y Contratistas en Compras MX Registro de Licitantes, Proveedores y Contratistas en Compras MX Registro de Licitantes, Proveedores y Contratistas en Compras MX",
+        "link_index": 17,
+        "step_id": "step:ac1f2c95bebf4a41b031c4fa37a8e0e2"
+      }
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/datos-abiertos",
+      "title": "Datos Abiertos",
+      "snippet": "Datos Abiertos Datos Abiertos Datos Abiertos",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://comprasmx.buengobierno.gob.mx/",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 2,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://comprasmx.buengobierno.gob.mx/",
+      "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+      "link_provenance": {
+        "parent_source_id": "source-067911656758",
+        "parent_page_url": "https://comprasmx.buengobierno.gob.mx/",
+        "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+        "link_url": "https://comprasmx.buengobierno.gob.mx/datos-abiertos",
+        "link_text": "Datos Abiertos Datos Abiertos Datos Abiertos",
+        "link_index": 12,
+        "step_id": "step:ac1f2c95bebf4a41b031c4fa37a8e0e2"
+      }
+    },
+    {
+      "url": "https://siem.economia.gob.mx",
+      "title": "Sistema de Información Empresarial Mexicano",
+      "snippet": "government business registry catalog",
+      "discovered_by": "model",
+      "query": "CompranetHermes contratos adjudicados proveedor razón social RFC datos abiertos CSV CompranetHermes OCDS Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Sistema de Información Empresarial Mexicano",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "https://www.gob.mx/se",
+      "title": "Secretaría de Economía",
+      "snippet": "federal ministry",
+      "discovered_by": "model",
+      "query": "CompranetHermes contratos adjudicados proveedor razón social RFC datos abiertos CSV CompranetHermes OCDS Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Secretaría de Economía",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "https://www.cofece.mx",
+      "title": "Comisión Federal de Competencia Económica",
+      "snippet": "antitrust authority with economic agent registry",
+      "discovered_by": "model",
+      "query": "CompranetHermes API contratos proveedores RFC descarga JSON CompranetHermes OCDS Supplier RFC",
+      "property_ids": [
+        "supplier_rfc"
+      ],
+      "score": 0.0,
+      "publisher": "Comisión Federal de Competencia Económica",
+      "lead_only": true,
+      "providers": [
+        "model"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "http://www.economia.gob.mx",
+      "title": "Secretariat of Economy",
+      "snippet": "Official website (Wikidata P856) of Secretariat of Economy (Q749484)",
+      "discovered_by": "wikidata",
+      "query": "Secretaría de Economía",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.0,
+      "publisher": "Secretaría de Economía",
+      "lead_only": true,
+      "providers": [
+        "wikidata"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1014473/000119312511175775/dex101.htm",
+      "title": "Registry Agreement",
+      "snippet": "6.1.3 “DNS Name Server” means the service complying with RFC 1034, 1035 and related RFCs made available on TCP/UDP port 53 on Registry Operator’s selected servers. 6.1.4 “ICANN-Accredited Registrar” means an ICANN-Accredited Registrar that has a Registry-Registrar Agreement in effect with Registry Operator. 6.1.5 “Monthly Timeframe” means each single calendar month beginning and ending at 0000 Coordinated Universal Time (UTC). [...] Records or using redirection within the DNS by the Registry is prohibited. When queried for such domain names the authoritative name servers must return a “Name Er",
+      "discovered_by": "tavily",
+      "query": "site:sec.gov US company registry lists cross-check open data Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.109582044,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2019804/000114036124030416/ny20027439x2_s1.htm",
+      "title": "filed",
+      "snippet": "General Risk Factors We are a blank check company with no operating history and no revenues, and you have no basis on which to evaluate our ability to achieve our business objective. [...] Check Companies Subject to Rule 419.”",
+      "discovered_by": "tavily",
+      "query": "site:sec.gov US company registry lists cross-check open data Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.098503634,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2034723/000121390026033923/ea0282734-f1_oneandone.htm",
+      "title": "Registration No. 333-[ ]",
+      "snippet": "| Supplier C | | | 12.57 | % | | | 10.55 | % | | | 11.61 | % | | | — | % | | Supplier D | | | — | % | | | — | % | | | — | % | | | 42.65 | % | | Supplier E | | | — | % | | | — | % | | | — | % | | | 57.35 | % | | Supplier F | | | 10.68 | % | | | 10.47 | % | | | — | % | | | — | % | | Supplier G | | | 10.48 | % | | | — | % | | | — | % | | | — | % | | Supplier H | | | — | % | | | 17.22 | % | | | — | % | | | — | % | [...] | Supplier C | | | 10.74 | % | | | \\ | | | | 19.05 | % | | | 10.55 | % | | Supplier D | | | \\ | | | | 10.75 | % | | | | | | Supplier E | | | \\ | | | | 10.42 | % | | | | | 10.47 | %",
+      "discovered_by": "tavily",
+      "query": "site:sec.gov US company registry lists cross-check open data Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.08513723,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1609711/000119312514230425/d728713dex1016.htm",
+      "title": "EX-10.16",
+      "snippet": "3.4.1.2 The data elements listed in Subsections 3.3.1.1 through 3.3.1.8; 3.4.1.3 the name and (where available) postal address, e-mail address, voice telephone number, and fax number of the billing contact; 3.4.1.4 any other Registry Data that Registrar has submitted to the Registry Operator or placed in the Registry Database under Subsection 3.2; and [...] 3.4.1.2 The data elements listed in Subsections 3.3.1.1 through 3.3.1.8; 3.4.1.3 the name and (where available) postal address, e-mail address, voice telephone number, and fax number of the billing contact; 3.4.1.4 any other Registry Data t",
+      "discovered_by": "tavily",
+      "query": "site:sec.gov US company registry lists cross-check open data Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.07115768,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1265888/000104746905018239/a2160129zex-10_5.htm",
+      "title": "Exhibit 10.5",
+      "snippet": "Until completion of the \"Compliance Report Process,\" NeuStar will assume responsibility for the operation of all of the currently undelegated name spaces identified in RFC 1480 and/or created by the prior usTLD Administrator.NeuStar will become the interim delegated manager for all such names and run the nameservers for those names.NeuStar's role as [...] to secure a successor registry. After the transition period, any rights held by Network Solutions, Inc., as registry in the registry data shall terminate. DOC will license the data on a non-exclusive, transferable, irrevocable, royalty-free, ",
+      "discovered_by": "tavily",
+      "query": "site:sec.gov US company registry lists cross-check open data Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name"
+      ],
+      "score": 0.057966188,
+      "publisher": null,
+      "lead_only": true,
+      "providers": [
+        "tavily"
+      ],
+      "iteration": 3
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/assets/public/favicon_compras_mx.ico",
+      "title": "comprasmx.buengobierno.gob.mx",
+      "snippet": "Public link on a captured publisher page.",
+      "discovered_by": "portal_link",
+      "query": "captured page from https://historico-compranet.buengobierno.gob.mx/#/",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "providers": [
+        "portal_link"
+      ],
+      "iteration": 3,
+      "exploration_depth": 1,
+      "follow_kind": "page",
+      "parent_url": "https://historico-compranet.buengobierno.gob.mx/#/",
+      "parent_capture_key": "sha256:b88930209f9917bb580e10ed455923caeed31207869943978ee817be005ea28e",
+      "link_provenance": {
+        "parent_source_id": "source-25ec965c0364",
+        "parent_page_url": "https://historico-compranet.buengobierno.gob.mx/#/",
+        "parent_capture_key": "sha256:b88930209f9917bb580e10ed455923caeed31207869943978ee817be005ea28e",
+        "link_url": "https://comprasmx.buengobierno.gob.mx/assets/public/favicon_compras_mx.ico",
+        "link_text": "comprasmx.buengobierno.gob.mx",
+        "link_index": 0,
+        "step_id": "step:624f61a270c64e959629c8bc07742d61"
+      }
+    }
+  ],
+  "candidates": [
+    {
+      "url": "https://www.sat.gob.mx",
+      "title": "Servicio de Administración Tributaria",
+      "snippet": "tax administration",
+      "discovered_by": "model",
+      "providers": [
+        "model"
+      ],
+      "query": "Compranet proveedores contratos públicos nombre razón social datos abiertos CompraNet OCDS Supplier RFC Legal name",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 1,
+      "status": "rejected",
+      "covers": [],
+      "capture_attempts": 1,
+      "source_id": "source-d887ba175514",
+      "capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+      "screenshot_key": "sha256:36ddf6e0ab394512cc7089157ccdd535f6ef1301d2fa1997cbba2cef1c0556a3",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://www.sat.gob.mx/portal/public/home",
+      "redirect_chain": [
+        "https://www.sat.gob.mx",
+        "https://www.sat.gob.mx/",
+        "https://www.sat.gob.mx/portal/public/home"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+          "tier": "primary",
+          "domain": "sat.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "domain": "sat.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "sat",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: Mexican tax authority incl. lista 69-B (SAT)",
+      "critic": {
+        "supplier_name": "SAT homepage has only a generic site search form and navigation links; no captured route to supplier legal-name records.",
+        "supplier_rfc": "No captured search form, listing, dataset, or API affordance that returns RFC records for suppliers."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://www.sat.gob.mx/portal/public/tramites/derechos-del-contribuyente",
+      "title": "Derechos del Contribuyente",
+      "snippet": "Derechos del Contribuyente Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "discovered_by": "portal_link",
+      "providers": [
+        "portal_link"
+      ],
+      "query": "captured page from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 1,
+      "status": "rejected",
+      "covers": [],
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.sat.gob.mx/portal/public/tramites/derechos-del-contribuyente",
+        "link_text": "Derechos del Contribuyente Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 60,
+        "step_id": "step:12e87601d1004c939815f23d002d2a82"
+      },
+      "capture_attempts": 1,
+      "source_id": "source-e3674c79c57c",
+      "capture_key": "sha256:f6ec260cbde73ed5ba4d9646dc73863ea9029ea41702c686c163ae6cdfeca0d0",
+      "screenshot_key": "sha256:3db7dc6d6bd373b9d88a3dd65b299c49fa36cc4817464c363fcf027ecbd81634",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://www.sat.gob.mx/portal/public/tramites/derechos-del-contribuyente",
+      "redirect_chain": [
+        "https://www.sat.gob.mx/portal/public/tramites/derechos-del-contribuyente"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+          "tier": "primary",
+          "domain": "sat.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "domain": "sat.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "sat",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: Mexican tax authority incl. lista 69-B (SAT)",
+      "critic": {
+        "supplier_name": "Derechos del Contribuyente page is informational; no retrieval route to supplier legal-name records.",
+        "supplier_rfc": "No captured form, listing, dataset, or API that supplies RFC values for suppliers."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://www.sat.gob.mx/portal/public/aviso-de-privacidad",
+      "title": "Aviso de privacidad",
+      "snippet": "Aviso de privacidad Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "discovered_by": "portal_link",
+      "providers": [
+        "portal_link"
+      ],
+      "query": "captured page from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 1,
+      "status": "rejected",
+      "covers": [],
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.sat.gob.mx/portal/public/aviso-de-privacidad",
+        "link_text": "Aviso de privacidad Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 62,
+        "step_id": "step:12e87601d1004c939815f23d002d2a82"
+      },
+      "capture_attempts": 1,
+      "source_id": "source-e3ddd9bf42b7",
+      "capture_key": "sha256:733facf12e74ae686ecc5c94c5035ae4574dc8f0a970c9c8651951edef100486",
+      "screenshot_key": "sha256:6cb676e87ba78801f79ce39daabc51c10dac2656a1fcda4d84660339d25fc9eb",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://www.sat.gob.mx/portal/public/aviso-de-privacidad",
+      "redirect_chain": [
+        "https://www.sat.gob.mx/portal/public/aviso-de-privacidad"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+          "tier": "primary",
+          "domain": "sat.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "domain": "sat.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "sat",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: Mexican tax authority incl. lista 69-B (SAT)",
+      "critic": {
+        "supplier_name": "Privacy-notice page; mentions Razón social only as collected personal data, with no retrieval route to supplier records.",
+        "supplier_rfc": "RFC appears only as a privacy data category; no search form, listing, dataset, or API returning RFC records."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://www.sat.gob.mx/minisitio/BuscadorCorreosFalsos/buscador.html",
+      "title": "Buscador de correos falsos",
+      "snippet": "Buscador de correos falsos Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "discovered_by": "portal_link",
+      "providers": [
+        "portal_link"
+      ],
+      "query": "captured page from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 1,
+      "status": "rejected",
+      "covers": [],
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.sat.gob.mx/minisitio/BuscadorCorreosFalsos/buscador.html",
+        "link_text": "Buscador de correos falsos Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 65,
+        "step_id": "step:12e87601d1004c939815f23d002d2a82"
+      },
+      "capture_attempts": 1,
+      "source_id": "source-219ddd2a0de1",
+      "capture_key": "sha256:62129d1209830865f89bf9f1a78b2e982d77ea6d55ba27c9084debcab03dca0d",
+      "screenshot_key": "sha256:1adfead8cbfcf3baf9a3d27e6d340a20d33deee7e5fc068c465517f90ac78c98",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://www.sat.gob.mx/minisitio/BuscadorCorreosFalsos/buscador.html",
+      "redirect_chain": [
+        "https://www.sat.gob.mx/minisitio/BuscadorCorreosFalsos/buscador.html"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+          "tier": "primary",
+          "domain": "sat.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "domain": "sat.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "sat",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: Mexican tax authority incl. lista 69-B (SAT)",
+      "critic": {
+        "supplier_name": "Search form queries email addresses of fake emails, not supplier legal names; wrong entity type.",
+        "supplier_rfc": "Captured search field is for email addresses, not RFC; no route to supplier RFC records."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://www.sat.gob.mx/portal/public/tramites/quejas-o-denuncias",
+      "title": "Quejas o denuncias",
+      "snippet": "Quejas o denuncias Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+      "discovered_by": "portal_link",
+      "providers": [
+        "portal_link"
+      ],
+      "query": "captured page from https://www.sat.gob.mx/portal/public/home",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 1,
+      "status": "rejected",
+      "covers": [],
+      "link_provenance": {
+        "parent_source_id": "source-d887ba175514",
+        "parent_page_url": "https://www.sat.gob.mx/portal/public/home",
+        "parent_capture_key": "sha256:2e22677cb54b6852bc798e35a5b3101a5531604150833f65cc4de8606ed0efe4",
+        "link_url": "https://www.sat.gob.mx/portal/public/tramites/quejas-o-denuncias",
+        "link_text": "Quejas o denuncias Portal de Trámites y Servicios Portal de Trámites y Servicios Prensa Derechos del Contribuyente Datos abiertos Aviso de privacidad Guía de usuario nuevo Portal Conciliación de factura Buscador de correos falsos Denuncias SAT Quejas o denuncias Nueva denuncia 55 8852 2222 Denuncia a factureras",
+        "link_index": 66,
+        "step_id": "step:12e87601d1004c939815f23d002d2a82"
+      },
+      "capture_attempts": 1,
+      "source_id": "source-06a200b76210",
+      "capture_key": "sha256:0ed136bce1aa4d1893c8cd6f06b19810d3d25f2c2d0e06cccbf5b4b2a3fc66bf",
+      "screenshot_key": "sha256:1f86070b98eca78a0957b49235c3c9d3c2a45e89238588a359f8af2a5342374e",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://www.sat.gob.mx/portal/public/tramites/quejas-o-denuncias",
+      "redirect_chain": [
+        "https://www.sat.gob.mx/portal/public/tramites/quejas-o-denuncias"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+          "tier": "primary",
+          "domain": "sat.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "domain": "sat.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "sat",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: Mexican tax authority incl. lista 69-B (SAT)",
+      "critic": {
+        "supplier_name": "Complaints page; no captured retrieval route to supplier legal-name records.",
+        "supplier_rfc": "No form, listing, dataset, or API affordance supplying RFC values for suppliers."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "http://www.gob.mx/se/",
+      "title": "Redirect destination at www.gob.mx",
+      "snippet": "Public URL observed in a browser redirect chain.",
+      "discovered_by": "approved_source",
+      "providers": [
+        "approved_source"
+      ],
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "iteration": 1,
+      "status": "rejected",
+      "covers": [],
+      "source_id": "source-454946f4f222",
+      "source_review_id": "source-454946f4f222",
+      "source_review_fingerprint": "343c4284091672255dfdb62bdedc9847abe51f4b75cfc512cf33f4abd02f920d",
+      "capture_attempts": 1,
+      "capture_key": "sha256:65320d781627336b5703e900b028f9552ad66f12d92b1978280f96cde1b0b43a",
+      "screenshot_key": "sha256:293c86a27d9769943946e8628aa3b8ca3f1a44e011a44b325a725073b12de881",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "http://www.gob.mx/se/",
+      "redirect_chain": [
+        "http://www.gob.mx/se/"
+      ],
+      "matched_publishers": [],
+      "publisher_inherited_from_approved_link": false,
+      "source_type": "compranet",
+      "authority": "review",
+      "authority_tier": "unknown",
+      "authority_reason": "publisher authority needs human review",
+      "critic": {
+        "supplier_name": "Empty redirect page with no text, forms, or content links; no retrieval route and no identified publisher.",
+        "supplier_rfc": "Empty redirect page; no captured retrieval route for RFC.",
+        "registered_address": "Empty redirect page; no captured retrieval route for registered address.",
+        "founding_date": "Empty redirect page; no captured retrieval route for founding date.",
+        "tax_list_status": "Empty redirect page; no captured retrieval route for 69-B status.",
+        "sanction_status": "Empty redirect page; no captured retrieval route for sanction status."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://www.cnbv.gob.mx/",
+      "title": "Redirect destination at www.cnbv.gob.mx",
+      "snippet": "Public URL observed in a browser redirect chain.",
+      "discovered_by": "approved_source",
+      "providers": [
+        "approved_source"
+      ],
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "iteration": 2,
+      "status": "capture_failed",
+      "covers": [],
+      "source_id": "source-480cb2d2014e",
+      "source_review_id": "source-480cb2d2014e",
+      "source_review_fingerprint": "627bffb9e32f0b0916b4a619eecb91bdf71be4825d996c56bb4faddf482e93e6",
+      "capture_reason": "sandbox_navigation_error",
+      "capture_error": "sandbox navigation failed",
+      "capture_outcome": "blocked",
+      "capture_attempts": 1
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Listado_completo_69-B.csv",
+      "title": "Listado completo Listado completo Listado completo",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+      "discovered_by": "approved_source",
+      "providers": [
+        "approved_source"
+      ],
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "iteration": 2,
+      "status": "capture_failed",
+      "covers": [],
+      "source_id": "source-link-481def00947ae0aebcb7",
+      "source_review_id": "source-link-481def00947ae0aebcb7",
+      "source_review_fingerprint": "a12275b7d2e7b7930e5b60cb55fb078994bbe4b19868def655257777d7dbf52f",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-8c5c823c9953",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/contribuyentes_publicados.html",
+        "parent_capture_key": "sha256:e807abc2bfe773af6f5462b432108dea2cd69a389513c8ec9556224529f9f8f3",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Documents_AGAFF/Listado_completo_69-B.csv",
+        "link_text": "Listado completo Listado completo Listado completo",
+        "link_index": 37,
+        "step_id": "step:95201f00fa0c4d78a8d05bbfe19f86a5"
+      },
+      "capture_attempts": 1,
+      "capture_reason": "sandbox_parse_failed",
+      "capture_error": "<redacted>",
+      "capture_outcome": "failed",
+      "capture_key": "sha256:c117757498bf547eba34ed3df9a6c01e73228c5ca7fd2ba67ded6825023c0fed"
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/",
+      "title": "Publisher root at comprasmx.buengobierno.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for ComprasMX / Buen Gobierno federal public-procurement publisher.",
+      "discovered_by": "authority_policy",
+      "providers": [
+        "authority_policy"
+      ],
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 2,
+      "status": "rejected",
+      "covers": [],
+      "capture_attempts": 1,
+      "source_id": "source-067911656758",
+      "capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+      "screenshot_key": "sha256:5f708439f0a3d8c9037fb8492d3983093c357819cda56517c92ae5f5d3665d38",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://comprasmx.buengobierno.gob.mx/",
+      "redirect_chain": [
+        "https://comprasmx.buengobierno.gob.mx/"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "ComprasMX / Buen Gobierno federal public-procurement publisher",
+          "tier": "primary",
+          "domain": "comprasmx.buengobierno.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 5 names ComprasMX/Buen Gobierno as the federal procurement publisher for contract awards (supplier, RFC, agency, amount, date), replacing dead compranet.hacienda.gob.mx; historic CompraNet retained."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "ComprasMX / Buen Gobierno federal public-procurement publisher",
+        "domain": "comprasmx.buengobierno.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "compranet",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: ComprasMX / Buen Gobierno federal public-procurement publisher",
+      "critic": {
+        "founding_date": "Root portal has no supplier records, tables, or parsed document; no retrieval route for founding date.",
+        "registered_address": "No listing, dataset, form, or document evidence on this page supplies supplier addresses.",
+        "supplier_name": "Policy-matched primary procurement publisher, but this root page is a navigation portal with no concrete record-level access path; only a generic keyword form (search_like false) and generic links.",
+        "supplier_rfc": "Publisher is authoritative for contract award RFCs per policy, but no captured form, listing, dataset, or API affordance on this page provides RFC records."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://datos.gob.mx/",
+      "title": "Publisher root at datos.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for Mexican public procurement records (CompraNet/compras publicas).",
+      "discovered_by": "authority_policy",
+      "providers": [
+        "authority_policy"
+      ],
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 2,
+      "status": "inconclusive",
+      "covers": [],
+      "capture_reason": "bot_challenge",
+      "capture_error": "sandbox navigation failed",
+      "capture_outcome": "blocked",
+      "capture_attempts": 1,
+      "alternate_channel_hint": "Search for the publisher's open-data portal, published datasets, or documented API; do not retry or bypass the interstitial."
+    },
+    {
+      "url": "https://economia.gob.mx/",
+      "title": "Publisher root at economia.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for Mexican public commercial registries (registros publicos).",
+      "discovered_by": "authority_policy",
+      "providers": [
+        "authority_policy"
+      ],
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 2,
+      "status": "capture_failed",
+      "covers": [],
+      "capture_reason": "redirect_outside_allowlist",
+      "capture_error": "redirect left the job allowlist",
+      "capture_outcome": "blocked",
+      "capture_attempts": 1
+    },
+    {
+      "url": "https://comprasmx.buengobierno.gob.mx/datos-abiertos",
+      "title": "Datos Abiertos",
+      "snippet": "Datos Abiertos Datos Abiertos Datos Abiertos",
+      "discovered_by": "portal_link",
+      "providers": [
+        "portal_link"
+      ],
+      "query": "captured page from https://comprasmx.buengobierno.gob.mx/",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 3,
+      "status": "rejected",
+      "covers": [],
+      "link_provenance": {
+        "parent_source_id": "source-067911656758",
+        "parent_page_url": "https://comprasmx.buengobierno.gob.mx/",
+        "parent_capture_key": "sha256:46bef8ac65b03b39eea6302d83820a456571a24994b702b9ba90efa78c257076",
+        "link_url": "https://comprasmx.buengobierno.gob.mx/datos-abiertos",
+        "link_text": "Datos Abiertos Datos Abiertos Datos Abiertos",
+        "link_index": 12,
+        "step_id": "step:ac1f2c95bebf4a41b031c4fa37a8e0e2"
+      },
+      "capture_attempts": 1,
+      "source_id": "source-09b6e90aec84",
+      "capture_key": "sha256:b8604e5f8794d7c9bd6ce4d820e46fd631f378324be0ef0e042873faea3e2e40",
+      "screenshot_key": "sha256:f7ff623b59bab85422c3dcb305cb5fbbe53cdba5cefdcc2f80858d5d78b5024d",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://comprasmx.buengobierno.gob.mx/datos-abiertos",
+      "redirect_chain": [
+        "https://comprasmx.buengobierno.gob.mx/datos-abiertos"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "ComprasMX / Buen Gobierno federal public-procurement publisher",
+          "tier": "primary",
+          "domain": "comprasmx.buengobierno.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 5 names ComprasMX/Buen Gobierno as the federal procurement publisher for contract awards (supplier, RFC, agency, amount, date), replacing dead compranet.hacienda.gob.mx; historic CompraNet retained."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "ComprasMX / Buen Gobierno federal public-procurement publisher",
+        "domain": "comprasmx.buengobierno.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "compranet",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: ComprasMX / Buen Gobierno federal public-procurement publisher",
+      "critic": {
+        "founding_date": "Landing page with no forms, tables, or dataset download links in captured evidence; no retrieval route for founding date, and procurement publisher is not authoritative for company founding.",
+        "registered_address": "No concrete access path on the Datos Abiertos landing page; captured links contain no dataset or record-list route, and procurement records are not authoritative for registered address.",
+        "supplier_name": "Publisher is authoritative for contract supplier data, but this page is a landing page: no forms, no listing rows, and no captured dataset download links, so no concrete retrieval route exists.",
+        "supplier_rfc": "Authoritative procurement publisher, but captured evidence shows only category text with no dataset link, form, or listing; cannot confirm an access path supplying RFC."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls",
+      "title": "Por situación ante el RFC",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+      "discovered_by": "approved_source",
+      "providers": [
+        "approved_source"
+      ],
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "iteration": 3,
+      "status": "rejected",
+      "covers": [],
+      "source_id": "source-link-6bcafaea9baf0b235c28",
+      "source_review_id": "source-link-6bcafaea9baf0b235c28",
+      "source_review_fingerprint": "49f0a47b1c628fb7c1f415684eab64e99c5b75725dfe64c1ecd992552096cd41",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-16d6e359e403",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls",
+        "link_text": "Por situación ante el RFC",
+        "link_index": 17,
+        "step_id": "step:3f635ff0b0784089bec3e58a818eb344"
+      },
+      "capture_attempts": 1,
+      "capture_key": "sha256:a18539ba460006b54f6ddf41ea79e5e17a83368245d0eda6274f32055b3a49bf",
+      "screenshot_key": null,
+      "artifact_kind": "download",
+      "document_key": "sha256:a18539ba460006b54f6ddf41ea79e5e17a83368245d0eda6274f32055b3a49bf",
+      "document_content_type": "application/vnd.ms-excel",
+      "document_size_bytes": 89088,
+      "capture_status": 200,
+      "landing_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls",
+      "redirect_chain": [
+        "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/PorSitRFC21.xls"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+          "tier": "primary",
+          "domain": "sat.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+        }
+      ],
+      "publisher_inherited_from_approved_link": true,
+      "publisher_of_record": {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "domain": "sat.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "sat",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved document link inherits its verified parent publisher",
+      "critic": {
+        "supplier_name": "Parsed sheet holds monthly aggregate counts of RFC statuses; no per-supplier rows or name column, so it cannot supply legal names.",
+        "supplier_rfc": "Sheet is aggregate statistics by month (Activos/Suspendidos/Cancelados counts); no RFC identifier column or entity rows, so no retrieval route for a supplier's RFC.",
+        "registered_address": "Aggregate monthly counts only; no address column and no entity-level rows, and SAT statistics file is not an address provider.",
+        "founding_date": "Sheet contains yearly/monthly totals of taxpayer statuses, not registration dates per company; no founding-date column or entity rows.",
+        "tax_list_status": "SAT is authoritative for 69-B, but this file is aggregate counts by month, not the lista 69-B entity list; no per-supplier status rows exist here.",
+        "sanction_status": "Aggregate monthly statistics file; no sanction screening data, no entity rows, and SAT statistics are not the sanctions-screening source."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_38_EmpCer.xls",
+      "title": "Empresas certificadas OEA",
+      "snippet": "Document link observed on https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+      "discovered_by": "approved_source",
+      "providers": [
+        "approved_source"
+      ],
+      "query": "digest-verified source approval from an earlier run",
+      "property_ids": [
+        "supplier_name",
+        "supplier_rfc",
+        "registered_address",
+        "founding_date",
+        "tax_list_status",
+        "sanction_status"
+      ],
+      "iteration": 3,
+      "status": "rejected",
+      "covers": [],
+      "source_id": "source-link-72b98c3e7f7c5545a35b",
+      "source_review_id": "source-link-72b98c3e7f7c5545a35b",
+      "source_review_fingerprint": "d0f1a3eca3577968eddf806671bb11913ed9555e9ba02660a78c188165dff346",
+      "dataset_link": true,
+      "link_provenance": {
+        "parent_source_id": "source-16d6e359e403",
+        "parent_page_url": "https://www.sat.gob.mx/minisitio/DatosAbiertos/padron.html",
+        "parent_capture_key": "sha256:d5c6ad02ac8e921beba45a249915d8c8e3f53f65715a5a771654f77f01b3be19",
+        "link_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_38_EmpCer.xls",
+        "link_text": "Empresas certificadas OEA",
+        "link_index": 23,
+        "step_id": "step:5fc2f12971194cd5a39b6e1a1de2cbca"
+      },
+      "capture_attempts": 1,
+      "capture_key": "sha256:50cd349241114d25a75e9a01efbbe29f85e31ed332608c5120e95ec9fd0d1be9",
+      "screenshot_key": null,
+      "artifact_kind": "download",
+      "document_key": "sha256:50cd349241114d25a75e9a01efbbe29f85e31ed332608c5120e95ec9fd0d1be9",
+      "document_content_type": "application/vnd.ms-excel",
+      "document_size_bytes": 75264,
+      "capture_status": 200,
+      "landing_url": "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_38_EmpCer.xls",
+      "redirect_chain": [
+        "https://wu1agsprosta001.blob.core.windows.net/agsc-publicaciones/Datos_abiertos/Cifras_SAT/Documents/FORMATO_38_EmpCer.xls"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+          "tier": "primary",
+          "domain": "sat.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+        }
+      ],
+      "publisher_inherited_from_approved_link": true,
+      "publisher_of_record": {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "domain": "sat.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "sat",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved document link inherits its verified parent publisher",
+      "critic": {
+        "supplier_name": "Parsed sheet holds monthly counts of certified companies; no name column or per-entity rows, so it cannot supply legal names.",
+        "supplier_rfc": "Sheet is aggregate counts of certified companies per month; no RFC column or entity-level rows, so no retrieval route for a supplier's RFC.",
+        "registered_address": "Aggregate monthly counts only; no address column and no entity rows, so the sheet cannot supply registered addresses.",
+        "founding_date": "Sheet contains yearly/monthly totals of certified companies, not registration dates per company; no founding-date column.",
+        "tax_list_status": "SAT is authoritative for 69-B, but this OEA certification file is aggregate counts by month, not the 69-B entity list; no per-supplier status rows.",
+        "sanction_status": "Aggregate monthly statistics of certified companies; no sanction screening data or entity rows, and this is not a sanctions source."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://treasury.gov/",
+      "title": "Publisher root at treasury.gov",
+      "snippet": "Domain root listed in the approved authority policy for US sanctions lists (OFAC) cross-check.",
+      "discovered_by": "authority_policy",
+      "providers": [
+        "authority_policy"
+      ],
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 3,
+      "status": "inconclusive",
+      "covers": [],
+      "capture_reason": "bot_challenge",
+      "capture_error": "sandbox navigation failed",
+      "capture_outcome": "blocked",
+      "capture_attempts": 1,
+      "alternate_channel_hint": "Search for the publisher's open-data portal, published datasets, or documented API; do not retry or bypass the interstitial."
+    },
+    {
+      "url": "https://sat.gob.mx/",
+      "title": "Publisher root at sat.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for Mexican tax authority incl. lista 69-B (SAT).",
+      "discovered_by": "authority_policy",
+      "providers": [
+        "authority_policy"
+      ],
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 3,
+      "status": "rejected",
+      "covers": [],
+      "capture_attempts": 1,
+      "source_id": "source-e62db434b477",
+      "capture_key": "sha256:64c6afc5392894cf6bdc5414625fd2cc47348aed380aea58206fb46f7b6ef29e",
+      "screenshot_key": "sha256:36ddf6e0ab394512cc7089157ccdd535f6ef1301d2fa1997cbba2cef1c0556a3",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://sat.gob.mx/portal/public/home",
+      "redirect_chain": [
+        "https://sat.gob.mx/",
+        "https://sat.gob.mx/portal/public/home"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+          "tier": "primary",
+          "domain": "sat.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 2 designates SAT, including 69-B tax-list status, as primary."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "Mexican tax authority incl. lista 69-B (SAT)",
+        "domain": "sat.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "sat",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: Mexican tax authority incl. lista 69-B (SAT)",
+      "critic": {
+        "founding_date": "Portal home page with only a generic site 'Buscar' search; no captured route returning company registration dates, and the tax portal is not the founding-date authority.",
+        "registered_address": "Generic portal search only; no captured form or listing that returns a company's registered address, and SAT portal is not the address authority.",
+        "supplier_name": "Home page offers only a generic content search with no captured taxpayer-lookup form or record listing; no concrete route to a supplier's legal name.",
+        "supplier_rfc": "SAT is authoritative for RFC, but this home page captures only a generic 'Buscar' site search with no taxpayer/RFC lookup form or record listing."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    },
+    {
+      "url": "https://historico-compranet.buengobierno.gob.mx/",
+      "title": "Publisher root at historico-compranet.buengobierno.gob.mx",
+      "snippet": "Domain root listed in the approved authority policy for ComprasMX / Buen Gobierno federal public-procurement publisher.",
+      "discovered_by": "authority_policy",
+      "providers": [
+        "authority_policy"
+      ],
+      "query": "approved publisher domain root",
+      "property_ids": [
+        "founding_date",
+        "registered_address",
+        "supplier_name",
+        "supplier_rfc"
+      ],
+      "iteration": 3,
+      "status": "rejected",
+      "covers": [],
+      "capture_attempts": 2,
+      "source_id": "source-25ec965c0364",
+      "capture_key": "sha256:b88930209f9917bb580e10ed455923caeed31207869943978ee817be005ea28e",
+      "screenshot_key": "sha256:acffc041d1d4506d3d9574999378c4d26e37ca4f13e7d78364db41b81e00701a",
+      "artifact_kind": "html",
+      "capture_status": 200,
+      "landing_url": "https://historico-compranet.buengobierno.gob.mx/#/",
+      "redirect_chain": [
+        "https://historico-compranet.buengobierno.gob.mx/",
+        "https://historico-compranet.buengobierno.gob.mx/#/"
+      ],
+      "matched_publishers": [
+        {
+          "kind": "ComprasMX / Buen Gobierno federal public-procurement publisher",
+          "tier": "primary",
+          "domain": "historico-compranet.buengobierno.gob.mx",
+          "jurisdiction": "Mexico",
+          "rationale": "Human revision 5 names ComprasMX/Buen Gobierno as the federal procurement publisher for contract awards (supplier, RFC, agency, amount, date), replacing dead compranet.hacienda.gob.mx; historic CompraNet retained."
+        }
+      ],
+      "publisher_inherited_from_approved_link": false,
+      "publisher_of_record": {
+        "kind": "ComprasMX / Buen Gobierno federal public-procurement publisher",
+        "domain": "historico-compranet.buengobierno.gob.mx",
+        "tier": "primary",
+        "basis": "approved_policy"
+      },
+      "source_type": "compranet",
+      "authority": "auto",
+      "authority_tier": "primary",
+      "authority_reason": "approved publisher kind: ComprasMX / Buen Gobierno federal public-procurement publisher",
+      "critic": {
+        "founding_date": "Search form and listing are procedure-level (expediente fields, Dependencia, publication date); no company founding-date field, and procurement publisher is not authoritative for founding date.",
+        "registered_address": "Captured form fields and listing headers cover procedure metadata only; no supplier address column or route, and procurement records are not an address authority.",
+        "supplier_name": "Publisher is authoritative for contract supplier data, but captured search fields and listing headers are procedure-level with no supplier name column or supplier search route.",
+        "supplier_rfc": "Authoritative procurement publisher, but the captured form searches expediente/procedimiento identifiers and the listing shows no RFC column; no confirmed route to a supplier's RFC."
+      },
+      "access_path": {},
+      "property_evidence": {}
+    }
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3",
+    "at": "2026-09-27T18:41:22.676151+00:00"
+  }
+}

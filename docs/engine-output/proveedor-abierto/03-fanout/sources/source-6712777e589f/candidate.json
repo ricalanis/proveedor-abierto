@@ -1,0 +1,24 @@
+{
+  "source_id": "source-6712777e589f",
+  "url": "https://www.inadem.gob.mx/",
+  "title": "Redirect destination at www.inadem.gob.mx",
+  "snippet": "Public URL observed in a browser redirect chain.",
+  "provider": "sandbox_redirect",
+  "providers": [
+    "sandbox_redirect"
+  ],
+  "capture_key": null,
+  "authority": "review",
+  "authority_tier": "unknown",
+  "authority_reason": "publisher authority needs human review",
+  "fingerprint": "546ff44b14a7fe5ae18287fd925085fbdc6820ae2ae056b2cedbb34fd14ce37a",
+  "redirect_chain": [
+    "http://www.inadem.gob.mx/",
+    "https://www.inadem.gob.mx/"
+  ],
+  "generated_by": {
+    "backend": "vultr",
+    "model": "glm-5.3-flash",
+    "at": "2026-09-27T09:52:02.462216+00:00"
+  }
+}

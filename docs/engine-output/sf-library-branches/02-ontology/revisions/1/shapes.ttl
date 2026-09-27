@@ -1,0 +1,23 @@
+# generated_by: {"at": "2026-09-27T18:31:42.526208+00:00", "backend": "vultr", "model": "minimax-m3"}
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix onto: <https://ontofill.dev/ontology/> .
+
+onto:library_branchShape a sh:NodeShape ;
+    sh:targetClass onto:library_branch
+    ; sh:property [ sh:path onto:branch_id ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:branch_name ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:address ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:weekly_opening_hours ; sh:datatype xsd:string ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:has_free_wifi ; sh:datatype xsd:boolean ; sh:minCount 1 ]
+    ; sh:property [ sh:path onto:sfgov_address ; sh:datatype xsd:string ]
+    .
+
+onto:source_recordShape a sh:NodeShape ;
+    sh:targetClass onto:source_record
+    ; sh:property [ sh:path onto:source_id ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:source_name ; sh:datatype xsd:string ]
+    ; sh:property [ sh:path onto:source_url ; sh:datatype xsd:anyURI ]
+    ; sh:property [ sh:path onto:is_public_readonly ; sh:datatype xsd:boolean ]
+    .
+
