@@ -67,7 +67,6 @@ services:
       <<: *env
       PA_ROLE: approver
       PA_IDENTITY_HEADER: X-NetBird-User              # prefills the approver's name; nothing depends on it
-      PA_LOG_HEADER_NAMES: ${PA_LOG_HEADER_NAMES:-}   # "1" = log request header NAMES (never values), diagnostics only
     volumes:
       - ${PA_LAKE_DIR:-../.lake}:/lake:ro
       - ${PA_CASE_HOST_DIR:-../case}:/case:rw          # only the approver writes, and only APPROVED markers
