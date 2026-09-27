@@ -105,7 +105,7 @@ local_mode() {
 remote_mode() {
   local vm=$1 inv=$2 app=$3
   echo "Remote gate checks (VM ${vm})"
-  for port in 80 443 3000 5000 5432 7700 7878 8000 8080 8400 8401 8402 8443 8700 8702 8766 9000; do
+  for port in 80 443 3000 5000 5432 7700 7878 8000 8080 8400 8401 8402 8410 8443 8700 8702 8766 9000; do
     if port_open "$vm" "$port" 3; then fail "VM port $port is open"; else pass "VM port $port closed"; fi
   done
   # Zero public inbound ports, SSH included: administration goes over NetBird.

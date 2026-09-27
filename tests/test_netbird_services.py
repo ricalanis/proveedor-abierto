@@ -117,3 +117,12 @@ def test_replay_service_only_when_configured_and_gated_like_the_investigator():
     replay = next(s for s in api.services if s["name"] == "proveedor-replay.eu1.netbird.services")
     inv = next(s for s in api.services if s["name"] == "proveedor.eu1.netbird.services")
     assert replay["auth"] == inv["auth"] and replay["targets"][0]["port"] == 8402
+
+
+
+def test_console_service_gated_like_the_approver():
+    api = FakeApi([VM])
+    assert run(api, "apply", env={**ENV, "PA_CONSOLE_PORT": "8410"})[0] == 0
+    console = next(s for s in api.services if s["name"] == "ontofill-console.eu1.netbird.services")
+    approver = next(s for s in api.services if s["name"] == "proveedor-approver.eu1.netbird.services")
+    assert console["auth"] == approver["auth"] and console["targets"][0]["port"] == 8410

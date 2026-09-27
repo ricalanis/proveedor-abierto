@@ -16,6 +16,8 @@ Configuration comes from the environment (deploy/.env or the repo's .env, both g
     PA_INVESTIGATOR_PASSWORD or PA_INVESTIGATOR_PIN     investigator URL credential
     PA_APPROVER_GROUP           IdP distribution group for SSO on the approver URL (preferred), or PA_APPROVER_PIN
     PA_ALLOWED_COUNTRIES        optional, e.g. "US,MX": country allowlist on both services
+    PA_CONSOLE_PORT             optional: also the Ontofill Console service (name PA_CONSOLE_SERVICE, default
+                                "ontofill-console"), gated like the approver (SSO group, or the approver PIN)
     PA_REPLAY_PORT              optional: also a third service <prefix>-replay (the demo-insurance replay role,
                                 compose profile `replay`), gated by the investigator credential
 
@@ -141,6 +143,8 @@ def desired(api, env: dict[str, str]) -> list[dict]:
 
     services = [service(prefix, int(env.get("PA_INVESTIGATOR_PORT", 8400)), inv_auth),
                 service(f"{prefix}-approver", int(env.get("PA_APPROVER_PORT", 8401)), app_auth)]
+    if env.get("PA_CONSOLE_PORT"):  # the B2B engine console (CONTRACT §14): approvers only, like the approver URL
+        services.append(service(env.get("PA_CONSOLE_SERVICE", "ontofill-console"), int(env["PA_CONSOLE_PORT"]), app_auth))
     if env.get("PA_REPLAY_PORT"):  # read-only replay of a recorded run: same credential as the investigator
         services.append(service(f"{prefix}-replay", int(env["PA_REPLAY_PORT"]), inv_auth))
     return services
