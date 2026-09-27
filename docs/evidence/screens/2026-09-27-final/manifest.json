@@ -1,0 +1,85 @@
+{
+ "captured_at": "2026-09-27T17:39:42+00:00",
+ "files": [
+  {
+   "file": "harness-home-1440-dark.png",
+   "url": "https://proveedor-harness.eu1.netbird.services/",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": null
+  },
+  {
+   "file": "harness-dossier-1440-dark.png",
+   "url": "https://proveedor-harness.eu1.netbird.services/entities/sup:ACT150219FK1",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": null
+  },
+  {
+   "file": "harness-dossier-receipt-1440-dark.png",
+   "url": "https://proveedor-harness.eu1.netbird.services/entities/sup:ACT150219FK1",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": "receipt"
+  },
+  {
+   "file": "harness-relationships-1440-dark.png",
+   "url": "https://proveedor-harness.eu1.netbird.services/relationships",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": "ontology-note"
+  },
+  {
+   "file": "harness-signals-1440-dark.png",
+   "url": "https://proveedor-harness.eu1.netbird.services/signals",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": null
+  },
+  {
+   "file": "console-sf-library-branches-answer-1440-dark.png",
+   "url": "https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": null
+  },
+  {
+   "file": "console-proveedor-abierto-hub-1440-dark.png",
+   "url": "https://ontofill-console-judges.eu1.netbird.services/cases/proveedor-abierto",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": null
+  },
+  {
+   "file": "console-proveedor-abierto-run-efc9be56964b-1440-dark.png",
+   "url": "https://ontofill-console-judges.eu1.netbird.services/cases/proveedor-abierto/runs/run-efc9be56964b",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": null
+  },
+  {
+   "file": "console-library-demo-containment-1440-dark.png",
+   "url": "https://ontofill-console-judges.eu1.netbird.services/cases/library-demo/runs/containment-demo-202609270251",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": null
+  },
+  {
+   "file": "console-proveedor-abierto-inference-run-efc9be56964b-1440-dark.png",
+   "url": "https://ontofill-console-judges.eu1.netbird.services/cases/proveedor-abierto/inference?run=run-efc9be56964b",
+   "status": 200,
+   "viewport": "1440x900",
+   "scheme": "dark",
+   "action": null
+  }
+ ]
+}
