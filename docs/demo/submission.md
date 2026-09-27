@@ -55,7 +55,8 @@ connections and a journal from any value back to the brief.
 - **Engine on the real case:** the PRD, factors and ontology are approved, and many real runs are on the console.
   There is **no engine gold yet**. The primary procurement portal's data API was refused by our egress allowlist,
   and the source critic accepted no other candidate. We didn't loosen the critic. The allowlist now admits the
-  portal's own API and CDN hosts, and the run resumed on that fix. **The engine run continues after submission;
+  portal's own API and CDN hosts (GET only; third-party hosts stay blocked and POSTs are refused), and the run
+  resumed on that fix. The portal now renders inside the sandbox. **The engine run continues after submission;
   its status is live on the judges console.**
 - **Harness-assisted run (Claude Code, not engine-authored, labelled on every page):** 394 suppliers and 958
   contracts from public data, keyed to the approved ontology and measured by the same unmodified DoD probe.

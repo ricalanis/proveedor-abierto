@@ -81,8 +81,11 @@ Three tracks, each labelled for what it is.
    and every failure fixed in code and rerun. All inference runs on Vultr. It has **no engine gold yet**: the primary
    federal procurement portal (ComprasMX) is a JavaScript app whose data API the sandbox egress allowlist refused,
    and the source critic has accepted none of the remaining candidates. We did not loosen the critic to get a
-   number; the allowlist now admits ComprasMX's own API and CDN hosts (engine `378a8c0`, deployed 10:52 PT), and run
-   `run-efc9be56964b` resumed on it. **The engine run continues after submission; its status is live on the judges
+   number. The allowlist now admits ComprasMX's own API and CDN hosts (engine `378a8c0`, deployed 10:52 PT), and run
+   `run-efc9be56964b` resumed on it. By 10:59 PT the data API host had been allowed 21 times and blocked 0 times, and
+   the portal now renders inside the gVisor sandbox (before, it was an empty shell). The blast radius stayed zero
+   while egress widened: only sibling hosts of a trusted publisher were added, GET only. Third-party analytics and
+   font CDNs stay blocked, and POSTs are refused. **The engine run continues after submission; its status is live on the judges
    console.**
 2. **A harness-assisted run (Claude Code, not engine-authored).** To show what the definition of done looks like
    on real data, a Claude Code session built a dataset by hand-written scripts from public downloads, keyed to the
