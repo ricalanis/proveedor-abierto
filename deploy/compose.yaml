@@ -46,6 +46,8 @@ services:
   # Replay again: docker compose --profile replay up -d --no-build --force-recreate replay
   replay:
     <<: *app
+    image: ${PA_CONTROL_IMAGE:-proveedor-abierto-app:local}  # control pages live in the console; this role
+                                                          # stays on the last image that has them until retired
     profiles: [replay]
     environment:
       <<: *env
@@ -63,6 +65,8 @@ services:
 
   approver:
     <<: *app
+    image: ${PA_CONTROL_IMAGE:-proveedor-abierto-app:local}  # control pages live in the console; this role
+                                                          # stays on the last image that has them until retired
     environment:
       <<: *env
       PA_ROLE: approver
