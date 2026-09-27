@@ -24,6 +24,25 @@ def legacy_root(tmp_path_factory) -> Path:
     return out
 
 
+@pytest.fixture(scope="session")
+def legacy_validator_for():
+    """Validate the app's historical rows against app-owned fixture schemas."""
+    jsonschema = pytest.importorskip("jsonschema")
+    referencing = pytest.importorskip("referencing")
+    root = Path(__file__).parent / "legacy_schemas"
+    docs = {path.name: json.loads(path.read_text()) for path in root.glob("*.schema.json")}
+    registry = referencing.Registry().with_resources(
+        (doc["$id"], referencing.Resource.from_contents(doc)) for doc in docs.values()
+    )
+
+    def make(name: str):
+        return jsonschema.Draft202012Validator(
+            docs[name], registry=registry, format_checker=jsonschema.Draft202012Validator.FORMAT_CHECKER
+        )
+
+    return make
+
+
 def _jsonl_problems(path: Path, v, kind: str | None = None) -> list[str]:
     from conftest import s12_compat
 
@@ -46,9 +65,9 @@ def test_jsonl_rows(fixture_root, validator_for, filename, schema):
 
 @pytest.mark.parametrize("filename,schema", [("suppliers.jsonl", "supplier.schema.json"),
                                              ("contracts.jsonl", "contract.schema.json")])
-def test_legacy_layout_rows(legacy_root, validator_for, filename, schema):
-    """The pre-§11 layout the adapter still reads stays valid against the engine's legacy schemas."""
-    problems = _jsonl_problems(_run_dir(legacy_root) / filename, validator_for(schema))
+def test_legacy_layout_rows(legacy_root, legacy_validator_for, filename, schema):
+    """The pre-§11 layout remains valid against app-owned historical schemas."""
+    problems = _jsonl_problems(_run_dir(legacy_root) / filename, legacy_validator_for(schema))
     assert not problems, f"{len(problems)} violations, first: {problems[:5]}"
 
 
