@@ -95,9 +95,11 @@ Names must be neutral (for example `pa-control-plane`, `pa-sandbox`). Never capt
 contains an employer's or client's name; rename the peer in the dashboard first, or leave it out of the capture.
 Also keep account emails, setup keys, and the PIN or password fields out of frame.
 
-- [ ] `./verify.sh remote ...` output (VM ports closed, both URLs refuse unauthenticated requests)
-- [ ] `./verify.sh local` output on the VM
-- [ ] NetBird dashboard: the product and console services with their authentication settings
-- [ ] Access policy / groups: the `approvers` group on the console
-- [ ] Peers list: control-plane VM and sandbox VM connected peer to peer, with names checked
-- [ ] `./verify.sh remote` shows port 22 closed as well (admin over NetBird only)
+- [x] `./verify.sh remote <ip> <product-url> <console-url>`: PASS (all checked ports closed, port 22 included; both
+      URLs refuse unauthenticated requests)
+- [ ] `./verify.sh local` output on the VM (not yet captured for the README)
+- [x] NetBird services with their authentication: [`docs/evidence/netbird-services.png`](../docs/evidence/netbird-services.png)
+- [x] Groups and access policies (sandbox → control plane: tcp/8700 only, one way):
+      [`netbird-peers-groups.png`](../docs/evidence/netbird-peers-groups.png) ·
+      [`netbird-policies.png`](../docs/evidence/netbird-policies.png), rendered from the API by `netbird_evidence.py`
+      with only the two VM peers named

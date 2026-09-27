@@ -80,11 +80,12 @@ A control plane that plans on Vultr models and dispatches disposable sandboxes. 
   - **Controller** (MCP): `session.open / act / observe / close`, a warm pool of cells, recycled after every session.
     Two backends: the **native** loop (primary, concurrent) and **Skyvern** for hard navigation (one unmodified
     Skyvern per cell, called over its API).
-  - Postgres + Oxigraph for silver and gold. *(Deployment pending.)*
+  - Postgres + Oxigraph for silver and gold, on the control VM (loopback only).
 - **Sandbox host (VX1 #2), zero secrets:** each **cell** is gVisor Chromium "hands" behind an egress allowlist
   proxy, with memory, CPU, process and time caps, plus an optional Skyvern "brain" that holds only a session token.
-  Each cell has its own network; it cannot reach the cloud metadata IP, the mesh or other cells. *(Pending; the local
-  rehearsal runs runc.)*
+  Each cell has its own network; it cannot reach the cloud metadata IP, the mesh or other cells. Live on the sandbox
+  VM: a real cell reports runtime `runsc` and passes all six proof checkpoints (a local rehearsal without gVisor runs
+  `runc`, and the proof panel says so).
 - **Lake:** bronze (raw, content-addressed captures) on Vultr Object Storage; silver (observations with evidence,
   conflicts kept) and gold (reconciled, SHACL-valid values). Git never holds captured data. An ontology or PRD change
   re-refines gold from bronze without browsing again.
@@ -110,25 +111,80 @@ Every sandbox job reports **six proof checks** on the console's run view → San
 isolation probe (BLOCKED), teardown and secret hygiene (no keys in the pod; metadata IP and mesh BLOCKED). The
 proof also shows each job's resource limits (memory, CPU, processes, timeout, steps) and any job a limit killed.
 
-## Setup
+## Setup: run it yourself
 
-**Local quickstart** (synthetic data, no credentials):
+Four pieces, in two repos. Commands below were checked against the code; env vars are names only (values live in
+gitignored `.env` files on the machine that needs them).
+
+**1. The product (this repo), synthetic data, no credentials**
 
 ```bash
 uv sync --all-extras
-uv run pa-app serve --fixtures                        # http://127.0.0.1:8400
-uv run pa-app fixtures --domain libraries .cache/libs  # a second, unrelated domain (see below)
-uv run pytest -q                                      # unit, HTTP, schema and headless-browser tests
+uv run pa-app serve --fixtures                         # http://127.0.0.1:8400, synthetic export
+uv run pa-app fixtures --domain libraries .cache/libs   # a second, unrelated domain: same screens, no code changes
+uv run pa-app dod --gold-dir <export>                   # recompute the DoD from gold, cross-check metrics.json
+uv run pytest -q                                       # unit, HTTP, schema and headless-browser tests
 ```
 
-**Against a real engine export:** copy `lake.example.yaml` to `lake.yaml` (S3 or `kind: file`), or point
-`PA_GOLD_DIR` at a local export. `PA_RUN_ID` (or `serve --run-id`) pins a run that has no `latest` pointer, such
-as a mock run. `PA_CASE_DIR` points at the case package.
+Against a real engine export: copy `lake.example.yaml` to `lake.yaml` (S3 or `kind: file`), or set `PA_GOLD_DIR`
+to a local export; `PA_RUN_ID` (or `serve --run-id`) pins a run; `PA_CASE_DIR` points at the case package. The product
+is consumer-only: approvals, the live run view, spend, evidence and replay live in the Ontofill Console.
 
-**Deploy:** [`deploy/README.md`](deploy/README.md): Docker Compose with the two role containers, the NetBird Cloud
-reverse proxy (one URL per role) and `deploy/verify.sh` to prove the gate.
+**2. The engine** ([Ontofill](https://github.com/ricalanis/ontofill))
 
-**Public demo URL:** pending deployment.
+```bash
+cd ../ontofill && uv sync
+uv run ontofill run ../proveedor-abierto/case --to-phase 1 --budget-usd 2   # add --run-id run-<id> to name it
+```
+
+- Inference: in the deployment the engine calls Vultr **only through the inference gateway**:
+  `VULTR_INFERENCE_BASE_URL=http://<control NetBird IP>:8700/v1` and, in `VULTR_INFERENCE_API_KEY`, the engine's
+  gateway service token (not a Vultr key; see the browser-agent README, "Service principals"). On a development
+  laptop without the gateway you can instead put a direct Vultr key there; then nothing screens the prompts.
+- Lake: `lake.yaml` next to the case (`bronze.kind` s3 with `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`, or file).
+- Checkpoints: a run stops with **exit code 3** at each human checkpoint (PRD, factors, ontology) and writes
+  `APPROVAL_PENDING.md`. A person decides in the Ontofill Console (or, in development only, by writing `APPROVED` by
+  hand); the next `ontofill run` resumes or, after a deny with a reason, regenerates the artifact.
+- A second, unrelated brief (public libraries) runs in scratch with the same engine: see the Ontofill README,
+  "Try a second brief through the ontology checkpoint".
+
+**3. Inference gateway, controller and cells** (`ontofill/services/browser-agent`)
+
+```bash
+cd ../ontofill/services/browser-agent && uv sync
+uv run ba-gateway                                   # 127.0.0.1:8700; the only process with VULTR_INFERENCE_API_KEY and JEV_API_KEY
+uv run ba-controller --transport streamable-http   # MCP: session.open / act / observe / close
+```
+
+Gateway: `BA_GATEWAY_ADMIN_TOKEN`, `BA_GATEWAY_LOG`, `BA_GATEWAY_HOST` / `BA_GATEWAY_PORT`,
+`BA_GATEWAY_SERVICE_TOKENS` (the engine's principal, by token hash and budget). Cells: `BA_CELL_PROVIDER=ontofill-http`
+with `BA_CELLS_URL` / `BA_CELLS_TOKEN` drives the engine's gVisor substrate, served by `ontofill cells serve --port 8766`
+(needs `ONTOFILL_CELLS_TOKEN`, and `ONTOFILL_SANDBOX_DOCKER_HOST=ssh://…` for the sandbox VM's Docker with `runsc`).
+Live view per session: `BA_LIVEVIEW_EXPOSE=netbird` with `BA_LIVEVIEW_HOST=<control NetBird IP>` and
+`BA_LIVEVIEW_PORTS`.
+
+**4. The Ontofill Console** (`ontofill/console`)
+
+```bash
+cd ../ontofill/console && uv sync
+uv run ontofill-console serve --fixtures .cache/console-fixtures --identity local   # two synthetic cases, dev mode
+ONTOFILL_CONSOLE_CASES="main=/path/to/case" uv run ontofill-console serve        # real cases, SSO identity
+uv run ontofill-console replay /path/to/local/lake --scratch /tmp/replay           # demo insurance, scratch copy
+```
+
+Behind NetBird SSO the approver's identity comes from the header named in `ONTOFILL_CONSOLE_IDENTITY_HEADER`
+(default `X-NetBird-User`); `/whoami` shows which headers arrive (names only). Every decision is bound to the
+artifact's sha256 and appended to the case's `decisions.jsonl`.
+
+**Deploy** ([`deploy/README.md`](deploy/README.md)): two Vultr VMs joined by NetBird. The control VM runs the product
+container (`deploy/compose.yaml`, bound to its NetBird IP), the console (`ontofill/console/deploy/compose.yaml`), the
+gateway, controller and cell API; the sandbox VM runs Docker with gVisor `runsc`. `deploy/netbird_services.py
+plan|apply|status|retire` manages the two public services; `deploy/verify.sh remote <vm-ip> <product-url>
+<console-url>` proves zero open ports and that both URLs refuse unauthenticated requests.
+
+**Public URLs:** the product at https://proveedor.eu1.netbird.services (password) and the Ontofill Console at
+https://ontofill-console.eu1.netbird.services (NetBird SSO, approvers group). The product currently serves the
+**synthetic** fixture export: the real case is paused at its PRD checkpoint and has no gold yet.
 
 **Generic over the ontology.** The app takes its domain from the case's approved ontology: the primary class,
 property labels, definition-of-done properties, relations, rules and source classes
@@ -138,9 +194,10 @@ every screen with no code changes.
 | Folder | What goes there |
 |--------|-----------------|
 | `case/` | The case package: brief (the only human input), PRD, ontology, objectives, technical definition documents, macros. Written by the engine, forkable. |
-| `app/` | Investigation app: dossier, signal explainer, relationships, case journal, watchlist and open export, completeness, approvals |
+| `app/` | The consumer product: dossiers with receipts, explained signals, relationships, case journal, watchlist, open exports, completeness |
+| `deploy/` | Product container, NetBird services, remote verification |
 | `lake.example.yaml` | Pointer to the external lake (copy to `lake.yaml`; secrets only in env vars) |
-| `docs/` | Definition docs and the demo script |
+| `docs/` | Definition docs, the demo script and the NetBird evidence images (`docs/evidence/`) |
 
 Code: Apache-2.0 (`LICENSE`). Case package: CC BY 4.0 (`case/LICENSE`). No data in git. Public sources only, no logins.
 
