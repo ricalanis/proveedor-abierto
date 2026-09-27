@@ -57,3 +57,13 @@ def test_spend_shows_totals_only(tmp_path, monkeypatch):
     monkeypatch.setenv("PA_SPEND_HISTORY", str(hist))
     totals = evidence.load_spend()
     assert totals == {"ts": "t1", "credit_total": 200.0, "credit_used": 0.34, "credit_remaining": 199.66}
+
+
+def test_live_view_check_section(make_client, tmp_path, monkeypatch):
+    monkeypatch.setenv("PA_EVIDENCE_DIR", str(tmp_path))
+    monkeypatch.setenv("PA_SPEND_HISTORY", str(tmp_path / "missing.jsonl"))
+    assert "Per-cell live view" not in make_client().get("/evidence").text
+    (tmp_path / "live-view-check.txt").write_text("  PASS  viewer 200 with the session token\n"
+                                                 "  PASS  wrong token 404\n  PASS  after close 404\nRESULT: PASS\n")
+    html = make_client().get("/evidence").text
+    assert "Per-cell live view (NetBird expose)" in html and "PASS · wrong token 404" in html

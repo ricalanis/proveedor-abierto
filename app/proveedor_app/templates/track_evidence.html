@@ -44,6 +44,14 @@
   {% endif %}
 </section>
 
+{% if ev.live_view.source %}
+<section class="block" aria-labelledby="ev-lv-h">
+  <h2 id="ev-lv-h">Per-cell live view (NetBird expose)</h2>
+  <p class="note muted">A running cell's browser, published as a read-only view that dies with the session. Checked from outside, saved {{ ev.live_view.saved_at }}{% if ev.live_view.result %}: {{ ev.live_view.result }}{% endif %}.</p>
+  <ul class="ev-lines mono">{% for kind, text in ev.live_view.lines %}<li class="ev-line ev-line--{{ kind|lower }}">{{ kind }} · {{ text }}</li>{% endfor %}</ul>
+</section>
+{% endif %}
+
 {% if ev.verify.source %}
 <section class="block" aria-labelledby="ev-v-h">
   <h2 id="ev-v-h">Saved remote verification</h2>

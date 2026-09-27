@@ -22,6 +22,7 @@ from . import live
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CHECKLIST_DOC = "docs/reference/track-blast-radius-zero.md"
 VERIFY_FILE = "verify-remote.txt"
+LIVE_VIEW_FILE = "live-view-check.txt"  # saved outside-in check of a per-cell live view (netbird expose)
 LINE_RE = re.compile(r"^\s*(PASS|FAIL|WARN)\s+(.*)$")
 
 
@@ -79,12 +80,12 @@ class VerifyResult:
         return self.matching("unauthenticated")
 
 
-def load_verify() -> VerifyResult:
+def load_verify(name: str = VERIFY_FILE) -> VerifyResult:
     base = evidence_dir()
-    path = base / VERIFY_FILE if base else None
+    path = base / name if base else None
     if not path or not path.is_file():
         return VerifyResult()
-    out = VerifyResult(source=VERIFY_FILE, saved_at=_mtime(path))
+    out = VerifyResult(source=name, saved_at=_mtime(path))
     for raw in path.read_text(errors="replace").splitlines():
         m = LINE_RE.match(raw)
         if m:
@@ -194,4 +195,5 @@ def rows(store) -> dict:
         elif rule and rule.startswith("link:"):
             link = rule[5:]
         out.append({**row, "status": status, "notes": notes, "link": link})
-    return {"rows": out, "checklist_src": checklist_src, "verify": verify, "jobs": jp, "spend": load_spend()}
+    return {"rows": out, "checklist_src": checklist_src, "verify": verify, "jobs": jp, "spend": load_spend(),
+            "live_view": load_verify(LIVE_VIEW_FILE)}
