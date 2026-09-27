@@ -1,5 +1,13 @@
 # Live demo script (3 minutes)
 
+> **Final running order (Sun 27 Sep, 10:40 PT):** present with the deck in [`presentation/`](presentation/README.md) and
+> drive the beats in [`video-plan.md`](video-plan.md), which uses the runs as they stand at the freeze. The 1-minute
+> submission cut is [`one-minute-video.md`](one-minute-video.md). Two things changed since this script was written:
+> the second brief is now the **engine-authored** case `sf-library-branches` on the console (its answer page replaces
+> the scratch library run below), and the gold beat shows the **harness-assisted** product instance
+> (`https://proveedor-harness.<domain>`), labelled as not engine-authored. The engine has no gold yet. The rest of
+> this file is kept as the setup checklist and fallback notes.
+
 Judging: Technicality 40, Creativity 25, Live demo 20, Future potential 15. **The demo opens on the engine, not the
 app** (user decision, brief 08): the audience first meets Ontofill, an engine that turns *any* open question into an
 evidence-backed dataset, safely on Vultr, then watches it prove itself on one hard real case, Proveedor Abierto.
