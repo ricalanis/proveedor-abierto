@@ -193,12 +193,13 @@ How it is deployed and gated: [`deploy/README.md`](deploy/README.md). Management
 | Bonus criterion (NetBird deck) | Our setup | Evidence |
 |---|---|---|
 | 1. No open ports | The containers bind to the VM's NetBird IP, not a public interface. The public URLs go through the NetBird reverse proxy. The VMs allow zero public inbound ports, SSH included (admin over NetBird). | `deploy/verify.sh remote` ✓ (all checked ports closed, port 22 included) · `verify.sh local` ✓ |
-| 2. Gated access tied to a role | Two URLs, two credentials: the product = password or PIN; the Ontofill Console = SSO restricted to the approvers group, and each approval records the SSO identity. The product has no approval routes at all (404) and a read-only container. | `verify.sh remote` ✓ (both URLs refuse unauthenticated requests) · proxy auth settings screenshot (to capture) |
-| 3. Peer-to-peer | The control-plane VM and the sandbox VM talk over WireGuard; the sandbox host sits in its own group, which can reach only the control plane's ports (the deck's "fence in your agents"). | peers list + access policy screenshot (to capture; engine side) |
+| 2. Gated access tied to a role | Two URLs, two credentials: the product = password or PIN; the Ontofill Console = SSO restricted to the approvers group, and each approval records the SSO identity. The product has no approval routes at all (404) and a read-only container. | `verify.sh remote` ✓ (both URLs refuse unauthenticated requests) · [services and their auth](docs/evidence/netbird-services.png) ✓ |
+| 3. Peer-to-peer | The control-plane VM and the sandbox VM talk over WireGuard; the sandbox host sits in its own group, which can reach only the control plane's ports (the deck's "fence in your agents"). | [VM peers and groups](docs/evidence/netbird-peers-groups.png) ✓ · [access policies](docs/evidence/netbird-policies.png) ✓ (sandbox → control plane: tcp/8700 only, one way; the Default all-to-all policy is disabled) |
 | 4. Lifecycle-bound URLs (clarification) | Each browser session's live view gets its own `netbird expose` for exactly the session's lifetime: the controller starts it at `session.open` and kills it at `session.close`, so the URL itself stops existing. A per-session view token gates it too. | outside check ✓ (200 with the token, 404 without, 404 from NetBird after close; saved on the console's `/evidence`) |
 
-Before any screenshot: every peer, group and service name on screen is neutral (no employer or client names),
-and no emails, keys or PIN fields are in frame.
+The evidence images are rendered from the NetBird API by [`deploy/netbird_evidence.py`](deploy/netbird_evidence.py):
+only the two VM peers are ever named (other peers appear only as group member counts), no emails, keys or PINs, and
+the script refuses to save a page that would contain any other peer's name.
 
 ## Built during the event
 
