@@ -75,13 +75,14 @@ Three tracks, each labelled for what it is.
    "not in the approved ontology" on screen. The harness data lives outside both repos, `case/` and the lake; its
    caveats are listed on every page of the harness instance.
 3. **A second, unrelated case (engine-authored).** *"Which San Francisco Public Library branches offer free Wi-Fi,
-   and when is each one open?"* The same engine, no domain code: the PRD and factors are approved, and a rerun
-   (`run-01d4b6d08cfc`) started on `378a8c0`. Its answer page shows the live run and fills with gold cards when
-   gold lands:
+   and when is each one open?"* The same engine, no domain code: the PRD and factors are approved. The rerun
+   (`run-01d4b6d08cfc`, on `378a8c0`) stopped at the ontology step on a remaining validator gap (R58b: a rule whose
+   label does not match its predicate); the fix is queued. Its answer page shows the run and fills with gold cards
+   when gold lands:
    https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
 
    **Building in the open.** The simpler SF case found four engine defects that the harder case had hidden. All four
-   were fixed today, each with tests:
+   were fixed today, each with tests, and a fifth (R58b, above) is found and queued:
    - P1 rejected city-level jurisdictions ("San Francisco, California, USA" against a publisher's "USA").
    - P2 had no presence operator, so invalid rules exhausted the phase. Invalid rules are now set aside as
      recommendations, with deterministic salvage.

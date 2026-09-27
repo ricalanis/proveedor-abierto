@@ -55,10 +55,11 @@ connections and a journal from any value back to the brief.
   contracts from public data, keyed to the approved ontology and measured by the same unmodified DoD probe.
   0.924 of suppliers have all six core fields, and 0 of 7,761 values lack evidence.
 - **Second brief, same engine:** "Which San Francisco Public Library branches offer free Wi-Fi, and when is each one
-  open?" Its PRD and factors are approved, and it is rerunning on today's fixes. This simpler case found four
+  open?" Its PRD and factors are approved; its rerun stopped at the ontology step on a remaining validator gap,
+  with the fix queued. This simpler case found four
   engine defects the hard case had hidden: city-level jurisdictions, a missing presence rule in the ontology
   validator, a core field never bound to a property, and a runner that reported a needs-human pause as a crash.
-  All four were fixed in code with tests the same day.
+  All four were fixed in code with tests the same day; a fifth is found and queued.
 
 ## Challenges
 
