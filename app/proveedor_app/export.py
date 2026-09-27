@@ -63,7 +63,9 @@ def to_csv(run: Run, ids=None) -> str:
         for name in props:
             f = values.get(name) or {}
             ev = f.get("evidence") or []
-            row += ["" if f.get("value") is None else f["value"], f.get("status", "missing"),
+            value = f.get("value")
+            value = ("true" if value else "false") if isinstance(value, bool) else ("" if value is None else value)
+            row += [value, f.get("status", "missing"),
                     "" if f.get("confidence") is None else f["confidence"], ev[0]["url"] if ev else ""]
         row += [";".join(fl["rule_id"] for fl in e.get("flags") or []), len(e.get("links") or [])]
         writer.writerow(row)
@@ -175,6 +177,8 @@ def _term(aligned: str | None, local: str) -> str:
 
 
 def _literal(datatype: str, value) -> str:
+    if isinstance(value, bool):  # list membership: a Turtle boolean, never "True"^^xsd:boolean
+        return "true" if value else "false"
     if datatype.startswith("xsd:") and datatype != "xsd:string":
         return f"{turtle_string(value)}^^{datatype}"
     return turtle_string(value)

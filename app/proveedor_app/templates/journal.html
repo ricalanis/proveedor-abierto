@@ -10,7 +10,7 @@
 <ol class="journal">
   <li class="stop stop--value">
     <p class="stop__phase">{{ _("Value") }}</p>
-    <p class="stop__title"><span class="ev__value">{{ ref.data.value if ref.data.value is not none else _("not found") }}</span></p>
+    <p class="stop__title"><span class="ev__value">{{ ref.data.value|showval(domain.prop_datatype(ref.prop)) if ref.data.value is not none else _("not found") }}</span></p>
     <p class="stop__meta"><span class="status status--{{ ref.data.status }}">{{ status_word(ref.data.status) }}</span> <span>{{ _("confidence {level}", level=confidence_word(ref.data.confidence)) }}</span>
       · <a href="/entities/{{ ref.entity_id }}?ev={{ ref.value_id|urlencode }}#evidence">{{ ngettext("See receipt", "See {n} receipts", ref.data.evidence|length) }}</a></p>
   </li>

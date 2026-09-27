@@ -78,6 +78,12 @@ class Domain:
                 return p.label
         return humanize(prop_id)
 
+    def prop_datatype(self, prop_id: str, cls: str | None = None) -> str:
+        for p in self.props(cls) if cls else [q for ps in self.properties.values() for q in ps]:
+            if p.id == prop_id:
+                return p.datatype
+        return ""
+
     def relation_label(self, rel_id: str) -> str:
         return (self.relations.get(rel_id) or {}).get("label") or humanize(rel_id)
 

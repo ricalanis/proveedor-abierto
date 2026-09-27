@@ -581,6 +581,18 @@ def ngettext(lang: str):
     return plural
 
 
+def value_label(value, datatype: str = "", lang: str = DEFAULT_LANG) -> str:
+    """A gold value for readers: booleans as Sí/No (list membership comes out as true/false), dates in words, integral
+    numbers without a trailing .0. Anything else is shown as exported."""
+    if isinstance(value, bool):
+        return ("Sí" if value else "No") if lang == "es" else ("Yes" if value else "No")
+    if datatype == "xsd:date" and isinstance(value, str) and parse_ts(value):
+        return date_label(value, lang)
+    if isinstance(value, float) and value.is_integer() and datatype not in ("xsd:decimal", "xsd:double"):
+        return str(int(value))
+    return "" if value is None else str(value)
+
+
 def parse_ts(value) -> datetime | None:
     if not value:
         return None

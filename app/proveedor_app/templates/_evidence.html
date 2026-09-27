@@ -5,7 +5,7 @@
       <p class="ev__field">{{ domain.prop_label(selected.prop) }}</p>
       <span class="status status--{{ st }}">{{ status_word(st) }}</span>
     </div>
-    <p class="ev__value">{{ selected.data.value if selected.data.value is not none else _("not found") }}</p>
+    <p class="ev__value">{{ selected.data.value|showval(domain.prop_datatype(selected.prop)) if selected.data.value is not none else _("not found") }}</p>
     <dl class="lines">
       <div><dt>{{ _("Receipts") }}</dt><dd>{{ (selected.data.evidence or [])|length }}</dd></div>
       {% if st != "missing" %}<div><dt>{{ _("Confidence") }}</dt><dd>{{ confidence_word(selected.data.confidence) }}</dd></div>{% endif %}

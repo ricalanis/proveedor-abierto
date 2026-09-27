@@ -22,7 +22,7 @@
         <li class="change change--{{ c.kind }}">
           {% if c.kind == "field" %}
             <span class="change__field">{{ domain.prop_label(c.field) }}</span>
-            <span class="muted">{{ c.before if c.before is not none else _("not found") }}</span> → <strong>{{ c.after if c.after is not none else _("not found") }}</strong>
+            <span class="muted">{{ c.before|showval(domain.prop_datatype(c.field)) if c.before is not none else _("not found") }}</span> → <strong>{{ c.after|showval(domain.prop_datatype(c.field)) if c.after is not none else _("not found") }}</strong>
             {% if c.status_before != c.status_after %}<span class="muted">({{ status_word(c.status_before) if c.status_before else _("absent") }} → {{ status_word(c.status_after) }})</span>{% endif %}
             {% if c.value_id and c.after is not none %}<a href="/entities/{{ s.id }}?ev={{ c.value_id|urlencode }}#evidence">{{ _("See receipt") }}</a>{% endif %}
           {% elif c.kind == "signal" %}{{ _("New signal:") }} {{ c.text }}

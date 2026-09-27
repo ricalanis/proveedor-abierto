@@ -10,7 +10,7 @@
     <header class="dossier__head">
       <h1>{{ run.title(e) }}</h1>
       <dl class="facts">
-        {% if id_prop %}<div><dt>{{ domain.prop_label(id_prop, cls) }}</dt><dd class="mono">{{ (props[id_prop] or {}).value or "—" }}</dd></div>{% endif %}
+        {% if id_prop %}<div><dt>{{ domain.prop_label(id_prop, cls) }}</dt><dd class="mono">{{ (props[id_prop] or {}).value|showval or "—" }}</dd></div>{% endif %}
         {% if dod_ids %}<div><dt>{{ _("Basic profile") }}</dt><dd>{{ _("{n} of {m} facts confirmed", n=filled, m=dod_ids|length) }}</dd></div>{% endif %}
         {% for rel, group in related.items() %}<div><dt>{{ domain.relation_label(rel) }}</dt><dd class="mono">{{ group.rows|length }}</dd></div>{% endfor %}
         <div><dt>{{ _("Sources") }}</dt><dd class="mono">{{ source_count }}</dd></div>
@@ -54,7 +54,7 @@
             <p class="fact__label">{{ domain.prop_label(name, cls) }}{% if name in dod_ids %} <span class="core" title="{{ _('Part of the basic profile') }}">{{ _("basic") }}</span>{% endif %}</p>
             <span class="status status--{{ st }}">{{ status_word(st) }}</span>
           </div>
-          <p class="fact__value">{% if f and f.value is not none %}{{ f.value|date if ptypes.get(name) == "xsd:date" else f.value }}{% else %}{{ _("Not found in public sources") }}{% endif %}</p>
+          <p class="fact__value">{% if f and f.value is not none %}{{ f.value|showval(ptypes.get(name)) }}{% else %}{{ _("Not found in public sources") }}{% endif %}</p>
           {% if ev0 %}
           <dl class="lines fact__receipt">
             {% if ev0.url or ev0.source_type %}<div><dt>{{ _("Source") }}</dt><dd class="fact__src">{% if ev0.url %}{{ host_of(ev0.url) }}{% else %}{{ domain.source_label(ev0.source_type) }}{% endif %}{% if f.evidence|length > 1 %} <span class="lines__more">{{ _("+{n} more", n=f.evidence|length - 1) }}</span>{% endif %}</dd></div>{% endif %}
@@ -84,10 +84,10 @@
         <tbody>
         {% for t in group.rows %}{% set tp = t.properties or {} %}
           <tr>{% for p in cols %}{% set v = (tp[p.id] or {}).value %}
-            {% if loop.first %}<th scope="row">{{ v if v is not none else "—" }}<span class="mono sub">{{ t.id }}</span></th>
+            {% if loop.first %}<th scope="row">{{ v|showval(p.datatype) if v is not none else "—" }}<span class="mono sub">{{ t.id }}</span></th>
             {% elif p.datatype in ("xsd:decimal", "xsd:integer") %}<td class="num mono" data-label="{{ p.label }}">{{ v|money }}</td>
             {% elif p.datatype == "xsd:date" %}<td data-label="{{ p.label }}">{{ v|date if v else "—" }}</td>
-            {% else %}<td data-label="{{ p.label }}">{{ (v|string)|replace("_", " ") if v is not none else "—" }}</td>{% endif %}
+            {% else %}<td data-label="{{ p.label }}">{{ (v|showval(p.datatype))|replace("_", " ") if v is not none else "—" }}</td>{% endif %}
           {% endfor %}</tr>
         {% endfor %}
         </tbody>
