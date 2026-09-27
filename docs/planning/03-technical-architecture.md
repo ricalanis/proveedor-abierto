@@ -79,9 +79,12 @@ question into a verified, evidence-backed dataset and an investigation app.
   per-step hook even inside Skyvern's own loop.
 
 ## 6. Refinement: from raw to trusted
+- **Cut (user, 18:07):** Oxigraph silver/gold graphs; silver is Postgres, gold is the JSONL/CSV/RDF export. Simula runs at depth 1
+  with a separate critic (depth 2, sampling mixes and Elo are cut). P4 negotiation and the P1 research ledger are cut. See
+  `coord/GAPS.md` for the full cut list.
 - **Bronze:** immutable, content-addressed captures (HTML, accessibility tree, screenshots, files, site graphs) in
   Vultr Object Storage. **Silver:** typed observations with evidence; duplicates and conflicts kept. **Gold:**
-  reconciled, SHACL-valid values; a double critic on high-stakes fields.
+  reconciled, SHACL-valid values (the double critic is cut).
 - Entity resolution uses identifiers compared in code plus model confirmation. Metrics and DoD are computed on gold;
   gaps loop back to discovery. An ontology or PRD change **re-refines gold from bronze without re-browsing**.
 - Gold export (generic): `entities.jsonl` + `ontology.json` + `trace.jsonl` + `jobs.jsonl` + `metrics.json`
