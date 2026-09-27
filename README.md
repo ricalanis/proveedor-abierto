@@ -99,27 +99,25 @@ Three tracks, each labelled for what it is.
    "not in the approved ontology" on screen. The harness data lives outside both repos, `case/` and the lake; its
    caveats are listed on every page of the harness instance.
 3. **A second, unrelated case (engine-authored).** *"Which San Francisco Public Library branches offer free Wi-Fi,
-   and when is each one open?"* The same engine, no domain code: the PRD and factors are approved. The rerun
-   now gets past the core-field check. The last gap at the ontology step (R58b, below) has a fix deployed (engine
-   `93816dc`), and the case is rerunning on it as `run-a12bcc59b7e2`, result pending. Its answer page shows the run and fills with gold cards
-   when gold lands:
+   and when is each one open?"* The same engine, no domain code: the PRD and factors are approved. On engine
+   `93816dc` its rerun (`run-a12bcc59b7e2`) passed the ontology schema for the first time, then stopped at the next
+   check (R63, below; fix in progress). Its answer page shows the run and fills with gold cards when gold lands:
    https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
 
-   **Building in the open.** The simpler SF case found five engine defects that the harder case had hidden. Four
+   **Building in the open.** The simpler SF case found six engine defects that the harder case had hidden. Five
    are fixed, with tests:
    - P1 rejected city-level jurisdictions ("San Francisco, California, USA" against a publisher's "USA").
    - P2 had no presence operator, so invalid rules exhausted the phase. Invalid rules are now set aside as
      recommendations, with deterministic salvage.
+   - The rule critic judged ontology rules as passing checks, but they are red-flag patterns (a match raises a
+     flag), so no rule could pass. Rules are now defined as flag violations in the prompts (`829559e`).
+   - A core PRD field ("weekly opening hours") was never bound to a DoD property. The first fix did not trigger;
+     the second (`3c1a2b0`) is verified on a live rerun.
    - The runner reported an exhausted PRD or ontology as a crash. It now pauses as needs-human, with a
      phase-specific ask.
 
-   - A core PRD field ("weekly opening hours") was never bound to a DoD property (R59). The first fix did not
-     trigger; the second (`3c1a2b0`) is verified on a live rerun.
-
-   The fifth has a fix deployed and a rerun pending (R58b). Ontology rules are red-flag patterns: a matching predicate raises a flag. The rule
-   critic judged them as passing checks instead, so correct violation rules were rejected as "inverted", positive
-   checks as "tautologies", and no rule could pass. The fix (`829559e`) defines rules as flag violations in the
-   generator and critic prompts, with a set-aside fallback.
+   One is in progress (R63): the compiled DoD queries re-authored the thresholds instead of copying them from the
+   approved PRD. The fix copies them deterministically.
 
 ## Use case
 

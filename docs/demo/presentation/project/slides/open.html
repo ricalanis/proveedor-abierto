@@ -1,20 +1,21 @@
-<section id="open" data-transition="fade" style="background:#f3f5f8; color:#1b2233; font-family:'Public Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
-<h2 style="font-size:72px; font-weight:600; line-height:1.1">The easy case found five engine bugs</h2>
-<p style="font-size:34px; line-height:1.35; color:#4a5263; width:1560px">The simpler SF library brief surfaced defects the hard case had hidden. Four are fixed with tests; the fifth has a fix deployed, rerun pending.</p>
+<section id="open" data-transition="fade" style="background:#f3f5f8; color:#1b2233; font-family:'Public Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:36px">
+<h2 style="font-size:72px; font-weight:600; line-height:1.1">The easy case found six engine bugs</h2>
+<p style="font-size:32px; line-height:1.35; color:#4a5263; width:1560px">The simpler SF library brief surfaced defects the hard case had hidden. Five are fixed with tests; one is in progress.</p>
 <div style="display:flex; gap:32px">
-<div style="flex:2; display:flex; flex-direction:column; gap:20px">
+<div style="flex:2; display:flex; flex-direction:column; gap:16px">
 <p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#2a4fc0">FIXED</p>
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
-<p style="font-size:28px; line-height:1.35; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:28px"><b>P1:</b> city-level jurisdictions were rejected ("San Francisco, California, USA" against "USA").</p>
-<p style="font-size:28px; line-height:1.35; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:28px"><b>P2:</b> invalid ontology rules exhausted the phase. They're now set aside, with salvage.</p>
-<p style="font-size:28px; line-height:1.35; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:28px"><b>P2:</b> "weekly opening hours" was never bound to a property. The second fix is verified live.</p>
-<p style="font-size:28px; line-height:1.35; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:28px"><b>Runner:</b> an exhausted phase looked like a crash. It now pauses as needs-human.</p>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+<p style="font-size:26px; line-height:1.3; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:20px"><b>P1:</b> city-level jurisdictions were rejected.</p>
+<p style="font-size:26px; line-height:1.3; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:20px"><b>P2:</b> invalid rules exhausted the phase; now set aside, with salvage.</p>
+<p style="font-size:26px; line-height:1.3; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:20px"><b>P2:</b> the critic read red-flag rules as passing checks, so none could pass.</p>
+<p style="font-size:26px; line-height:1.3; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:20px"><b>P2:</b> "weekly opening hours" was never bound to a property.</p>
+<p style="font-size:26px; line-height:1.3; background:#fcfdfe; border:1px solid #d3d8e0; border-radius:8px; padding:20px"><b>Runner:</b> an exhausted phase looked like a crash; now needs-human.</p>
 </div>
 </div>
-<div style="flex:1; display:flex; flex-direction:column; gap:20px">
-<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">FIX DEPLOYED · RERUN PENDING</p>
-<p style="font-size:28px; line-height:1.35; background:#fbf0de; border-radius:8px; padding:28px"><b>P2:</b> ontology rules are red-flag patterns, but the rule critic judged them as passing checks. Correct rules were rejected as "inverted", so none could pass.</p>
+<div style="flex:1; display:flex; flex-direction:column; gap:16px">
+<p style="font-family:'IBM Plex Mono', monospace; font-size:24px; color:#8a5410">IN PROGRESS</p>
+<p style="font-size:26px; line-height:1.3; background:#fbf0de; border-radius:8px; padding:20px"><b>P2:</b> the compiled DoD re-authored the thresholds instead of copying them from the approved PRD.</p>
 </div>
 </div>
-<aside>Building in the open: the failures are on the console with their evidence, and the fixes are in the public commit history (engine 4c58a04, 378a8c0 and 3c1a2b0; runner 6e0c705). Gaps R57, R58, R59 and R60 are fixed; R58b is in progress. The first R59 fix did not trigger; the second is verified on run-577d56beff9b.</aside>
+<aside>Building in the open: each failure is on the console with its evidence, and each fix is in the public commit history (engine 4c58a04, 378a8c0, 3c1a2b0 and 93816dc; runner 6e0c705). R57, R58, R58b, R59 and R60 are fixed; R63 is in progress. On 93816dc, run-a12bcc59b7e2 passed the ontology schema for the first time.</aside>
 </section>
