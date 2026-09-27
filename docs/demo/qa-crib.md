@@ -2,8 +2,8 @@
 
 The track deck spells out what the judge asks for each requirement (`docs/reference/event-decks.md` §1).
 Answer in one sentence, then put the **exact screen** that proves it in front of the judge. Never claim more than
-the screen shows. Items marked **pending** need the Vultr VMs; check them off before going on stage, or say
-plainly that the answer comes from the local rehearsal.
+the screen shows. Everything below is live on the Vultr VMs (as of Sun 27 Sep, 15:40 UTC); the one open item is
+gold, which the real case has not produced yet: say so plainly and show the bronze audit instead.
 
 Shared framing, in the deck's words:
 - **"Two instances. One boundary."** VX1 #1 is the control plane (engine and this app). VX1 #2 is the sandbox

@@ -103,7 +103,9 @@ Also keep account emails, setup keys, and the PIN or password fields out of fram
 - [x] `./verify.sh remote <ip> <product-url> <console-url> <judges-url>`: PASS (all checked ports closed, 22 and 8411
       included; every URL refuses unauthenticated requests; with the judges password, 9 write routes → 403 under a
       forged approvers header, and the product serves the app)
-- [ ] `./verify.sh local` output on the VM (not yet captured for the README)
+- [x] `./verify.sh local` on the VM (Sun 27 Sep 15:40 UTC, `PA_BIND_IP` = the NetBird IP): PASS. The product is bound to
+      the NetBird IP only, has no approval routes (GET and POST 404), is not reachable on the public IP, and its
+      container cannot write the case or its own root filesystem.
 - [x] NetBird services with their authentication: [`docs/evidence/netbird-services.png`](../docs/evidence/netbird-services.png)
 - [x] Groups and access policies (sandbox → control plane: tcp/8700 only, one way):
       [`netbird-peers-groups.png`](../docs/evidence/netbird-peers-groups.png) ·
