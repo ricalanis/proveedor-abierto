@@ -8,23 +8,24 @@ import json
 import os
 import random
 import sys
+from pathlib import Path
 
 LOCAL = os.environ.get("PROBE_LOCAL")  # a directory with lake/ and case/ (fixture validation)
 if LOCAL:
     CASE = os.path.join(LOCAL, "case")
     ROOT = os.path.join(LOCAL, "lake")
-    CID = sorted(os.listdir(os.path.join(ROOT, "gold")))[0]
+    CID = min(os.listdir(os.path.join(ROOT, "gold")))
 
     def get(key):
         path = os.path.join(ROOT, key)
-        return open(path, "rb").read() if os.path.isfile(path) else None
+        return Path(path).read_bytes() if os.path.isfile(path) else None
 
     def exists(key):
         return os.path.isfile(os.path.join(ROOT, key))
 else:
     CASE = "/srv/proveedor-abierto/case"
     env = {}
-    for line in open("/opt/ontofill/engine.env"):
+    for line in Path("/opt/ontofill/engine.env").read_text().splitlines():
         if "=" in line and not line.startswith("#"):
             k, v = line.rstrip("\n").split("=", 1)
             env[k] = v.strip().strip('"')
@@ -33,7 +34,7 @@ else:
     import boto3
     import yaml
 
-    lake = yaml.safe_load(open("/srv/proveedor-abierto/lake.yaml"))
+    lake = yaml.safe_load(Path("/srv/proveedor-abierto/lake.yaml").read_text())
     b = lake["bronze"]
     ep = b.get("endpoint") or env["LAKE_S3_ENDPOINT"]
     s3 = boto3.client("s3", endpoint_url=ep if str(ep).startswith("http") else "https://" + ep)
@@ -61,7 +62,7 @@ base = f"gold/{CID}/{run}"
 ents = [json.loads(ln) for ln in (get(f"{base}/entities.jsonl") or b"").splitlines() if ln.strip()]
 onto = json.loads(get(f"{base}/ontology.json") or b"{}")
 metrics = json.loads(get(f"{base}/metrics.json") or b"{}")
-queries = json.load(open(f"{CASE}/02-ontology/dod-queries.json")).get("queries", [])
+queries = json.loads(Path(f"{CASE}/02-ontology/dod-queries.json").read_text()).get("queries", [])
 by_class = {}
 for e in ents:
     by_class.setdefault(e.get("class"), []).append(e)
@@ -99,7 +100,9 @@ for q in queries:
     elif agg == "entities_meeting_completeness":
         ids = dod_props.get(cls, [])
         mr = q.get("min_ratio", 0.8)
-        meets = lambda e: bool(ids) and sum(gold_field(e, pid) for pid in ids) / len(ids) >= mr  # noqa: E731
+        meets = lambda e, ids=ids, mr=mr: (
+            bool(ids) and sum(gold_field(e, pid) for pid in ids) / len(ids) >= mr
+        )
         if q.get("measure") == "share" or (q.get("measure") is None and tgt < 1):
             rel = q.get("relation_id") or next(iter(rel_of.values()), None)
             linked = [e for e in sel if any(lk.get("property") == rel for lk in e.get("links") or [])]
@@ -144,9 +147,8 @@ sample = random.Random(0).sample(evs, min(40, len(evs)))
 missing = 0
 for ev in sample:
     for key in (ev.get("bronze_key"), ev.get("screenshot_key")):
-        if key and key.startswith("sha256:"):
-            if not exists("bronze/sha256/" + key.split(":", 1)[1]):
-                missing += 1
+        if key and key.startswith("sha256:") and not exists("bronze/sha256/" + key.split(":", 1)[1]):
+            missing += 1
 print(f"evidence items: {len(evs)}; spot-checked {len(sample)}: {missing} bronze/screenshot keys missing")
 
 # a few real rows for the video
