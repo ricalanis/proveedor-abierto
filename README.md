@@ -24,26 +24,48 @@ source.
 
 ## For judges
 
-Two live URLs, one public password. Both are read-only for you: nothing you click can change the case or a run.
+Three live URLs, one public password. All are read-only for you: nothing you click can change a case or a run.
 
 | URL | What you see |
 |-----|--------------|
-| **https://proveedor.eu1.netbird.services** | Proveedor Abierto, the product: dossiers, red flags with their explanation, the journal that traces a value back to the brief. Spanish first; add `?lang=en` for English. |
-| **https://ontofill-console-judges.eu1.netbird.services** | The Ontofill Console, read-only: every case, its runs, checkpoints, gold completeness, spend and inference calls, evidence. Approvals, case edits, start/pause and the kill switch are refused (403). |
+| **https://ontofill-console-judges.eu1.netbird.services** | The Ontofill Console, read-only: every case, its runs, checkpoints and the decision log, discovery and source reviews, sandbox jobs with their proof checks, failures, gold completeness, spend and every inference call. Approvals, case edits, start/pause and the kill switch are refused (403). |
+| **https://proveedor-harness.eu1.netbird.services** | Proveedor Abierto over the **harness-assisted** dataset (394 real suppliers, see below): dossiers with receipts, red flags, connections, the journal. Every page carries the banner "Harness-assisted run (Claude Code), not engine-authored". Spanish first; add `?lang=en` for English. |
+| **https://proveedor.eu1.netbird.services** | The same product over the engine's own export. Until the engine lands gold it serves a **synthetic** fixture (obviously fake: "Proveedor Ejemplo NN", RFCs starting with `ZZZ`), so you can see how an engine-authored dossier reads. |
 
-**Password (both URLs): `pas89-auar7-gju9z-msyn9`**
+**Password (all three URLs): `pas89-auar7-gju9z-msyn9`**
 
 The password is shared on purpose and will be rotated after the hackathon. It is not used anywhere else. Decisions
-happen on a third URL, `https://ontofill-console.eu1.netbird.services`, which only members of the approvers group
-can open through NetBird SSO. All three are NetBird reverse-proxy services. The VMs behind them have no open inbound
+happen on a fourth URL, `https://ontofill-console.eu1.netbird.services`, which only members of the approvers group
+can open through NetBird SSO. All four are NetBird reverse-proxy services. The VMs behind them have no open inbound
 port, SSH included ([`deploy/verify.sh`](deploy/verify.sh) `remote` checks this from outside, along with the refusals
 above).
 
-**Where the real case stands (Sun 27 Sep, 12:30 UTC):** its PRD, factors and ontology are approved, and the engine
-has crawled for real several times (source reviews, sandbox captures, failures fixed in code and rerun), but it has
-**no gold yet**. Until it does, the product serves a **synthetic** fixture export, so you can see how a dossier reads:
-its suppliers are obviously fake ("Proveedor Ejemplo NN", RFCs starting with `ZZZ`). Everything on the judges
-console is real: every run, decision, source review and failure.
+### Where things stand (Sun 27 Sep, 17:45 UTC)
+
+Three tracks, each labelled for what it is.
+
+1. **The engine on the real case (engine-authored).** The PRD, factors and ontology are approved in the console,
+   each decision bound to the digest of the exact file reviewed. The engine has run discovery and capture for real
+   many times: source reviews, gVisor sandbox jobs with all six proof checks, real document fetches into bronze,
+   and every failure fixed in code and rerun. All inference runs on Vultr. It has **no engine gold yet**: the primary
+   federal procurement portal (ComprasMX) is a JavaScript app whose data API the sandbox egress allowlist refused
+   (fix in review), and the source critic has accepted none of the remaining candidates. We did not loosen the
+   allowlist or the critic to get a number.
+2. **A harness-assisted run (Claude Code, not engine-authored).** To show what the definition of done looks like
+   on real data, a Claude Code session built a dataset by hand-written scripts from public downloads, keyed to the
+   **approved** ontology and measured by the same unmodified DoD probe. Result: 394 suppliers and 958 contracts;
+   dod1 394 ≥ 50; dod2 0.924 with all six core fields; dod3 0 of 7,761 values without evidence; dod4 met by the
+   probe, 3 of 4 against the approved source classes (no public company registry was reachable). Contracts are
+   INAI's own OCDS publication; ComprasMX refused bulk access (403 and reCAPTCHA) and that block was not bypassed.
+   Founding dates are derived from the RFC, and addresses are as declared in contracts. Supplier-to-supplier
+   connections (same procedure 372, shared address 7, shared contact person 18) are a **harness extension**, marked
+   "not in the approved ontology" on screen. The harness data lives outside both repos, `case/` and the lake; its
+   caveats are listed on every page of the harness instance.
+3. **A second, unrelated case (engine-authored).** *"Which San Francisco Public Library branches offer free Wi-Fi,
+   and when is each one open?"* The same engine, no code changes: the PRD and factors are approved; the ontology step
+   is blocked by an engine validator defect (fix pending). Its answer page shows the live run and fills with gold
+   cards when gold lands:
+   https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
 
 ## Use case
 
@@ -223,11 +245,9 @@ plan|apply|status|retire` manages the public services; `deploy/verify.sh remote 
 <console-url> [<judges-console-url>]` proves zero open ports, that every URL refuses unauthenticated requests, and that
 the judges console refuses every write.
 
-**Public URLs:** the product at https://proveedor.eu1.netbird.services (the judges password), the read-only
-console at https://ontofill-console-judges.eu1.netbird.services (the judges password) and the Ontofill Console at
-https://ontofill-console.eu1.netbird.services (NetBird SSO, approvers group). The product currently serves the
-**synthetic** fixture export: the real case is past its PRD, factors and ontology checkpoints and crawling, but has
-no gold yet.
+**Public URLs:** listed under [For judges](#for-judges): the read-only console, the product over the harness-assisted
+dataset and the product over the engine's export (all behind the judges password), plus the Ontofill Console for
+approvers (NetBird SSO, approvers group).
 
 **Generic over the ontology.** The app takes its domain from the case's approved ontology: the primary class,
 property labels, definition-of-done properties, relations, rules and source classes
@@ -254,8 +274,10 @@ vocabulary from the case ontology.
   agent read.
 - **Signal explainer** (`/signals`): each red flag with its rule, the evidence it was computed from, a
   plain-language explanation, steps to verify it, and a dispute path. Signals are prompts to check, not accusations.
-- **Relationships** (`/relationships`): entities linked by the relations the ontology defines (here: shared
-  address, shared legal representative, same procedure), each link backed by the value that creates it.
+- **Relationships** (`/relationships`): entities linked by the relations the ontology defines, each link backed by
+  the value that creates it. The approved ontology defines supplier → contract; the supplier-to-supplier types on the
+  harness instance (same procedure, shared address, shared contact person) are marked on screen as not in the
+  approved ontology.
 - **Case journal** (`/journal/<value_id>`): a replay from any value back to the brief, through the capture
   step, the technical definition, the objective, the ontology and the PRD.
 - **Watchlist and open export** (`/watchlist`, `/export/*`): follow entities and see what changed since the
@@ -307,42 +329,23 @@ the script refuses to save a page that would contain any other peer's name.
 Built during the Vultr Agent Arena (Sat 11:30 → Sun 12:00 PT). The first commit (`e008b0d`) holds what
 pre-existed: the definition documents in `docs/planning/` and `docs/reference/`, and an empty scaffold (folder
 layout, placeholder READMEs, `case/brief.md`, `lake.example.yaml`). The full license texts were added in the same
-commit. Everything else was built during the event, one granular commit at a time. The table is a snapshot of
-`git log --reverse --format='%h %ad %s' --date=format:'%a %H:%M'`; the log itself is the source of truth:
+commit. Everything else was built during the event, one granular commit at a time. The table groups
+`git log --reverse --date=format:'%a %H:%M'` by work block; the log itself is the source of truth:
 [public commit history](https://github.com/ricalanis/proveedor-abierto/commits/main).
 
-| Commit | When (PT) | What |
-|--------|-----------|------|
-| `e008b0d` | Sat 13:32 | Scaffold: case package, app layout, definition docs, Apache-2.0 and CC BY 4.0 licenses |
-| `80e6b3d` | Sat 13:39 | App foundation: gold-export reader, synthetic fixtures, DoD evaluator, supplier index and dossier |
-| `0df86ab` | Sat 13:43 | Completeness view with live follow, lake file kind, bronze meta sidecars, headless UI smoke tests |
-| `617b000` | Sat 13:43 | Sync definition docs |
-| `0bdfe61` | Sat 13:52 | Investigation layer: signal explainer with dispute path, case journal, relationships, watchlist, exports, approvals |
-| `5c59444` | Sat 13:54 | README with roles, NetBird evidence checklist and 'Built during the event'; demo script and video plan; local file lake support |
-| `575acd9` | Sat 13:55 | Harden templates against missing confidence; render every page for every value; messy-row tests |
-| `b7e8f09` | Sat 14:05 | Live run view (CONTRACT 4b/7/8) with replay for rehearsal and demo insurance |
-| `4c2776b` | Sat 14:07 | Declare generated_by provenance in fixtures and replay status (engine schemas now require it) |
-| `aa8fad5` | Sat 14:11 | Approver review screens for the PRD, factors (per-factor accept/reject) and ontology (CONTRACT v0.2 4c) |
-| `5bce36b` | Sat 14:13 | Demo-replay mode: snapshot a run with its captures, replay it at N x or a set duration |
-| `921b7ed` | Sat 14:13 | Demo script: stall fallback uses the snapshot replay |
-| `7e3bef0` | Sat 14:18 | Deploy + NetBird gating for the app: two role containers on loopback, one credential per URL, verify.sh |
-| `5812181` | Sat 14:20 | Evaluation harness (judges the engine, never feeds it): official reference taxonomies, Simula scorer, PRD rubric |
-| `ca8c5c7` | Sat 14:24 | Operator run on the engine's first real (mock) output: adapt the app to structured trace fields |
-| `ec4e897` | Sat 14:25 | Judge-facing evidence: README pitch + five-phase diagram + commit-backed build list; timed rehearsal and Q&A crib |
-| `5a35c3c` | Sat 14:26 | Fixture sandbox jobs follow the engine's jobs.schema.json; replay emits complete job records only |
-| `0671472` | Sat 14:27 | CONTRACT v0.5: label preview-past-checkpoint output; show evidence format apart from source class |
-| `9d83502` | Sat 14:30 | Engine report card (/engine): score the engine's own output against the eval yardstick |
-| `1421a06` | Sat 14:31 | Deploy docs for NetBird Cloud; verify.sh remote requires SSH closed too; screenshot name hygiene |
-| `de020d1` | Sat 14:38 | Sync definition docs |
-| `eda254a` | Sat 14:39 | CONTRACT v0.6: Jev as a supporting decision backend |
-| `0649b67` | Sat 14:40 | Add event decks reference (synced) |
-| `cbd8d51` | Sat 14:41 | Align with the event decks: isolation tier + verifiable outputs in the proof, deck language in demo docs, NetBird bonus mapping |
-| `ebe6df1` | Sat 14:42 | deploy: no secrets in cloud-init user_data (readable via the metadata service) |
-| `68cc710` | Sat 14:45 | Show how each source was found (discovered_by) in the run view, the journal index and the journal replay |
-| `9deef5c` | Sat 14:49 | deploy/netbird_services.py: the two role URLs as NetBird Cloud reverse-proxy services, via the API |
-| `e303624` | Sat 14:56 | Approver-only /spend page from the spend tracker's history; deploy binds to the NetBird IP (confirmed) |
-| `2dc71df` | Sat 15:19 | Generic, ontology-driven app (CONTRACT v0.7 §11): entities + the case's ontology, second-domain proof |
-| `87eb1e2` | Sat 15:19 | Sync reference docs |
+| When (PT) | What was built | Commits (first → last) |
+|-----------|----------------|------------------------|
+| Sat 13:32 | Pre-existing only: definition docs, empty scaffold, `case/brief.md`, licenses | `e008b0d` |
+| Sat 13:39–14:31 | App foundation: gold-export reader, synthetic fixtures, DoD evaluator, dossier, signals with dispute path, journal, relationships, exports; evaluation harness (reference taxonomies, Simula scorer, PRD rubric) | `80e6b3d` → `9d83502` |
+| Sat 14:18–15:44 | Deploy and NetBird gating (role URLs through the reverse proxy, `verify.sh`), track alignment (Pattern A/B, approve-before-submit gate, six proof checks), generic ontology-driven app with a second-domain proof | `7e3bef0` → `e8df371` |
+| Sat 16:22–17:56 | First live PRD draft from the engine on Vultr, checkpoint deny with a reason, loop threads, track-checklist evidence page, per-cell live-view check | `ef5371e` → `ca1c0db` |
+| Sat 18:01–18:44 | Split into two products: the Ontofill Console (engine, approvers) and Proveedor Abierto (consumer, Spanish first, receipts on every value); approver and replay URLs retired; NetBird evidence images from the API | `36f4213` → `2a8ff1c` |
+| Sat 19:11–22:57 | Receipt identity and source directory, real-data readiness, process docs (question → linked data, Vultr + NetBird usage), screenshot kit that never signs in, public judges password and read-only console | `ba74cd0` → `83c2bc2` |
+| Sun 05:36–08:42 | Demo script and video plan on the night's real runs with an honest gold status; real-case console screenshots; `eval/gold_probe.py`, a read-only recount of the DoD from gold | `c5bc840` → `b21a682` |
+| Sun 10:18–10:32 | Harness-assisted dataset as a separate, labelled product instance; connection types outside the approved ontology say so | `ac69d66` → `d64e197` |
+
+The engine itself (phases, sandbox cells, gateway, console, runner) was built in the same window in
+[Ontofill](https://github.com/ricalanis/ontofill/commits/main); its README has the matching timeline.
 
 Engine output written into `case/` during the live run is committed separately and marked by its
 `generated_by` provenance. Mock runs never enter the tracked `case/`.
