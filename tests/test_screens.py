@@ -41,7 +41,7 @@ def test_kit_captures_product_views(fixture_root, store, tmp_path):
         time.sleep(0.05)
     try:
         out = tmp_path / "shots"
-        m = screens.capture(out, product=f"http://127.0.0.1:{port}", console=None, targets=[], state=tmp_path / "st",
+        m = screens.capture(out, product=f"http://127.0.0.1:{port}", console=None, targets=[],
                             only="product", log=lambda *_: None)
     finally:
         srv.should_exit = True
@@ -67,3 +67,12 @@ def test_redaction_hides_emails_and_declared_names():
         text = pg.inner_text("body")
         assert "ana@" not in text and "Ana Example" not in text and "group:approvers" in text and "[name]" in text
         b.close()
+
+
+def test_the_kit_cannot_sign_in_or_store_sessions():
+    import inspect
+
+    from proveedor_app import cli, screens
+
+    src = inspect.getsource(screens) + inspect.getsource(cli)
+    assert "storage_state(" not in src and "def login" not in src and "--login" not in src

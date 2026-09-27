@@ -32,11 +32,10 @@ Run it: `uv run pa-app serve --fixtures` (synthetic data), or point `PA_GOLD_DIR
 
 ## Screenshot kit (demo and judges)
 
-`uv run pa-app screens` captures the key views of this product and of the Ontofill Console (tour, inbox, operation,
-definition, discovery, pages, site graph, output, entity graph, inference, failures, summary, watch, new case) at
-1280 and 390 px in light and dark. It writes them to `docs/evidence/screens/<UTC date>/` with a `manifest.json`.
-Both live URLs need NetBird sign-in. Run `--login console` and `--login product` once: a browser window opens, you
-sign in, and the session is saved under `.cache/screens/`, which is not in git. After that, runs are headless.
-Before each capture, e-mail addresses and self-declared names are replaced with placeholders. `--target case[:run]`
-picks the console case and run (repeatable). `--product`/`--console` point the kit at other hosts, such as local servers.
+`uv run pa-app screens --product <url> --console <url> --target case[:run]` captures the key views of this product and
+of the Ontofill Console (tour, inbox, operation, definition, discovery, pages, site graph, output, entity graph,
+inference, failures, summary, watch, new case) at 1280 and 390 px in light and dark. It writes them to
+`docs/evidence/screens/<UTC date>/` with a `manifest.json`. It never signs in and never stores a session: point it at
+the services' NetBird mesh addresses, where the console refuses every decision, so the capture is read-only by
+construction. Before each capture, e-mail addresses and self-declared names are replaced with placeholders.
 Set `PA_CONSOLE_URL` on the product so empty states link judges to the console `/tour`.

@@ -1,14 +1,14 @@
 """Reproducible screenshot kit for the demo and judges (R13): the key views of Proveedor Abierto and the Ontofill
-Console, captured from a running deploy (the live NetBird URLs, or local servers) at 1280 and 390 px, light and dark.
+Console, captured from a running deploy at 1280 and 390 px, light and dark.
 
-Both live URLs sit behind NetBird sign-in. Sign in once per site with `--login`, which opens a real browser window,
-waits for you, and saves the session under `--state` (keep it out of git: it is a login cookie). Then run headless.
-Before each capture, personal data is redacted in the page: e-mail addresses and self-declared names become
-placeholders. Only `group:<name>` and role words remain. A `manifest.json` lists every file with its URL and time.
+Read-only by construction: the kit never signs in and never stores a session. Point it at the services directly over
+the NetBird mesh (an admin peer reaches them without the proxy). The console refuses every decision from direct mesh
+peers, so nothing captured this way can act. The masthead then reads "not in group … · read-only", which is honest for
+screenshots. Before each capture, personal data is redacted in the page: e-mail addresses and self-declared names
+become placeholders. A `manifest.json` lists every file with its URL, status and time.
 
-    uv run pa-app screens --login console      # once: sign in through NetBird SSO, then press Enter
-    uv run pa-app screens --login product      # once: the investigator password page
-    uv run pa-app screens --target library-demo --target library-demo:run-xxxx
+    uv run pa-app screens --product http://<mesh-ip>:8400 --console http://<mesh-ip>:8410 \
+        --target library-demo --target library-demo:<run-id>
 """
 
 from __future__ import annotations
@@ -19,8 +19,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import quote, urljoin
 
-PRODUCT_URL = "https://proveedor.eu1.netbird.services"
-CONSOLE_URL = "https://ontofill-console.eu1.netbird.services"
 MODES = ((1280, "dark"), (1280, "light"), (390, "dark"), (390, "light"))
 
 # Replaces e-mail addresses and "<name> (self-declared)" with placeholders in every text node and input value.
@@ -99,7 +97,7 @@ def product_views(page, base: str) -> list[tuple[str, str]]:
     return views
 
 
-def capture(out: Path, *, product: str | None, console: str | None, targets: list[str], state: Path,
+def capture(out: Path, *, product: str | None, console: str | None, targets: list[str],
             only: str | None = None, log=print) -> dict:
     from playwright.sync_api import sync_playwright
 
@@ -112,8 +110,7 @@ def capture(out: Path, *, product: str | None, console: str | None, targets: lis
         for site, base in sites:
             if not base or (only and only != site):
                 continue
-            state_file = state / f"{site}.json"
-            opts = {"storage_state": str(state_file)} if state_file.is_file() else {}
+            opts: dict = {}  # never a stored session: the capture must not be able to act as anyone
             probe = browser.new_context(**opts).new_page()
             views = product_views(probe, base) if site == "product" else \
                 [v for t in (targets or ["library-demo"]) for v in console_views(probe, base, t)]
@@ -135,20 +132,3 @@ def capture(out: Path, *, product: str | None, console: str | None, targets: lis
         browser.close()
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2))
     return manifest
-
-
-def login(site: str, url: str, state: Path) -> Path:
-    """Open a real browser window at the site, let a person sign in, then save the session for headless runs."""
-    from playwright.sync_api import sync_playwright
-
-    state.mkdir(parents=True, exist_ok=True)
-    target = state / f"{site}.json"
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        ctx = browser.new_context()
-        ctx.new_page().goto(url)
-        input(f"Sign in to {url} in the window that opened, then press Enter here to save the session… ")
-        ctx.storage_state(path=str(target))
-        browser.close()
-    target.chmod(0o600)
-    return target

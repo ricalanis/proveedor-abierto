@@ -49,15 +49,11 @@ def _screens(args: argparse.Namespace) -> int:
 
     from . import screens
 
-    product = args.product or screens.PRODUCT_URL
-    console = args.console or screens.CONSOLE_URL
-    state = Path(args.state)
-    if args.login:
-        saved = screens.login(args.login, product if args.login == "product" else console, state)
-        print(f"saved the {args.login} session to {saved} (keep it out of git)")
-        return 0
+    product, console = args.product, args.console
+    if not product and not console:
+        raise SystemExit("give --product and/or --console (the services' mesh addresses; the kit never signs in)")
     out = Path(args.out) if args.out else REPO_ROOT / "docs" / "evidence" / "screens" / datetime.now(UTC).strftime("%Y-%m-%d")
-    m = screens.capture(out, product=product, console=console, targets=args.target, state=state, only=args.only)
+    m = screens.capture(out, product=product, console=console, targets=args.target, only=args.only)
     bad = [f for f in m["files"] if f["status"] and f["status"] >= 400]
     print(f"{len(m['files'])} screenshots in {out} · {m['redactions']} redactions · {len(bad)} non-200 pages")
     return 1 if bad else 0
@@ -115,13 +111,13 @@ def main(argv: list[str] | None = None) -> int:
     p.set_defaults(fn=_fixtures)
 
     p = sub.add_parser("screens", help="capture the demo screenshots (product + console) at 1280/390, light and dark")
-    p.add_argument("--product", default=None, help="product base URL (default: the live NetBird URL)")
-    p.add_argument("--console", default=None, help="console base URL (default: the live NetBird URL)")
+    p.add_argument("--product", default=os.environ.get("PA_SCREENS_PRODUCT"),
+                   help="product base URL, e.g. the service's mesh address (env PA_SCREENS_PRODUCT)")
+    p.add_argument("--console", default=os.environ.get("PA_SCREENS_CONSOLE"),
+                   help="console base URL, e.g. the service's mesh address (env PA_SCREENS_CONSOLE)")
     p.add_argument("--target", action="append", default=[], help="console case[:run] (repeatable; default library-demo)")
     p.add_argument("--only", choices=("product", "console"))
     p.add_argument("--out", default=None, help="output folder (default docs/evidence/screens/<UTC date>)")
-    p.add_argument("--state", default=str(REPO_ROOT / ".cache" / "screens"), help="saved sign-in sessions (not in git)")
-    p.add_argument("--login", choices=("product", "console"), help="open a browser to sign in once and save the session")
     p.set_defaults(fn=_screens)
 
     p = sub.add_parser("dod", help="recompute the DoD keys from gold and cross-check metrics.json")
