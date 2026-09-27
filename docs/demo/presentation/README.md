@@ -7,7 +7,7 @@ slide.
 
 Order: cover · the question · five phases · two VMs, one boundary · six proof checks · the recorded containment run · Pattern A
 and B · honest status (engine, harness-assisted, SF library) · receipts on real data (harness-assisted, labelled) · the DoD recounted from gold ·
-zero open ports · a second brief · what the easy case taught the engine · close.
+zero open ports · a second brief · the five bugs the easy case found · close.
 
 Images on the slides are the screenshots in `../../evidence/screens/2026-09-27-final/` (uploaded to the rendered deck). Numbers on the slides match the README's "Where things stand" section. The harness-assisted run is labelled as such
 on every slide that shows it; the engine has no gold yet.

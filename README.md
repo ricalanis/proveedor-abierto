@@ -81,15 +81,18 @@ Three tracks, each labelled for what it is.
    when gold lands:
    https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
 
-   **Building in the open.** The simpler SF case found four engine defects that the harder case had hidden. All four
-   were fixed today, each with tests, and a fifth (R58b, above) is found and queued:
+   **Building in the open.** The simpler SF case found five engine defects that the harder case had hidden. Three
+   are fixed, with tests:
    - P1 rejected city-level jurisdictions ("San Francisco, California, USA" against a publisher's "USA").
    - P2 had no presence operator, so invalid rules exhausted the phase. Invalid rules are now set aside as
      recommendations, with deterministic salvage.
-   - A core PRD field ("weekly opening hours") was never bound to a DoD property. The missing property is now added
-     deterministically, with a repair receipt for human review.
    - The runner reported an exhausted PRD or ontology as a crash. It now pauses as needs-human, with a
      phase-specific ask.
+
+   Two are found and queued:
+   - Rules whose label does not match their predicate still exhaust P2 (R58b).
+   - A core PRD field ("weekly opening hours") is still not bound to a DoD property (R59). A fix shipped in
+     `378a8c0`, but it did not trigger on the SF rerun.
 
 ## Use case
 
