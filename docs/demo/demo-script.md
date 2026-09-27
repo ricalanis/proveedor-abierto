@@ -16,9 +16,13 @@ narrate little; never describe what you cannot show; numbers come from the live 
 - **Architecture frame:** the ASCII diagram from `03-technical-architecture.md` (control plane → gVisor cells →
   Object Storage, NetBird around it) open full screen in a terminal tab or slide.
 - **Second brief, run live the night before:** a scratch, non-procurement case (for example the public-libraries
-  brief) run on live Vultr inference to its ontology checkpoint, in scratch, **never in `case/`**. Use Codex's
-  one-command second-brief run (*command pending from Codex; write it here*). Keep two terminal tabs ready: the two
-  `brief.md` files side by side, and the two generated ontologies' class lists side by side.
+  brief) run on live Vultr inference, in scratch, **never in `case/`**. The command is in the Ontofill README ("Try a
+  second brief through the ontology checkpoint"): it copies `tests/genericity/cases/libraries/brief.md` into a scratch
+  case and runs `ontofill run <scratch>/case --to-phase 2 --run-id run-library-<ts> --budget-usd 1.00` with a scratch
+  `LAKE_ROOT`. It pauses at each checkpoint: **the user** approves the library PRD and factors (never the operator),
+  then it stops at the library ontology. Done so far on the control VM: `run-library-1790469369` in
+  `/root/demo-library`, paused at its PRD (glm-5.3). Keep two terminal tabs ready: the two `brief.md` files side by
+  side, and the two PRDs (or ontologies, once the library one exists) side by side.
 - Two browser windows, both through NetBird: **investigator URL** (left) and **approver URL** (right).
 - A terminal on the control-plane VM, in `proveedor-abierto/`, with the engine CLI ready.
 - A paused case run at the PRD checkpoint (`case/01-scope/APPROVAL_PENDING.md` exists, no `APPROVED`).
@@ -41,11 +45,11 @@ narrate little; never describe what you cannot show; numbers come from the live 
 | Time | Beat | Where | What to do and say |
 |------|------|-------|--------------------|
 | 0:00–0:15 | **The engine** | architecture frame | "An agent that only chats is a demo. Ontofill executes: brief → PRD → ontology → sources → sandboxed agents → gold data with evidence." Point at the three homes: control plane (plans on Vultr models; the inference gateway holds the only key), gVisor cells on the sandbox host (zero secrets, destroyed after every session), Object Storage (every raw capture). NetBird around all of it. |
-| 0:15–0:35 | **Generic by construction** | terminal: the two `brief.md` files, then the two ontologies | "Same engine, zero code changes. A different question gives a different PRD, ontology and sources. A guard test keeps domain words out of the engine." Show the scratch case's generated classes next to ours for three seconds. Say that the scratch case ran live last night. |
+| 0:15–0:35 | **Generic by construction** | terminal: the two `brief.md` files, then the two PRDs (the two ontologies once the library one is approved through) | "Same engine commit, same model, zero code changes. A different question gives a different PRD, ontology and sources. A guard test keeps domain words out of the engine." What is real today, both live on glm-5.3: the library PRD's personas are a resident and a librarian, its DoD is "every free-internet flag and opening-hours value cites a public source, ≥ 90% of libraries have both", and its only trusted publisher is the city government; ours has an analyst and an oversight stakeholder, "≥ 50 suppliers linked to real public contracts, ≥ 80% with a complete core profile", and Mexican federal publishers plus US lists as secondary. |
 | 0:35–0:50 | **The test case: Proveedor Abierto** | `case/brief.md`, then approver `/approvals` | "Our hard test: who receives public money in Mexico, and are they legitimate companies?" One sentence, no dataset. The engine wrote a PRD with personas, jobs and a testable definition of done, and is waiting. Click **Approve the PRD**. "Only the approver can. The investigator URL returns 403." |
 | 0:50–1:05 | **Ontology + gate** | approver `/approvals/02-ontology/factors`, `/approvals/02-ontology`, then an action request under `/approvals` | Reject the factor without evidence, accept the rest, approve: "approve numbers, not vibes." If an action request is waiting (approve-before-submit gate), open it: screenshot, intended action, risk tier; deny it. "Anything final needs a person." |
 | 1:05–1:20 | **Discovery** | investigator `/journal` sources table | "Nobody gave it sources. Each lead was confirmed by a sandbox capture and checked against the approved authority policy." Open one TDD: allowed domains, starting mode, refresh rule. |
-| 1:20–1:55 | **Execution: Pattern B + Pattern A** | investigator `/run`, then the live view | Steps stream in with their mode (D0 download, D1 script, S1 native agent, S2 Skyvern cell). Point at an S1 browser action and its **verify verdict**: Jev's cheap check first, the Vultr vision model only when Jev is unsure ("decided by code / Jev / Vultr"). Point at a **repair** attempt with its stderr and patch (Pattern A). The per-property bars climb. Open a running cell's **live view** for a few seconds: "that browser is in a gVisor sandbox on the other VM; this is a read-only view that dies with the session." Then "watch the engine argue with itself, then close its own gaps": open the **Phase 1 loop** thread (the critic's objections, the revision that answered them, the approver's reason as a human revision, "stopped: checks passed") and point at the **Reopened phase 3** marker, where the gap loop sent discovery back for a gold gap. |
+| 1:20–1:55 | **Execution: Pattern B + Pattern A** | investigator `/run`, then the live view (real: a gVisor cell's browser via a per-session `netbird expose` URL that disappears when the session closes) | Steps stream in with their mode (D0 download, D1 script, S1 native agent, S2 Skyvern cell). Point at an S1 browser action and its **verify verdict**: Jev's cheap check first, the Vultr vision model only when Jev is unsure ("decided by code / Jev / Vultr"). Point at a **repair** attempt with its stderr and patch (Pattern A). The per-property bars climb. Open a running cell's **live view** for a few seconds: "that browser is in a gVisor sandbox on the other VM; this is a read-only view that dies with the session." Then "watch the engine argue with itself, then close its own gaps": open the **Phase 1 loop** thread (the critic's objections, the revision that answered them, the approver's reason as a human revision, "stopped: checks passed") and point at the **Reopened phase 3** marker, where the gap loop sent discovery back for a gold gap. |
 | 1:55–2:25 | **Containment** | investigator `/run`, then **Sandbox proof** | Trigger the hostile page: the inference gateway's Jev + content-safety screen flags the prompt injection and quarantines the page text before the model sees it as instructions, and the page's attempts to reach the metadata IP or another domain come back **BLOCKED** at the cell's egress allowlist (the **quarantined** step in the stream: withheld from planning, kept as evidence; if it has scrolled out of the latest 150 steps, click "Show the whole trail"). Then the extractor that runs `rm -rf /` or loops forever: a **limit kill** badge appears (timeout or memory cap). Scroll to Sandbox proof: "Two instances. One boundary." Isolation probe BLOCKED, secret hygiene (no keys in the cell; the real key lives only in the gateway; metadata IP and mesh BLOCKED), the job's resource limits and the kill, teardown verified. "Only the cell died. The host is untouched." |
 | 2:25–2:45 | **The output** | investigator `/entities/<id>`, a signal, then "Trace this value to the brief" | Every property shows value, confidence and status; click a value's captures (source link, screenshot, selector). Open the signal: rule, evidence, how to verify, dispute path: "a signal, not an accusation." Trace one value: capture step → TDD → objective → ontology → PRD → brief. "Proveedor Abierto is just a viewer on Ontofill's gold export." |
 | 2:45–3:00 | **Close** | NetBird console, then both repo URLs | Zero inbound ports (`verify.sh remote`), role-gated URLs (two credentials), VMs peer to peer. Show `github.com/ricalanis/ontofill` first, then `github.com/ricalanis/proveedor-abierto`. "Swap the brief, get a different investigation. Same engine, same boundary." |
@@ -63,6 +67,16 @@ say that they are recorded. Never describe a containment you cannot show.
   raw capture link.
 
 ## Numbers to say (fill from the live run, never invent)
+
+Measured so far (2026-09-27, production path on the two VX1s):
+- Browser cell on the sandbox VM (gVisor `runsc`, 2 vCPU at the time): create 7.3 s cold, destroy 2.9 s; session open
+  through the controller ~8 s.
+- The six proof checkpoints on a real cell: host (runsc) ✓, task ✓, where ✓, isolation 3/3 BLOCKED (non-allowlisted
+  network, write outside the pod, write outside the writable mount), secrets ✓ (0 keys in env or files, metadata IP
+  BLOCKED, mesh BLOCKED), teardown ✓ (destroyed).
+- Live view: frames from the cell's real Chromium; a wrong token and a closed session both return 404.
+- Phase 1 on live Vultr inference: 2 loop iterations (propose glm-5.3, critique minimax-m3, revise, check) at about
+  $0.02–0.035 per attempt; the critic's objections and the failed checks are what stopped a bad draft from passing.
 
 - Second brief: its generated classes __ vs ours __ (same engine commit __)
 

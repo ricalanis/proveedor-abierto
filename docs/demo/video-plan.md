@@ -6,7 +6,7 @@ run ID in a corner so the numbers are checkable. Cut anything that is not visibl
 | Time | Shot | Voice-over (about 150 words in total) |
 |------|------|------------------------------------|
 | 0:00–0:06 | **The engine:** the architecture frame from `03-technical-architecture.md` | "Ontofill turns an open question into a dataset where every value has a receipt. It plans on Vultr models and works in disposable sandboxes." |
-| 0:06–0:14 | **Two briefs, two ontologies:** the scratch second brief and ours side by side, then their generated classes | "Same engine, zero code changes. A different question gives a different ontology and different sources." |
+| 0:06–0:14 | **Two briefs, two PRDs:** the library brief and ours side by side, then their live PRDs (personas, DoD, publishers); the two ontologies once the user has approved the library case through its checkpoints | "Same engine, zero code changes. A different question gives a different ontology and different sources." |
 | 0:14–0:20 | **The test case:** `case/brief.md`, then the approver approves the PRD | "Our hard test: who receives public money in Mexico, and are they legitimate? A person signs off on a URL only approvers can reach." |
 | 0:20–0:30 | `/run`: a browser action, its vision verdict, a repair attempt | "Agents browse in gVisor sandboxes. A Vultr vision model checks each step; failing code gets its error back and retries." |
 | 0:30–0:42 | **Containment:** the hostile page quarantined and BLOCKED, a limit kill, then the Sandbox proof | "A hostile page and an `rm -rf /` hit the sandbox. They are quarantined, blocked or killed. Only the cell dies." |

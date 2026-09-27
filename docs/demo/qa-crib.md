@@ -28,8 +28,9 @@ over a private NetBird network."
 Backup screens: the Vultr console showing both instances (no keys or credit codes on screen), and the NetBird
 peers list (neutral peer names only).
 
-**Status:** the screens are built. Real values come from VX1 #2 **(pending VM)**. The local mock run shows
-runtime `runc` on OrbStack, and the tier line flags it honestly.
+**Status:** real. A browser cell on VX1 #2 reports runtime `runsc` in its host checkpoint (CPU virtualization flag
+`svm`; no `/dev/kvm`, so gVisor runs without KVM there). The local mock run still shows `runc`, and the tier line flags
+that honestly.
 
 ## 2. "Is the model yours, or a borrowed key?"
 
@@ -82,9 +83,9 @@ caps, it holds no secrets, and it is torn down when the job ends. Nothing runs i
 Backup: `deploy/verify.sh local`. The app listens on loopback only, and the investigator container cannot write
 the case or its own root filesystem.
 
-**Status:** the proof panel renders the six checks and the limits. The engine emits limits, secret hygiene and
-limit kills per CONTRACT §12 *(pending engine)*; the live Docker sandbox test already shows network and write
-probes BLOCKED and teardown verified.
+**Status:** real on a live gVisor cell: isolation 3/3 BLOCKED, 0 keys in env or files, metadata IP and mesh BLOCKED,
+teardown verified (the `/evidence` page shows the same from saved files). Limit kills come from the engine's
+containment fixtures run on the sandbox host.
 
 ## Likely follow-ups
 
