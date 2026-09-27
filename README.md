@@ -40,6 +40,26 @@ can open through NetBird SSO. All four are NetBird reverse-proxy services. The V
 port, SSH included ([`deploy/verify.sh`](deploy/verify.sh) `remote` checks this from outside, along with the refusals
 above).
 
+**The problem statement, point by point** (Blast Radius Zero, plus the NetBird bonus):
+
+| Requirement | Where to see it |
+|-------------|-----------------|
+| VM-based backend on Vultr (mandatory) | Two Vultr VMs: the control plane and the sandbox host ([architecture](#architecture-two-instances-one-boundary)) |
+| Agent LLM calls through Vultr Serverless Inference (mandatory) | Console → a run → **Inference**: every call with its model and provider, the share on Vultr and unattributed calls ([screenshot](docs/evidence/screens/2026-09-27-final/console-proveedor-abierto-inference-run-efc9be56964b-1440-dark.png)) |
+| Vultr plans and dispatches, not static hosting | The engine plans each phase on Vultr models and dispatches sandbox jobs from the control VM to the sandbox VM |
+| Sandboxes never inside the app process | gVisor (`runsc`) cells on the separate sandbox VM; each job reports "where it ran" |
+| Process isolation · secret hygiene · resource limits · lifecycle | Six proof checks on every sandbox job: isolation probe BLOCKED; 0 keys, metadata IP and mesh BLOCKED; memory/CPU/process/time caps; cell destroyed after each job |
+| Containment moment (rm -rf, infinite loop, hostile page) | [`containment-demo-202609270251`](https://ontofill-console-judges.eu1.netbird.services/cases/library-demo/runs/containment-demo-202609270251): an extractor that runs `rm -rf /` then loops forever is stopped by its limit with a host sentinel intact, and a prompt-injection page is quarantined |
+| Pattern B: browser use, vision verification, approve-before-submit | Playwright Chromium in gVisor cells. Vision verification on Vultr Serverless Inference is proven live in a sandboxed browser cell (`qwen3.8-27b` verdicts: achieved, not achieved, not achievable); the case runs so far used document and page capture, so their traces show no vision steps yet. Any action beyond a read-only GET waits for a person in the console's approvals |
+| Pattern A: code runs, stderr fed back, retry | Extractor repair loop in a networkless cell: console run view → *Repairs* (attempt, stderr, diff); passing extractors become versioned macros |
+| Multi-step agentic workflow, real executed results | Five phases from a one-sentence brief, with real captures in bronze; every run's steps are on the console |
+| Production-style web app at a public URL | The product and the console, at the URLs above |
+| GitHub repo with setup and docs | [Setup: run it yourself](#setup-run-it-yourself), plus [Ontofill](https://github.com/ricalanis/ontofill) |
+| Only work built during the event | [Built during the event](#built-during-the-event) in both READMEs, and the public commit histories |
+| NetBird 1: no open ports | [NetBird section](#netbird-the-zero-port-access-bonus): `deploy/verify.sh remote` finds every port closed, SSH included |
+| NetBird 2: gated access matched to a role | Password for viewers (judges), SSO restricted to the approvers group for decisions |
+| NetBird 3: lifecycle-bound URLs | Each browser session's live view gets its own `netbird expose` URL that returns 404 once the session closes |
+
 **What you will see** (screenshots over the public URLs, Sun 27 Sep ~17:45 UTC, in [`docs/evidence/screens/2026-09-27-final/`](docs/evidence/screens/2026-09-27-final/)):
 
 | | |

@@ -1,25 +1,43 @@
 # 1-minute submission video
 
-The submission video. The 3-minute live demo is [`video-plan.md`](video-plan.md). Record at 1440×900 on the
-**judges console** and the **harness product instance** (both read-only, judges password). Never film the approvers
-console. No music under the voice. Put a small caption in a corner on every shot that says what it is, for example
-"engine-authored · run-efc9be56964b" or "harness-assisted (Claude Code), not engine-authored".
+The video for the submission form. The organizers ask for "a short one minute demo video … highlighting the specific
+features, code, and functionality that your team built during the hackathon". The track and the NetBird bonus also
+each ask for something to be on screen:
+
+| Required on screen | Shot |
+|--------------------|------|
+| Only work built during the event, identifiable as such | caption on 0:00 and the closing repo shot (commit history) |
+| Real executed results, a multi-step agentic workflow | 0:06–0:18 |
+| **One containment moment** (rm -rf, infinite loop or hostile page) | 0:18–0:32 |
+| Public demo URL, product-style app | 0:32–0:44 |
+| NetBird tier 1: firewall with no inbound application ports, then the public URL loads | 0:44–0:50 |
+| NetBird tier 2: the auth prompt | 0:50–0:54 |
+| NetBird tier 3: a URL going dead after its task | 0:54–1:00 |
+
+Record at 1440×900. Film only the **judges console** (read-only), the **harness product instance** and the NetBird
+moments in [`netbird-bonus-moments.md`](netbird-bonus-moments.md). Never film the approvers console, the Vultr
+account menu, emails, keys or mesh addresses (crop in the recorder). There's no music under the voice. Every shot
+gets a small corner caption saying what it is, for example "engine-authored · run-efc9be56964b" or
+"harness-assisted (Claude Code), not engine-authored".
 
 Console base: `https://ontofill-console-judges.eu1.netbird.services` (`C` = `/cases/proveedor-abierto`).
 Harness product: `https://proveedor-harness.eu1.netbird.services` (`H`).
 
 | Time | Shot | Screen | Voice-over (≈150 words) |
 |------|------|--------|-------------------------|
-| 0:00–0:07 | The question | `C/files/brief.md` | "One sentence goes in: who receives public money in Mexico, and are they legitimate companies? No dataset, no source list." |
-| 0:07–0:17 | People only approve | `C/approvals/01-scope`, then `C/approvals` (the decision log) | "Ontofill plans on Vultr models and drafts a PRD, then an ontology. People only approve or deny, and each decision is bound to the exact file they reviewed." |
-| 0:17–0:32 | Blast radius zero | `/cases/library-demo/runs/containment-demo-202609270251` (Sandbox proof panel, Limit kills, Hostile pages quarantined), then `C/runs/run-9c120dd56edd` (six checkpoints) | "Every browser and every extractor runs in a gVisor cell on a second VM. It holds no keys, and it can't reach the metadata IP or the mesh. A hostile page gets quarantined, a runaway loop gets killed, and the cell is destroyed after each job." |
-| 0:32–0:47 | Receipts | `H` home, a dossier, click **Ver comprobante**, then `H/relationships` | "This is what the definition of done looks like on real data: 394 suppliers, every value with its receipt. This run was harness-assisted, and it says so on every page. The engine's own gold hasn't landed yet, and the console shows exactly why." |
-| 0:47–0:54 | Generic | `/cases/sf-library-branches/answer` | "Swap the brief, and the same engine is asking about San Francisco's libraries." |
-| 0:54–1:00 | Zero open ports | NetBird services image (`docs/evidence/netbird-services.png`), then both GitHub repos | "Zero open ports, all on Vultr. An agent that executes safely is a product." |
+| 0:00–0:06 | The question | `C/files/brief.md`, caption "all built Sat 11:30 → Sun 12:00 PT" | "One sentence goes in: who receives public money in Mexico, and are they legitimate companies? Everything you'll see, we built this weekend." |
+| 0:06–0:18 | Plans on Vultr, people approve | `C/approvals/01-scope`, then `C/runs/run-efc9be56964b` scrolling steps | "Ontofill plans every step on Vultr Serverless Inference. It drafts a PRD, an ontology, then discovers sources. People only approve, bound to the exact file they reviewed." |
+| 0:18–0:32 | **Containment** | `/cases/library-demo/runs/containment-demo-202609270251`: the "Stopped by a resource limit" and "Hostile page quarantined" rows, then the secrets checkpoint | "Every action runs in a gVisor sandbox on a second VM, with no keys inside. This extractor runs rm -rf slash and then loops forever. The limit kills it and the host is untouched. A prompt-injection page gets quarantined." |
+| 0:32–0:44 | Receipts | `H`: a dossier, click **Ver comprobante** | "Every value has a receipt. This dataset was harness-assisted, and it says so. The engine's own gold is still running, live on the console." |
+| 0:44–0:50 | Zero open ports | Vultr firewall group `deny-inbound` → Inbound Rules: empty; then `verify.sh remote` → `RESULT: PASS` | "No inbound ports on either VM, SSH included." |
+| 0:50–0:54 | Gated by role | a private window opening the judges console → NetBird password page | "Judges get a password; approvers get SSO." |
+| 0:54–1:00 | A URL that dies | a live-view URL: 200 during its session, 404 after close (moment (c)), then the two GitHub repos | "Each browser session's URL dies with it. An agent that executes safely is a product." |
 
 ## Rules for the cut
 
-- Keep the harness caption on screen for the whole 0:32–0:47 shot. Never call that dataset engine gold.
+- Keep the harness caption on screen for the whole 0:32–0:44 shot. Never call that dataset engine gold.
 - Only film URLs on the NetBird reverse proxy: no mesh addresses, no peer names, no password on screen.
-- If a live page is slow, use the matching still from `docs/evidence/screens/` instead. Every number in the voice
-  must be visible on screen or in the linked evidence.
+- If a live page is slow, use the matching still from `docs/evidence/screens/2026-09-27-final/`. Every number in the
+  voice-over must be visible on screen or in the linked evidence.
+- The closing quote is the track's own line. Say it as theirs or cut it: "as the track puts it, an agent that
+  executes safely is a product."
