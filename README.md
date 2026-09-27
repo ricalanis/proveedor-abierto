@@ -39,8 +39,11 @@ can open through NetBird SSO. All three are NetBird reverse-proxy services. The 
 port, SSH included ([`deploy/verify.sh`](deploy/verify.sh) `remote` checks this from outside, along with the refusals
 above).
 
-What the pages show depends on how far the real run has got: until it reaches gold, the product shows the last
-published export, and the console shows the run waiting at its current checkpoint.
+**Where the real case stands (Sun 27 Sep, 12:30 UTC):** its PRD, factors and ontology are approved, and the engine
+has crawled for real several times (source reviews, sandbox captures, failures fixed in code and rerun), but it has
+**no gold yet**. Until it does, the product serves a **synthetic** fixture export, so you can see how a dossier reads:
+its suppliers are obviously fake ("Proveedor Ejemplo NN", RFCs starting with `ZZZ`). Everything on the judges
+console is real: every run, decision, source review and failure.
 
 ## Use case
 
@@ -223,7 +226,8 @@ the judges console refuses every write.
 **Public URLs:** the product at https://proveedor.eu1.netbird.services (the judges password), the read-only
 console at https://ontofill-console-judges.eu1.netbird.services (the judges password) and the Ontofill Console at
 https://ontofill-console.eu1.netbird.services (NetBird SSO, approvers group). The product currently serves the
-**synthetic** fixture export: the real case is paused at its PRD checkpoint and has no gold yet.
+**synthetic** fixture export: the real case is past its PRD, factors and ontology checkpoints and crawling, but has
+no gold yet.
 
 **Generic over the ontology.** The app takes its domain from the case's approved ontology: the primary class,
 property labels, definition-of-done properties, relations, rules and source classes
