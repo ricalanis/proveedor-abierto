@@ -33,6 +33,24 @@ Harness product: `https://proveedor-harness.eu1.netbird.services` (`H`).
 | 0:50–0:54 | Gated by role | a private window opening the judges console → NetBird password page | "Judges get a password; approvers get SSO." |
 | 0:54–1:00 | A URL that dies | a live-view URL: 200 during its session, 404 after close (moment (c)), then the two GitHub repos | "Each browser session's URL dies with it. An agent that executes safely is a product." |
 
+## Recording the tier 3 shot (a URL that dies)
+
+Start this only when the recorder is ready. It uses a scratch browser session that touches neither case: it
+visits example.com and iana.org only, makes no model calls, and costs about $0. From `proveedor-abierto/` on a
+machine joined to the NetBird mesh:
+
+```bash
+ssh root@<control NetBird IP> /opt/ontofill/engine/services/browser-agent/.venv/bin/python - --hold 60 \
+    < docs/demo/liveview_moment.py
+```
+
+1. The terminal prints `LIVE VIEW URL: https://….eu1.netbird.services/…`. Open it: a live stream of the sandbox
+   browser, switching between the two sites every 8 s.
+2. After `--hold` seconds the session closes, and the terminal prints `token_revoked=True` and the cell teardown.
+3. The script polls the same URL until it prints `GET live-view URL -> 404`. Reload the tab and film the 404.
+
+Crop the terminal so the SSH target (a mesh address) is out of frame.
+
 ## Rules for the cut
 
 - Keep the harness caption on screen for the whole 0:32–0:44 shot. Never call that dataset engine gold.
