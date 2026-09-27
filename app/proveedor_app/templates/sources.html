@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% macro authority_line(a) -%}
+  {%- if not a -%}<span class="muted">{{ _("The case does not say") }}</span>
+  {%- elif a.basis == "trusted" -%}{{ _("On the case's trusted list") }}{% if a.kind %} · {{ a.kind|replace("_", " ") }}{% endif %}{% if a.tier %} · {{ _(TIER_WORDS[a.tier]) }}{% endif %}
+  {%- elif a.basis == "objectives" -%}{{ _(TIER_WORDS[a.tier]) }}{% if a.kind %} · {{ a.kind|replace("_", " ") }}{% endif %}
+  {%- else -%}{{ _("Not on the case's trusted list") }} · {{ _("case rule: {action}", action=_(a.tier)) }}
+  {%- endif -%}
+{%- endmacro %}
+{% block title %}{{ _("Source directory") }}{% endblock %}
+{% block main %}
+<section class="page-head">
+  <h1>{{ _("Source directory") }}</h1>
+  <p class="lede">{{ _("Every public source behind a published value: what kind of site it is, which facts it backs, when it was read, and whether the case counts it as a trusted publisher. Each one links to a receipt you can check.") }}</p>
+</section>
+
+{% if m.sources %}
+<dl class="tally tally--inline" aria-label="{{ _('Sources in numbers') }}">
+  <div><dt>{{ _("sources behind published values") }}</dt><dd>{{ m.sources|length }}</dd></div>
+  <div><dt>{{ _("values with a receipt") }}</dt><dd>{{ m.value_count }}</dd></div>
+  {% if m.policy %}<div><dt>{{ _("on the case's trusted list") }}</dt><dd>{{ m.sources|selectattr("authority")|selectattr("authority.basis", "equalto", "trusted")|list|length }}</dd></div>{% endif %}
+</dl>
+{% if m.policy %}<p class="note muted">{{ _("The case definition names its trusted publishers by domain; for any other site its rule is “{action}”.", action=_(m.unknown_action or "review")) }} <a href="/case-file?path=01-scope/prd.md">{{ _("Read the definition") }}</a></p>{% else %}<p class="note muted">{{ _("The case definition has not published a trusted-publisher list, so no source is ranked here.") }}</p>{% endif %}
+
+<ol class="source-list" aria-label="{{ _('Sources') }}">
+  {% for s in m.sources %}
+  <li class="slip source" id="source-{{ s.key }}">
+    <div class="slip__head">
+      <h2 class="source__host">{{ s.host }}</h2>
+      {% if s.authority and s.authority.basis == "trusted" %}<span class="status status--gold">{{ _("Trusted") }}</span>{% elif s.authority and s.authority.basis == "unlisted" %}<span class="status status--missing">{{ _("Unlisted") }}</span>{% endif %}
+    </div>
+    <dl class="lines">
+      <div><dt>{{ _("Kind") }}</dt><dd>{{ s.kind or "—" }}</dd></div>
+      <div><dt>{{ _("Backs") }}</dt><dd>{{ ngettext("{n} value", "{n} values", s.backs) }}</dd></div>
+      {% if s.first and s.last|date != s.first|date %}<div><dt>{{ _("First read") }}</dt><dd>{{ s.first|date }}</dd></div><div><dt>{{ _("Last read") }}</dt><dd>{{ s.last|date }}</dd></div>
+      {% elif s.first %}<div><dt>{{ _("Captured") }}</dt><dd>{{ s.first|date }}</dd></div>{% endif %}
+      <div><dt>{{ _("Authority") }}</dt><dd>{{ authority_line(s.authority) }}</dd></div>
+    </dl>
+    <table class="source__props">
+      <caption class="visually-hidden">{{ _("Values it backs, by fact") }}</caption>
+      <thead class="visually-hidden"><tr><th scope="col">{{ _("Fact") }}</th><th scope="col">{{ _("Values") }}</th></tr></thead>
+      <tbody>
+      {% for label, n in s.by_prop %}<tr><th scope="row">{{ label }}</th><td class="num mono">{{ n }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% if s.example %}<p class="slip__foot"><a class="ev-link" href="/entities/{{ s.example.entity_id|urlencode }}?ev={{ s.example.value_id|urlencode }}#evidence">{{ _("See one receipt: {prop} of {who}", prop=s.example.prop, who=s.example.title) }} <span aria-hidden="true">→</span></a></p>{% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{% else %}
+<section class="empty-state">
+  <h2>{{ _("No source backs a published value yet") }}</h2>
+  <p>{{ _("Sources appear here as soon as a value is published with its receipt. Until then there is nothing to list: the directory never shows a site that has not backed a value.") }}</p>
+  <p><a href="/como-se-hizo#sources">{{ _("How sources are found") }}</a></p>
+</section>
+{% endif %}
+
+{% if m.unused %}
+<section class="block unused" aria-labelledby="unused-h">
+  <h2 id="unused-h">{{ _("Found, not backing any published value") }} <span class="count-inline">{{ m.unused|length }}</span></h2>
+  <p class="note muted">{{ _("The case found these candidate sources, but no published value rests on them yet.") }}</p>
+  <table class="ledger ledger--plain">
+    <thead><tr><th scope="col">{{ _("Source") }}</th><th scope="col">{{ _("Kind") }}</th><th scope="col">{{ _("Authority") }}</th></tr></thead>
+    <tbody>
+    {% for s in m.unused %}<tr><th scope="row" class="mono">{{ s.host }}</th><td>{{ s.kind or "—" }}</td><td>{{ authority_line(s.authority) }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+{% endblock %}

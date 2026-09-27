@@ -4,7 +4,6 @@ gold export only. No engine internals (modes, steps, runs, costs): those belong 
 from __future__ import annotations
 
 import json
-from urllib.parse import urlsplit
 
 from . import dod, i18n
 from .domain import Domain, humanize
@@ -49,20 +48,11 @@ def _prd(case: CaseDir) -> dict | None:
             "non_goals": texts("non_goals"), "done": done, "pending": pending}
 
 
-def _sources(run: Run, domain: Domain) -> list[dict]:
-    """The public sources behind published values, most used first."""
-    by_source: dict[str, dict] = {}
-    for ref in run.values.values():
-        for ev in ref.data.get("evidence") or []:
-            key = ev.get("source_id") or urlsplit(ev.get("url") or "").hostname
-            if not key:
-                continue
-            s = by_source.setdefault(key, {"host": urlsplit(ev.get("url") or "").hostname or key,
-                                           "kind": domain.source_label(ev["source_type"]) if ev.get("source_type") else None,
-                                           "value_ids": set()})
-            s["value_ids"].add(ref.value_id)
-    rows = [{"host": s["host"], "kind": s["kind"], "backs": len(s["value_ids"])} for s in by_source.values()]
-    return sorted(rows, key=lambda s: (-s["backs"], s["host"]))
+def _sources(run: Run, case: CaseDir, domain: Domain) -> list[dict]:
+    """The public sources behind published values, most used first (same counts as /fuentes)."""
+    from .sources import directory
+
+    return [{"host": s["host"], "kind": s["kind"], "backs": s["backs"]} for s in directory(run, case, domain)["sources"]]
 
 
 def _evidence(run: Run) -> dict:
@@ -86,7 +76,7 @@ def build(run: Run | None, case: CaseDir, domain: Domain) -> dict:
         "basic": [p.label for p in domain.dod_props()],
         "rules": [domain.rule(rid)["label"] for rid in domain.rules],
         "relations": [domain.relation_label(rid) for rid in domain.peer_relations()],
-        "sources": _sources(run, domain) if run else [],
+        "sources": _sources(run, case, domain) if run else [],
         "found_sources": len(case.sources()),
         "evidence": _evidence(run) if run else None,
         "engine_repo": ENGINE_REPO, "case_repo": CASE_REPO,

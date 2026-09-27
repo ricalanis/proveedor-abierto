@@ -103,7 +103,7 @@ def test_no_horizontal_scroll(browser, base_url, width):
     pg = ctx.new_page()
     for path in ("/", "/suppliers/sup:fixture-007", "/completeness", "/signals", "/signals/sup:fixture-005/0",
                  "/relationships", "/journal", "/journal/val:0001-008-founding_date", "/watchlist?ids=sup:fixture-005",
-                 "/data", "/about", "/?lang=en", "/suppliers/sup:fixture-007?ev=val:0001-007-address"):
+                 "/data", "/about", "/?lang=en", "/suppliers/sup:fixture-007?ev=val:0001-007-address", "/fuentes"):
         pg.goto(base_url + path)
         assert pg.evaluate("document.documentElement.scrollWidth") <= width, path
     ctx.close()

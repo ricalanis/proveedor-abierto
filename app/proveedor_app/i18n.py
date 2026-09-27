@@ -452,6 +452,56 @@ ES: dict[str, str] = {
         "Este caso aún no publica sus datos, o este sitio no está conectado a ellos. Vuelve más tarde.",
     "Technical reason": "Motivo técnico",
     "Case package": "Paquete del caso",
+    # receipt slips (dossier + receipt panel): mono lines, uppercase on screen
+    "Captured": "Captura",
+    "Where": "Lugar",
+    "Confidence": "Confianza",
+    "Receipts": "Comprobantes",
+    "+{n} more": "+{n} más",
+    # source directory (/fuentes)
+    "Source directory": "Directorio de fuentes",
+    "Every public source behind a published value: what kind of site it is, which facts it backs, when it was read, and whether the case counts it as a trusted publisher. Each one links to a receipt you can check.":
+        "Cada fuente pública detrás de un dato publicado: qué tipo de sitio es, qué datos respalda, cuándo se leyó y si el caso la cuenta como editor de confianza. Cada una enlaza a un comprobante que puedes revisar.",
+    "Sources in numbers": "Las fuentes en números",
+    "sources behind published values": "fuentes detrás de datos publicados",
+    "values with a receipt": "datos con comprobante",
+    "on the case's trusted list": "en la lista de confianza del caso",
+    "On the case's trusted list": "En la lista de confianza del caso",
+    "Not on the case's trusted list": "Fuera de la lista de confianza del caso",
+    "The case does not say": "El caso no lo indica",
+    "case rule: {action}": "regla del caso: {action}",
+    "The case definition names its trusted publishers by domain; for any other site its rule is “{action}”.":
+        "La definición del caso nombra a sus editores de confianza por dominio; para cualquier otro sitio su regla es «{action}».",
+    "Read the definition": "Leer la definición",
+    "The case definition has not published a trusted-publisher list, so no source is ranked here.":
+        "La definición del caso aún no publica una lista de editores de confianza, así que aquí no se clasifica ninguna fuente.",
+    "Trusted": "De confianza",
+    "Unlisted": "Fuera de lista",
+    "Backs": "Respalda",
+    "{n} value": "{n} dato",
+    "{n} values": "{n} datos",
+    "First read": "Primera lectura",
+    "Last read": "Última lectura",
+    "Authority": "Autoridad",
+    "Values it backs, by fact": "Datos que respalda, por tipo de dato",
+    "Values": "Datos",
+    "See one receipt: {prop} of {who}": "Ver un comprobante: {prop} de {who}",
+    "No source backs a published value yet": "Ninguna fuente respalda todavía un dato publicado",
+    "Sources appear here as soon as a value is published with its receipt. Until then there is nothing to list: the directory never shows a site that has not backed a value.":
+        "Las fuentes aparecen aquí en cuanto se publica un dato con su comprobante. Mientras tanto no hay nada que listar: el directorio nunca muestra un sitio que no haya respaldado un dato.",
+    "How sources are found": "Cómo se encuentran las fuentes",
+    "Found, not backing any published value": "Encontradas, sin respaldar ningún dato publicado",
+    "The case found these candidate sources, but no published value rests on them yet.":
+        "El caso encontró estas fuentes candidatas, pero todavía ningún dato publicado se basa en ellas.",
+    "Open the source directory": "Abrir el directorio de fuentes",
+    "every source with the facts it backs, when it was read, whether the case trusts it, and one receipt to check.":
+        "cada fuente con los datos que respalda, cuándo se leyó, si el caso confía en ella y un comprobante para revisar.",
+    # authority tiers (sources.TIERS) and the PRD's unknown_source_action
+    "Primary source": "Fuente primaria",
+    "Secondary source": "Fuente secundaria",
+    "Used after review": "Se usa tras revisión",
+    "Tier not decided": "Nivel sin decidir",
+    "review": "revisión",
 }
 
 

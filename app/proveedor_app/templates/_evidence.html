@@ -1,33 +1,36 @@
+{% set st = selected.data.status or "missing" %}
 <div class="ev" data-value-id="{{ selected.value_id }}">
-  <p class="ev__what">
-    <span class="ev__field">{{ domain.prop_label(selected.prop) }}</span>
-    <span class="ev__value">{{ selected.data.value if selected.data.value is not none else _("not found") }}</span>
-  </p>
-  <p class="ev__meta">
-    <span class="status status--{{ selected.data.status }}">{{ status_word(selected.data.status) }}</span>
-    {% if selected.data.status != "missing" %}<span>{{ _("confidence {level}", level=confidence_word(selected.data.confidence)) }}</span>{% endif %}
-    <a href="/journal/{{ selected.value_id|urlencode }}">{{ _("How we got this value") }}</a>
-  </p>
-  {% set gb = selected.data.generated_by or {} %}
-  {% if gb.backend == "jev" and selected.data.status == "gold" %}
-  <p class="ev__conflict">{{ _("Only a supporting model backs this value; it still needs a second check.") }}</p>
-  {% endif %}
-  {% if gb.backend == "recorded" %}
-  <p class="ev__conflict">{{ _("Simulated collection: this value came from recorded responses and will be replaced by a live run.") }}</p>
-  {% endif %}
-  {% if selected.data.status == "conflict" %}
-  <p class="ev__conflict">{{ _("Sources disagree. Each receipt below shows what that source says; the value above is the best-supported one.") }}</p>
-  {% endif %}
+  <div class="slip ev__slip ev--{{ st }}">
+    <div class="slip__head">
+      <p class="ev__field">{{ domain.prop_label(selected.prop) }}</p>
+      <span class="status status--{{ st }}">{{ status_word(st) }}</span>
+    </div>
+    <p class="ev__value">{{ selected.data.value if selected.data.value is not none else _("not found") }}</p>
+    <dl class="lines">
+      <div><dt>{{ _("Receipts") }}</dt><dd>{{ (selected.data.evidence or [])|length }}</dd></div>
+      {% if st != "missing" %}<div><dt>{{ _("Confidence") }}</dt><dd>{{ confidence_word(selected.data.confidence) }}</dd></div>{% endif %}
+    </dl>
+    {% set gb = selected.data.generated_by or {} %}
+    {% if gb.backend == "jev" and st == "gold" %}
+    <p class="ev__conflict">{{ _("Only a supporting model backs this value; it still needs a second check.") }}</p>
+    {% endif %}
+    {% if gb.backend == "recorded" %}
+    <p class="ev__conflict">{{ _("Simulated collection: this value came from recorded responses and will be replaced by a live run.") }}</p>
+    {% endif %}
+    {% if st == "conflict" %}
+    <p class="ev__conflict">{{ _("Sources disagree. Each receipt below shows what that source says; the value above is the best-supported one.") }}</p>
+    {% endif %}
+    <p class="slip__foot"><a href="/journal/{{ selected.value_id|urlencode }}">{{ _("How we got this value") }}</a></p>
+  </div>
   <ol class="captures">
   {% for e in selected.data.evidence or [] %}
-    <li class="capture">
-      <p class="capture__src">
-        <span class="capture__type">{{ domain.source_label(e.source_type) if e.source_type else _("Public source") }}{% if e.format %} · <span class="mono">{{ e.format }}</span>{% endif %}</span>
-        {% set href = safe_url(e.url) %}
-        {% if not e.url %}<span class="muted">{{ _("No link recorded") }}</span>{% elif href %}<a class="source-link" href="{{ href }}" target="_blank" rel="noopener noreferrer nofollow">{{ host_of(e.url) }}<span class="mono path">{{ e.url[(e.url.find(host_of(e.url)) + host_of(e.url)|length):] }}</span></a>{% else %}<span class="mono">{{ e.url }}</span>{% endif %}
-      </p>
-      {% if e.captured_at %}<p class="capture__when">{{ _("Captured {date}", date=e.captured_at|datetime) }}</p>{% endif %}
-      {% if e.selector %}<p class="capture__where"><span class="capture__where-label">{{ _(WHERE_LABELS.get(e.format or "html", "Where in the source")) }}:</span> <code class="mono">{{ e.selector }}</code></p>{% endif %}
+    <li class="capture slip">
+      <p class="capture__type">{{ domain.source_label(e.source_type) if e.source_type else _("Public source") }}{% if e.format %} · <span class="mono">{{ e.format }}</span>{% endif %}</p>
+      <dl class="lines capture__lines">
+        <div><dt>{{ _("Source") }}</dt><dd class="capture__src">{% set href = safe_url(e.url) %}{% if not e.url %}{{ _("No link recorded") }}{% elif href %}<a class="source-link" href="{{ href }}" target="_blank" rel="noopener noreferrer nofollow">{{ host_of(e.url) }}<span class="path">{{ e.url[(e.url.find(host_of(e.url)) + host_of(e.url)|length):] }}</span></a>{% else %}{{ e.url }}{% endif %}</dd></div>
+        {% if e.captured_at %}<div><dt>{{ _("Captured") }}</dt><dd class="capture__when">{{ e.captured_at|datetime }}</dd></div>{% endif %}
+        {% if e.selector %}<div class="capture__where"><dt>{{ _("Where") }}</dt><dd><code>{{ e.selector }}</code>{% if e.format and e.format != "html" %}<span class="capture__where-label">{{ _(WHERE_LABELS.get(e.format, "Where in the source")) }}</span>{% endif %}</dd></div>{% endif %}
+      </dl>
       {% if e.screenshot_key %}
       <figure class="shot shot--page">
         <div class="shot__frame"><a href="/bronze/{{ e.screenshot_key|urlencode }}" target="_blank" rel="noopener"><img src="/bronze/{{ e.screenshot_key|urlencode }}" alt="{{ _('Screenshot of {host} captured {date}', host=host_of(e.url) or _('the source'), date=e.captured_at|date) }}" loading="lazy" width="640" height="360" data-shot></a></div>

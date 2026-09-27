@@ -29,7 +29,8 @@ def product_paths(run) -> list[str]:
     return ["/", "/?q=Ejemplo", "/?show=signals", "/?show=incomplete", "/?show=conflicts", f"/entities/{e['id']}",
             f"/entities/{e['id']}?ev={v.value_id}", f"/fragments/evidence/{v.value_id}", "/signals",
             f"/signals/{e['id']}/0", "/relationships", "/journal", f"/journal/{v.value_id}", "/completeness",
-            f"/watchlist?ids={e['id']}", "/watchlist", "/data", "/about", "/como-se-hizo", "/case-file?path=brief.md"]
+            f"/watchlist?ids={e['id']}", "/watchlist", "/data", "/about", "/como-se-hizo", "/fuentes", "/sources",
+            "/case-file?path=brief.md"]
 
 
 def test_every_product_route_renders_in_both_languages(make_client, run):
@@ -77,7 +78,12 @@ def test_dossier_shows_a_receipt_on_every_value(es, run):
             ev = f["evidence"][0]
             assert f'data-evidence="{f["value_id"]}"' in text
             assert re.sub(r"^https?://([^/]+).*", r"\1", ev["url"]) in text  # source host inline
-    assert "capturado el" in text and "Ver comprobante" in text and "confianza" in text
+    for line in ("<dt>Fuente</dt>", "<dt>Captura</dt>", "<dt>Lugar</dt>", "<dt>Confianza</dt>"):  # mono receipt lines
+        assert line in text, line
+    assert "Ver comprobante" in text and 'class="fact slip' in text
+    words = {"gold": "Confirmado", "conflict": "Fuentes en desacuerdo", "missing": "No encontrado"}
+    for status in {f.get("status") or "missing" for f in e["properties"].values()}:  # the stamp names the status
+        assert f'<span class="status status--{status}">{words[status]}</span>' in text
     assert "Agregar a mi lista" in text and f"/export/entities.csv?ids={e['id']}".replace(":", "%3A") in text
 
 
@@ -85,8 +91,8 @@ def test_receipt_carries_screenshot_link_and_capture_time(es, run):
     ref = next(r for r in run.values.values() if (r.data.get("evidence") or [{}])[0].get("screenshot_key"))
     ev = ref.data["evidence"][0]
     text = es.get(f"/fragments/evidence/{ref.value_id}").text
-    assert ev["url"] in text and "/bronze/" in text and "Capturado el" in text
-    assert i18n.date_label(ev["captured_at"], "es") in text
+    assert ev["url"] in text and "/bronze/" in text and "<dt>Captura</dt>" in text
+    assert i18n.date_label(ev["captured_at"], "es", with_time=True) in text
 
 
 def test_signal_is_framed_as_a_signal_with_a_dispute_path(es, run):

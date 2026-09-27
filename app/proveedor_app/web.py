@@ -71,6 +71,8 @@ def host_of(url: str | None) -> str:
 PAGE_SIZE = 25  # browse list rows per page
 
 STATUS_WORDS = {"gold": "Confirmed", "conflict": "Sources disagree", "missing": "Not found"}
+TIER_WORDS = {"primary": "Primary source", "secondary": "Secondary source", "review": "Used after review",
+              "unknown": "Tier not decided"}
 
 
 def confidence_level(confidence) -> str:
@@ -113,6 +115,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     env.globals.update(
         host_of=host_of,
         WHERE_LABELS=WHERE_LABELS,
+        TIER_WORDS=TIER_WORDS,
         safe_url=safe_url,
     )
     env.filters["pct"] = lambda x: f"{round((x or 0) * 100)}%"
@@ -388,6 +391,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lang = i18n.pick_lang(request.query_params.get("lang"), request.cookies.get(i18n.COOKIE))
         d = (r.domain if r else current_domain()).localized(lang)
         return render(request, "method.html", nav="method", run=r, m=method.build(r, case, d))
+
+    @app.get("/fuentes", response_class=HTMLResponse)
+    @app.get("/sources", response_class=HTMLResponse, include_in_schema=False)
+    def source_directory(request: Request):
+        from . import sources
+
+        try:
+            r = settings.store.run(request.query_params.get("run"))
+        except LookupError:
+            r = None
+        lang = i18n.pick_lang(request.query_params.get("lang"), request.cookies.get(i18n.COOKIE))
+        d = (r.domain if r else current_domain()).localized(lang)
+        return render(request, "sources.html", nav="sources", run=r, m=sources.directory(r, case, d))
 
     @app.get("/data", response_class=HTMLResponse)
     def open_data(request: Request):

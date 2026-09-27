@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 48" width="40" height="48">
+  <title>Proveedor Abierto</title>
+  <style>
+    .ink { stroke: #172033; } .slip { fill: #fdfdfe; } .stamp { stroke: #1f4fbf; }
+    @media (prefers-color-scheme: dark) { .ink { stroke: #e8ecf2; } .slip { fill: #1a2233; } .stamp { stroke: #8fb0ff; } }
+  </style>
+  <path class="ink slip" d="M4 2h32v38l-4-3-4 3-4-3-4 3-4-3-4 3-4-3-4 3z" stroke-width="3" stroke-linejoin="round"/>
+  <path class="ink" d="M11 14h18M11 21h12" fill="none" stroke-width="3" stroke-linecap="round"/>
+  <circle class="stamp" cx="27" cy="28" r="5" fill="none" stroke-width="3"/>
+</svg>

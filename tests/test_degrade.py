@@ -15,7 +15,7 @@ from proveedor_app.gold import GoldStore, LocalSource
 from proveedor_app.web import Settings, create_app
 
 PAGES = ["/", "/signals", "/relationships", "/completeness", "/data", "/about", "/como-se-hizo", "/journal",
-         "/watchlist"]
+         "/watchlist", "/fuentes"]
 
 
 def _runs(lake):
@@ -167,9 +167,9 @@ def test_page_level_receipts_degrade(fixture_root, tmp_path):
     name = c.get(f"/fragments/evidence/{e['properties']['legal_name']['value_id']}").text
     assert "<img" not in name and "copia guardada" in name
     founded = c.get(f"/fragments/evidence/{e['properties']['founding_date']['value_id']}").text
-    assert "Sin enlace registrado" in founded and "Capturado el" not in founded
+    assert "Sin enlace registrado" in founded and "<dt>Captura</dt>" not in founded
     dossier = c.get(f"/entities/{e['id']}").text
-    assert "capturado el —" not in dossier and "Ver comprobante" in dossier
+    assert "<dd class=\"fact__when\">—" not in dossier and "Ver comprobante" in dossier
 
 
 def test_how_it_was_made(make_client, store):

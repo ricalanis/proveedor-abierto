@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="icon" href="/static/mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/tokens.css">
   <link rel="stylesheet" href="/static/app.css">
   <script src="/static/app.js" defer></script>
@@ -15,15 +16,19 @@
 <body data-lang="{{ lang }}">
   <a class="skip" href="#main">{{ _("Skip to content") }}</a>
   <header class="masthead">
-    <div class="masthead__id">
-      <a class="wordmark" href="/">Proveedor Abierto</a>
-      <span class="tagline">{{ _("Who receives public money, with the receipts") }}</span>
-    </div>
+    <a class="masthead__id" href="/">
+      <svg class="mark" width="30" height="36" viewBox="0 0 40 48" aria-hidden="true" focusable="false"><path class="mark__slip" d="M4 2h32v38l-4-3-4 3-4-3-4 3-4-3-4 3-4-3-4 3z"/><path class="mark__lines" d="M11 14h18M11 21h12"/><circle class="mark__stamp" cx="27" cy="28" r="5"/></svg>
+      <span class="masthead__words">
+        <span class="wordmark">Proveedor Abierto</span>
+        <span class="tagline">{{ _("Who receives public money, with the receipts") }}</span>
+      </span>
+    </a>
     <a class="lang" href="{{ lang_href }}" hreflang="{{ other_lang }}" lang="{{ other_lang }}">{{ "English" if lang == "es" else "Español" }}</a>
     <nav class="tabs" aria-label="{{ _('Sections') }}">
       <a href="/" {% if nav == "entities" %}aria-current="page"{% endif %}>{{ _("Search") }}</a>
       <a href="/signals" {% if nav == "signals" %}aria-current="page"{% endif %}>{{ _("Signals") }}</a>
       <a href="/relationships" {% if nav == "relationships" %}aria-current="page"{% endif %}>{{ _("Connections") }}</a>
+      <a href="/fuentes" {% if nav == "sources" %}aria-current="page"{% endif %}>{{ _("Sources") }}</a>
       <a href="/watchlist" {% if nav == "watchlist" %}aria-current="page"{% endif %}>{{ _("My list") }}</a>
       <a href="/data" {% if nav == "data" %}aria-current="page"{% endif %}>{{ _("Open data") }}</a>
       <a href="/completeness" {% if nav == "completeness" %}aria-current="page"{% endif %}>{{ _("How complete") }}</a>

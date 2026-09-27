@@ -48,22 +48,27 @@
     <section aria-labelledby="fields-h" class="block">
       <h2 id="fields-h">{{ _("What public records say") }}</h2>
       <ol class="record-list">
-        {% for name in order %}{% set f = props.get(name) %}{% set ev0 = ((f or {}).evidence or [])|first %}
-        <li class="fact {% if selected and f and selected.value_id == f.value_id %}is-selected{% endif %} fact--{{ (f or {}).status or 'missing' }}" {% if f %}id="row-{{ f.value_id }}"{% endif %}>
-          <p class="fact__label">{{ domain.prop_label(name, cls) }}{% if name in dod_ids %} <span class="core" title="{{ _('Part of the basic profile') }}">{{ _("basic") }}</span>{% endif %}</p>
-          <p class="fact__value">{% if f and f.value is not none %}{{ f.value|date if ptypes.get(name) == "xsd:date" else f.value }}{% else %}<span class="muted">{{ _("Not found in public sources") }}</span>{% endif %}</p>
-          <p class="fact__receipt">
-            <span class="status status--{{ (f or {}).status or 'missing' }}">{{ status_word((f or {}).status or "missing") }}</span>
-            {% if ((f or {}).generated_by or {}).backend == "jev" %}<span class="backend backend--jev" title="{{ _('Only a supporting model backs this value; it still needs a second check.') }}">{{ _("needs a second check") }}</span>{% endif %}
-            {% if ev0 %}
-              {% if ev0.url %}<span class="fact__src">{{ host_of(ev0.url) }}</span>{% elif ev0.source_type %}<span class="fact__src">{{ domain.source_label(ev0.source_type) }}</span>{% endif %}
-              {% if ev0.captured_at %}<span class="fact__when">{{ _("captured {date}", date=ev0.captured_at|date) }}</span>{% endif %}
-              {% if f.status != "missing" %}<span class="fact__conf">{{ _("confidence {level}", level=confidence_word(f.confidence)) }}</span>{% endif %}
-              <a class="ev-link" href="/entities/{{ e.id }}?ev={{ f.value_id|urlencode }}#evidence" data-evidence="{{ f.value_id }}">{{ ngettext("See receipt", "See {n} receipts", f.evidence|length) }}</a>
-            {% elif f and f.status != "missing" %}
-              <span class="fact__noreceipt">{{ _("No receipt published for this value") }}</span>
-            {% endif %}
-          </p>
+        {% for name in order %}{% set f = props.get(name) %}{% set ev0 = ((f or {}).evidence or [])|first %}{% set st = (f or {}).status or "missing" %}
+        <li class="fact slip {% if selected and f and selected.value_id == f.value_id %}is-selected{% endif %} fact--{{ st }}" {% if f %}id="row-{{ f.value_id }}"{% endif %}>
+          <div class="slip__head">
+            <p class="fact__label">{{ domain.prop_label(name, cls) }}{% if name in dod_ids %} <span class="core" title="{{ _('Part of the basic profile') }}">{{ _("basic") }}</span>{% endif %}</p>
+            <span class="status status--{{ st }}">{{ status_word(st) }}</span>
+          </div>
+          <p class="fact__value">{% if f and f.value is not none %}{{ f.value|date if ptypes.get(name) == "xsd:date" else f.value }}{% else %}{{ _("Not found in public sources") }}{% endif %}</p>
+          {% if ev0 %}
+          <dl class="lines fact__receipt">
+            {% if ev0.url or ev0.source_type %}<div><dt>{{ _("Source") }}</dt><dd class="fact__src">{% if ev0.url %}{{ host_of(ev0.url) }}{% else %}{{ domain.source_label(ev0.source_type) }}{% endif %}{% if f.evidence|length > 1 %} <span class="lines__more">{{ _("+{n} more", n=f.evidence|length - 1) }}</span>{% endif %}</dd></div>{% endif %}
+            {% if ev0.captured_at %}<div><dt>{{ _("Captured") }}</dt><dd class="fact__when">{{ ev0.captured_at|date }}</dd></div>{% endif %}
+            {% if ev0.selector %}<div><dt>{{ _("Where") }}</dt><dd>{{ ev0.selector }}</dd></div>{% endif %}
+            {% if st != "missing" %}<div><dt>{{ _("Confidence") }}</dt><dd class="fact__conf">{{ confidence_word(f.confidence) }}</dd></div>{% endif %}
+          </dl>
+          {% endif %}
+          {% if ((f or {}).generated_by or {}).backend == "jev" %}<p class="backend backend--jev">{{ _("Only a supporting model backs this value; it still needs a second check.") }}</p>{% endif %}
+          {% if ev0 %}
+          <p class="slip__foot"><a class="ev-link" href="/entities/{{ e.id }}?ev={{ f.value_id|urlencode }}#evidence" data-evidence="{{ f.value_id }}">{{ ngettext("See receipt", "See {n} receipts", f.evidence|length) }} <span aria-hidden="true">→</span></a></p>
+          {% elif f and st != "missing" %}
+          <p class="slip__foot fact__noreceipt">{{ _("No receipt published for this value") }}</p>
+          {% endif %}
         </li>
         {% endfor %}
       </ol>

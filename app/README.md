@@ -11,6 +11,10 @@ labels, DoD properties, relations, rules, source classes). Any label may carry a
 when present. The app's own copy is in `i18n.py`; `tests/test_product.py` fails when a template string has no
 Spanish entry.
 
+Visual identity "Comprobante" (`static/tokens.css`, `static/app.css`): every value is a receipt slip with a perforated
+bottom edge, mono receipt lines and a stamp whose shape is the status (solid confirmed, dashed sources disagree,
+dotted not found); `static/mark.svg` is the mark and favicon. `tests/test_contrast.py` checks the token pairs for AA.
+
 Run it: `uv run pa-app serve --fixtures` (synthetic data), or point `PA_GOLD_DIR` / `lake.yaml` at a real export.
 
 | Screen | Route | Template |
@@ -21,6 +25,7 @@ Run it: `uv run pa-app serve --fixtures` (synthetic data), or point `PA_GOLD_DIR
 | Connections (shared address, representative, procedure) | `/relationships` | `relationships.html` |
 | Case journal: value → step → TDD → objective → ontology → PRD → brief | `/journal`, `/journal/<value_id>` | `journal_index.html`, `journal.html` |
 | My list (kept in the browser) + its downloads | `/watchlist` | `watchlist.html` |
+| Source directory: every source behind published values, facts it backs, capture dates, the PRD's authority decision, one receipt each | `/fuentes` (`/sources` alias) | `sources.html`, `sources.py` |
 | Open data: CSV, OCDS JSON, RDF | `/data`, `/export/{entities.csv,ocds.json,gold.ttl}` | `data.html`, `export.py` |
 | How complete is this data (plain language) | `/completeness`, `/api/completeness` | `completeness.html`, `dod.py` |
 | How it works, how to read a profile, disputes | `/about` | `about.html` |
