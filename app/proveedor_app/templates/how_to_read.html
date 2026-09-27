@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ _("How to read this profile?") }}{% endblock %}
+{% block main %}
+<article class="prose guide">
+  <h1>{{ _("How to read this profile?") }}</h1>
+  <p class="lede">{{ _("Every fact in a profile comes with its receipt: where it was published, when it was captured, where on the page it is, and how sure the collector is that it read it right.") }}</p>
+
+  <h2 id="receipt">{{ _("A receipt, part by part") }}</h2>
+  {% if ex %}
+  <p class="note muted">{{ _("A real receipt from this data:") }} <a href="/entities/{{ ex.entity_id }}?ev={{ ex.value_id|urlencode }}#evidence">{{ ex.title }}</a></p>
+  <div class="guide__example">
+    <div class="fact slip fact--{{ ex.status }}" aria-label="{{ _('Example receipt') }}">
+      <div class="slip__head">
+        <p class="fact__label"><span class="guide__n" aria-hidden="true">1</span>{{ ex.label }}</p>
+        <span class="status status--{{ ex.status }}"><span class="guide__n" aria-hidden="true">2</span>{{ status_word(ex.status) }}</span>
+      </div>
+      <p class="fact__value">{{ ex.value|showval(ex.datatype) }}</p>
+      <dl class="lines fact__receipt">
+        <div><dt><span class="guide__n" aria-hidden="true">3</span>{{ _("Source") }}</dt><dd class="fact__src">{{ ex.host }}</dd></div>
+        {% if ex.captured_at %}<div><dt><span class="guide__n" aria-hidden="true">4</span>{{ _("Captured") }}</dt><dd>{{ ex.captured_at|date }}</dd></div>{% endif %}
+        {% if ex.selector %}<div><dt><span class="guide__n" aria-hidden="true">5</span>{{ _("Where") }}</dt><dd>{{ ex.selector }}</dd></div>{% endif %}
+        <div><dt><span class="guide__n" aria-hidden="true">6</span>{{ _("Confidence") }}</dt><dd>{{ confidence_word(ex.confidence) }}</dd></div>
+      </dl>
+      <p class="slip__foot"><span class="guide__n" aria-hidden="true">7</span><a class="ev-link" href="/entities/{{ ex.entity_id }}?ev={{ ex.value_id|urlencode }}#evidence">{{ _("See receipt") }} <span aria-hidden="true">→</span></a></p>
+    </div>
+  </div>
+  {% endif %}
+  <ol class="guide__keys">
+    <li><b>{{ _("The fact") }}</b> {{ _("and its value, exactly as the public source shows it.") }}</li>
+    <li><b>{{ _("The stamp") }}</b> {{ _("says what the sources agree on (see below).") }}</li>
+    <li><b>{{ _("Source") }}</b>: {{ _("the public website that published the value. “+1 more” means other sources say the same or something different.") }}</li>
+    <li><b>{{ _("Captured") }}</b>: {{ _("when the collector read the page. Public records change; a later capture may differ.") }}</li>
+    <li><b>{{ _("Where") }}</b>: {{ _("the exact spot on the page or in the file where the value is (a page element, a cell, a field).") }}</li>
+    <li><b>{{ _("Confidence") }}</b>: {{ _("how sure the collector is that it read the value correctly (high, medium, low). It is not a judgment about the company.") }}</li>
+    <li><b>{{ _("See receipt") }}</b>: {{ _("opens the screenshot of the whole page, the link to it and a saved copy, so you can check it yourself.") }}</li>
+  </ol>
+
+  <h2 id="stamps">{{ _("The three stamps") }}</h2>
+  <dl class="glossary">
+    <div><dt><span class="status status--gold">{{ status_word("gold") }}</span></dt><dd>{{ _("Solid stamp. A public source published it and the receipt shows where.") }}</dd></div>
+    <div><dt><span class="status status--conflict">{{ status_word("conflict") }}</span></dt><dd>{{ _("Dashed stamp. Two sources say different things. Both receipts are kept; the value shown is the best-supported one, and you can compare them.") }}</dd></div>
+    <div><dt><span class="status status--missing">{{ status_word("missing") }}</span></dt><dd>{{ _("Dotted stamp. No public source we reached published it. An empty field is not evidence of anything.") }}</dd></div>
+  </dl>
+
+  <h2 id="signals">{{ _("What a signal is, and what it is not") }}</h2>
+  <div class="guide__cols">
+    <div><h3>{{ _("It is") }}</h3><ul class="plain-list">
+      <li>{{ _("a pattern in public records that investigators usually check first;") }}</li>
+      <li>{{ _("the result of a written rule, with the records it rests on;") }}</li>
+      <li>{{ _("a starting point, with steps to verify it yourself.") }}</li></ul></div>
+    <div><h3>{{ _("It is not") }}</h3><ul class="plain-list">
+      <li>{{ _("an accusation or a finding of wrongdoing;") }}</li>
+      <li>{{ _("a score or a probability of corruption;") }}</li>
+      <li>{{ _("proof that the records are right: they can be wrong or out of date.") }}</li></ul></div>
+  </div>
+
+  <h2 id="dispute">{{ _("If something is wrong") }}</h2>
+  <ol class="howto">
+    <li>{{ _("Open the value's receipt and follow the link to the office that published it.") }}</li>
+    <li>{{ _("Ask that office to correct the public record.") }}</li>
+    <li>{{ _("Tell us with a public issue in the repository; each signal page gives you a dispute record to paste.") }} <a href="https://github.com/ricalanis/proveedor-abierto/issues/new" rel="noopener">{{ _("Open an issue") }}</a></li>
+  </ol>
+  <p class="note">{{ _("When the public record changes, the next collection picks it up.") }} <a href="/about#dispute">{{ _("More about disputes") }}</a> · <a href="/fuentes">{{ _("All the sources") }}</a></p>
+</article>
+{% endblock %}

@@ -446,6 +446,75 @@ ES: dict[str, str] = {
         'El caso aún no publica sus reglas de señales. Cada una será una regla escrita, revisada contra los registros públicos de este sitio, con los registros en que se basa y cómo verificarla.',
     'See how complete the data is':
         'Ver qué tan completos son los datos',
+    # how to read a profile
+    'Full guide':
+        'Guía completa',
+    'How to read this profile?':
+        '¿Cómo leer esta ficha?',
+    'How to read it':
+        'Cómo leerlo',
+    'Every fact in a profile comes with its receipt: where it was published, when it was captured, where on the page it is, and how sure the collector is that it read it right.':
+        'Cada dato de una ficha viene con su comprobante: dónde se publicó, cuándo se capturó, en qué lugar de la página está y qué tan seguro está el recolector de haberlo leído bien.',
+    'A receipt, part by part':
+        'Un comprobante, parte por parte',
+    'A real receipt from this data:':
+        'Un comprobante real de estos datos:',
+    'Example receipt':
+        'Comprobante de ejemplo',
+    'The fact':
+        'El dato',
+    'and its value, exactly as the public source shows it.':
+        'y su valor, tal como lo muestra la fuente pública.',
+    'The stamp':
+        'El sello',
+    'says what the sources agree on (see below).':
+        'dice en qué coinciden las fuentes (ver abajo).',
+    'the public website that published the value. “+1 more” means other sources say the same or something different.':
+        'el sitio público que publicó el dato. «+1 más» significa que otras fuentes dicen lo mismo o algo distinto.',
+    'when the collector read the page. Public records change; a later capture may differ.':
+        'cuándo leyó la página el recolector. Los registros públicos cambian; una captura posterior puede ser distinta.',
+    'the exact spot on the page or in the file where the value is (a page element, a cell, a field).':
+        'el lugar exacto de la página o del archivo donde está el dato (un elemento de la página, una celda, un campo).',
+    'how sure the collector is that it read the value correctly (high, medium, low). It is not a judgment about the company.':
+        'qué tan seguro está el recolector de haber leído bien el dato (alta, media, baja). No es un juicio sobre la empresa.',
+    'opens the screenshot of the whole page, the link to it and a saved copy, so you can check it yourself.':
+        'abre la captura de la página completa, el enlace y una copia guardada, para que lo revises tú.',
+    'The three stamps':
+        'Los tres sellos',
+    'Solid stamp. A public source published it and the receipt shows where.':
+        'Sello sólido. Una fuente pública lo publicó y el comprobante muestra dónde.',
+    'Dashed stamp. Two sources say different things. Both receipts are kept; the value shown is the best-supported one, and you can compare them.':
+        'Sello discontinuo. Dos fuentes dicen cosas distintas. Se guardan ambos comprobantes; el dato que se muestra es el mejor respaldado y puedes compararlos.',
+    'Dotted stamp. No public source we reached published it. An empty field is not evidence of anything.':
+        'Sello punteado. Ninguna fuente pública que consultamos lo publicó. Un campo vacío no es evidencia de nada.',
+    'What a signal is, and what it is not':
+        'Qué es una señal y qué no es',
+    'It is':
+        'Es',
+    'a pattern in public records that investigators usually check first;':
+        'un patrón en los registros públicos que quienes investigan suelen revisar primero;',
+    'the result of a written rule, with the records it rests on;':
+        'el resultado de una regla escrita, con los registros en que se basa;',
+    'a starting point, with steps to verify it yourself.':
+        'un punto de partida, con pasos para verificarla tú.',
+    'It is not':
+        'No es',
+    'an accusation or a finding of wrongdoing;':
+        'una acusación ni un hallazgo de una falta;',
+    'a score or a probability of corruption;':
+        'una calificación ni una probabilidad de corrupción;',
+    'proof that the records are right: they can be wrong or out of date.':
+        'prueba de que los registros son correctos: pueden estar equivocados o desactualizados.',
+    'If something is wrong':
+        'Si algo está mal',
+    "Open the value's receipt and follow the link to the office that published it.":
+        'Abre el comprobante del dato y sigue el enlace a la oficina que lo publicó.',
+    'Tell us with a public issue in the repository; each signal page gives you a dispute record to paste.':
+        'Avísanos con un issue público en el repositorio; cada página de señal te da un registro de disputa para pegar.',
+    'More about disputes':
+        'Más sobre disputas',
+    'All the sources':
+        'Todas las fuentes',
     # no gold / case file
     "Nothing published yet": "Aún no hay nada publicado",
     "This case has not published its data yet, or this site is not connected to it. Please come back later.":

@@ -20,6 +20,7 @@
         {% if peers %}<a class="btn btn--quiet" href="/relationships?focus={{ e.id|urlencode }}{% for rel in domain.peer_relations() %}&t={{ rel }}{% endfor %}">{{ _("See connections") }}</a>{% endif %}
         <a class="btn btn--quiet" href="/export/entities.csv?ids={{ e.id|urlencode }}">{{ _("Download CSV") }}</a>
       </div>
+      <p class="how-to-read"><a href="/como-leer">{{ _("How to read this profile?") }}</a></p>
     </header>
 
     <section aria-labelledby="signals-h" class="block">
@@ -115,7 +116,7 @@
   </div>
 
   <aside class="evidence" id="evidence" aria-labelledby="evidence-h" tabindex="-1">
-    <h2 id="evidence-h">{{ _("Receipt") }}</h2>
+    <h2 id="evidence-h">{{ _("Receipt") }} <a class="how-to-read__inline" href="/como-leer#receipt">{{ _("How to read it") }}</a></h2>
     <div id="evidence-panel" aria-live="polite">
       {% if selected %}{% include "_evidence.html" %}{% else %}
       <p class="muted">{{ _("Choose “See receipt” on any value to see where it came from: the public page, a screenshot of it, and when it was captured.") }}</p>

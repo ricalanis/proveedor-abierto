@@ -478,3 +478,14 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   .path__step { padding-left: var(--space-xl); }
   .path__facts div { grid-template-columns: minmax(0, 1fr); gap: var(--space-3xs); }
 }
+
+/* ¿Cómo leer esta ficha? */
+.how-to-read { font-size: var(--text-sm); font-weight: 600; }
+.how-to-read__inline { font-size: var(--text-sm); font-weight: 500; margin-left: var(--space-xs); white-space: nowrap; }
+.guide__example { max-width: 520px; margin: var(--space-sm) 0; }
+.guide__n { display: inline-grid; place-items: center; width: 1.35em; height: 1.35em; margin-right: 6px; border-radius: 50%;
+  background: var(--color-stamp, var(--color-ink)); color: var(--color-paper); font: 700 var(--text-xs)/1 var(--font-mono); vertical-align: 1px; }
+.guide__keys { margin: 0; padding-left: 1.6em; display: grid; gap: var(--space-2xs); max-width: 68ch; }
+.guide__keys li::marker { font-family: var(--font-mono); font-weight: 700; }
+.guide__cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: var(--space-md) var(--space-xl); }
+.guide__cols h3 { font-size: var(--text-base); margin-bottom: var(--space-2xs); }

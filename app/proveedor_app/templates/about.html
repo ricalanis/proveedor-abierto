@@ -9,7 +9,7 @@
   <p>{{ _("Software agents read public websites, such as official registries, open-data portals and gazettes, the way a person would: searching, paging through results and downloading published files. They never log in, never get past a captcha and never submit anything except searches. Every page they read is kept as a saved copy with a screenshot.") }}</p>
   {% if sources %}<p>{{ ngettext("This data draws on {n} public source.", "This data draws on {n} public sources.", sources|length) }} <a href="/journal">{{ _("See them in the case journal") }}</a>.</p>{% endif %}
 
-  <h2>{{ _("How to read a profile") }}</h2>
+  <h2>{{ _("How to read a profile") }} <a class="how-to-read__inline" href="/como-leer">{{ _("Full guide") }}</a></h2>
   <dl class="glossary">
     <div><dt><span class="status status--gold">{{ status_word("gold") }}</span></dt><dd>{{ _("A public source published it, and the receipt shows where.") }}</dd></div>
     <div><dt><span class="status status--conflict">{{ status_word("conflict") }}</span></dt><dd>{{ _("Two sources say different things. Both are shown; neither is hidden.") }}</dd></div>

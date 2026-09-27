@@ -407,6 +407,32 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         d = (r.domain if r else current_domain()).localized(lang)
         return render(request, "sources.html", nav="sources", run=r, m=sources.directory(r, case, d))
 
+    @app.get("/como-leer", response_class=HTMLResponse)
+    @app.get("/how-to-read", response_class=HTMLResponse, include_in_schema=False)
+    def how_to_read(request: Request):
+        """A guide to reading a profile, illustrated with a real receipt from the data when there is one."""
+        try:
+            r = settings.store.run(request.query_params.get("run"))
+        except LookupError:
+            r = None
+        ex = None
+        if r:
+            lang = i18n.pick_lang(request.query_params.get("lang"), request.cookies.get(i18n.COOKIE))
+            d = r.domain.localized(lang)
+            for e in r.primary:
+                for name, f in (e.get("properties") or {}).items():
+                    evs = (f or {}).get("evidence") or []
+                    if isinstance(f, dict) and f.get("status") == "gold" and evs and evs[0].get("selector"):
+                        ex = {"entity_id": e["id"], "title": r.title(e), "value_id": f["value_id"], "value": f.get("value"),
+                              "status": "gold", "label": d.prop_label(name, e.get("class")),
+                              "datatype": d.prop_datatype(name, e.get("class")), "host": host_of(evs[0].get("url")),
+                              "captured_at": evs[0].get("captured_at"), "selector": evs[0].get("selector"),
+                              "confidence": f.get("confidence")}
+                        break
+                if ex:
+                    break
+        return render(request, "how_to_read.html", nav="about", run=r, ex=ex)
+
     @app.get("/data", response_class=HTMLResponse)
     def open_data(request: Request):
         from . import export as ex
