@@ -88,6 +88,58 @@ class S3Source:
         return f"S3Source({self.bucket})"
 
 
+# Flags that are not in the engine's shape (rule_id, label, explanation, evidence_value_ids), e.g. a harness-assisted
+# export's {"flag": "address_variants", "values": [...]}: readable titles; Spanish lives in i18n.ONTOLOGY_ES.
+FLAG_LABELS = {
+    "address_variants": "Address written differently across records",
+    "name_variants": "Name written differently across records",
+    "shared_contract": "Shares a contract with other suppliers",
+    "rfc_check_digit_mismatch": "RFC fails the SAT check digit",
+    "registry_match": "Found in a municipal supplier register",
+    "sabg_sanctioned": "Listed in the federal sanctions directory (SABG)",
+    "sat_69b_listed": "On the SAT 69-B list",
+    "name_differs_across_sources": "Name differs across sources",
+    "sanction_record_name_mention": "Name mentioned in a sanction record",
+    "source_class_not_in_approved_ontology": "Source class not in the approved ontology",
+    "proxy_source_class": "Source used in place of another source class",
+}
+
+
+def _items(v, cap: int = 5) -> str:
+    vals = [str(x) for x in (v if isinstance(v, list) else [v]) if x not in (None, "")]
+    return " · ".join(vals[:cap]) + (f" (+{len(vals) - cap})" if len(vals) > cap else "")
+
+
+def normalize_flag(f) -> dict | None:
+    """An engine-shaped flag from any flag record, so no page prints None and the CSV export never breaks."""
+    if not isinstance(f, dict):
+        return None
+    if f.get("rule_id") and f.get("label"):
+        return {**f, "evidence_value_ids": list(f.get("evidence_value_ids") or [])}
+    rid = str(f.get("rule_id") or f.get("flag") or f.get("type") or "flag")
+    parts = [str(f["note"])] if f.get("note") else []
+    for key, word in (("values", "Seen as"), ("suppliers", "With"), ("value", "Value"), ("proxy_for", "Stands in for"),
+                      ("source_id", "Source")):
+        if f.get(key) not in (None, "", []):
+            parts.append(f"{word}: {_items(f[key])}")
+    if isinstance(f.get("rows"), list):
+        parts.append(f"{len(f['rows'])} matching rows")
+    return {
+        **f,
+        "rule_id": rid,
+        "label": f.get("label") or f.get("title") or FLAG_LABELS.get(rid) or rid.replace("_", " ").capitalize(),
+        "explanation": f.get("explanation") or ". ".join(parts),
+        "evidence_value_ids": [v for v in f.get("evidence_value_ids") or [] if isinstance(v, str)],
+    }
+
+
+def normalize_flags(entities: list[dict]) -> list[dict]:
+    for e in entities:
+        if e.get("flags"):
+            e["flags"] = [n for n in (normalize_flag(f) for f in e["flags"]) if n]
+    return entities
+
+
 def _jsonl(raw: bytes | None) -> list[dict]:
     if not raw:
         return []
@@ -247,7 +299,7 @@ class GoldStore:
             entities_raw = self.source.read(f"{base}/entities.jsonl")
             layout = "entities"
             if entities_raw is not None:
-                entities = _jsonl(entities_raw)
+                entities = normalize_flags(_jsonl(entities_raw))
             else:  # pre-§11 export: the one adapter
                 entities = legacy_to_entities(_jsonl(self.source.read(f"{base}/suppliers.jsonl")),
                                               _jsonl(self.source.read(f"{base}/contracts.jsonl")))

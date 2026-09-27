@@ -597,6 +597,18 @@ ES: dict[str, str] = {
 # Spanish for ontology items, keyed by ontology id (classes, properties, relations, rules, source classes). The export
 # stays in the engine's shape; where an id is not listed here, the export's own label shows (Domain.localized).
 ONTOLOGY_ES: dict[str, dict] = {
+    # flags of a harness-assisted export (gold.FLAG_LABELS)
+    "address_variants": {"label": "Domicilio escrito de distintas formas en los registros"},
+    "name_variants": {"label": "Nombre escrito de distintas formas en los registros"},
+    "shared_contract": {"label": "Comparte un contrato con otros proveedores"},
+    "rfc_check_digit_mismatch": {"label": "El RFC no pasa el dígito verificador del SAT"},
+    "registry_match": {"label": "Aparece en un padrón municipal de proveedores"},
+    "sabg_sanctioned": {"label": "Aparece en el directorio de sancionados (SABG)"},
+    "sat_69b_listed": {"label": "Aparece en la lista 69-B del SAT"},
+    "name_differs_across_sources": {"label": "El nombre difiere entre fuentes"},
+    "sanction_record_name_mention": {"label": "Su nombre aparece en un registro de sanción"},
+    "source_class_not_in_approved_ontology": {"label": "Clase de fuente fuera de la ontología aprobada"},
+    "proxy_source_class": {"label": "Fuente usada en lugar de otra clase de fuente"},
     "supplier": {"label": "Proveedor", "label_plural": "Proveedores"},
     "contract": {"label": "Contrato", "label_plural": "Contratos"},
     "legal_name": {"label": "Razón social"}, "tax_id": {"label": "RFC"}, "address": {"label": "Domicilio"},
