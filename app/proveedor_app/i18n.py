@@ -19,6 +19,18 @@ MONTHS_EN = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct
 
 ES: dict[str, str] = {
     # chrome
+    "Harness-assisted run (Claude Code), not engine-authored.":
+        "Corrida asistida por el arnés (Claude Code), no generada por el motor.",
+    "Claude Code built this dataset from public downloads with its own scripts; the Ontofill engine did not produce it. Every value still carries its source, locator and quote.":
+        "Claude Code armó este conjunto de datos con descargas públicas y sus propios scripts; el motor Ontofill no lo produjo. Cada dato conserva su fuente, su ubicación y su cita.",
+    "Contracts are INAI's own purchases (its official OCDS publication, May 2020 to February 2025), not CompraNet: the CompraNet and ComprasMX downloads were blocked and were not bypassed.":
+        "Los contratos son compras del propio INAI (su publicación oficial OCDS, de mayo de 2020 a febrero de 2025), no de CompraNet: las descargas de CompraNet y ComprasMX estaban bloqueadas y no se evadió el bloqueo.",
+    "Founding dates are derived from each RFC, not read from a registry.":
+        "Las fechas de constitución se derivan de cada RFC, no se leyeron de un registro.",
+    "Addresses are as declared in the contracts (8 suppliers use a municipal supplier register instead).":
+        "Los domicilios son los declarados en los contratos (8 proveedores usan en su lugar un padrón municipal de proveedores).",
+    "Strictly against the approved source classes, 3 of the 4 required are covered: the commercial registry is still missing.":
+        "Contra las clases de fuente aprobadas, en sentido estricto se cubren 3 de las 4 requeridas: falta el registro público de comercio.",
     "Skip to content": "Saltar al contenido",
     "Sections": "Secciones",
     "Breadcrumb": "Ruta",

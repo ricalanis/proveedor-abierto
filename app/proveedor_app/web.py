@@ -170,6 +170,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ctx.setdefault("backend", r.inference_backend if r else None)
         ctx.setdefault("synthetic", bool(r and r.case_id.startswith("fixture")))
         ctx.setdefault("preview", bool(r and r.metrics.get("preview")))
+        # a dataset built outside the engine (harness-assisted) is labelled on every page, never passed off as gold
+        ctx.setdefault("harness", os.environ.get("PA_PROVENANCE") == "harness"
+                       or bool(r and (r.case_id.endswith("-harness") or r.inference_backend == "harness")))
         response = templates.TemplateResponse(request, name, ctx)
         if asked in i18n.LANGS and asked != request.cookies.get(i18n.COOKIE):
             response.set_cookie(i18n.COOKIE, asked, max_age=365 * 24 * 3600, samesite="lax")

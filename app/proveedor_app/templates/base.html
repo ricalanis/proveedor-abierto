@@ -36,6 +36,17 @@
       <a href="/about" {% if nav == "about" %}aria-current="page"{% endif %}>{{ _("How it works") }}</a>
     </nav>
   </header>
+  {% if harness %}
+  <div class="banner banner--harness" role="note">
+    <p><strong>{{ _("Harness-assisted run (Claude Code), not engine-authored.") }}</strong> {{ _("Claude Code built this dataset from public downloads with its own scripts; the Ontofill engine did not produce it. Every value still carries its source, locator and quote.") }}</p>
+    <ul>
+      <li>{{ _("Contracts are INAI's own purchases (its official OCDS publication, May 2020 to February 2025), not CompraNet: the CompraNet and ComprasMX downloads were blocked and were not bypassed.") }}</li>
+      <li>{{ _("Founding dates are derived from each RFC, not read from a registry.") }}</li>
+      <li>{{ _("Addresses are as declared in the contracts (8 suppliers use a municipal supplier register instead).") }}</li>
+      <li>{{ _("Strictly against the approved source classes, 3 of the 4 required are covered: the commercial registry is still missing.") }}</li>
+    </ul>
+  </div>
+  {% endif %}
   {% if synthetic %}
   <p class="banner" role="note"><strong>{{ _("Practice data.") }}</strong> {{ _("Every name, identifier and source on this site is invented (.example sites, obviously fake names). The real case has not published its data yet.") }}</p>
   {% endif %}
