@@ -4,6 +4,8 @@
 <section class="page-head">
   <h1>{{ _("Connections") }}</h1>
   <p class="lede">{{ _("{plural} that share something in public records, such as an address or a representative. A shared detail is a lead to check, not proof of a relationship. Each line links to the record that connects them.", plural=domain.class_label(plural=True)) }}</p>
+  {% set ext = [] %}{% for t in LINK_TYPES %}{% if (run.domain.relations.get(t) or {}).get("provenance") %}{% set _x = ext.append(t) %}{% endif %}{% endfor %}
+  {% if ext %}<p class="note conn-provenance">{{ _("Not in the approved ontology:") }} {% for t in ext %}<b>{{ domain.relation_label(t) }}</b> <span class="muted">({{ run.domain.relations[t].provenance }})</span>{% if not loop.last %}; {% endif %}{% endfor %}.</p>{% endif %}
 </section>
 
 {% if LINK_TYPES %}

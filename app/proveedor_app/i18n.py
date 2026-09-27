@@ -19,6 +19,7 @@ MONTHS_EN = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct
 
 ES: dict[str, str] = {
     # chrome
+    "Not in the approved ontology:": "Fuera de la ontología aprobada:",
     "Harness-assisted run (Claude Code), not engine-authored.":
         "Corrida asistida por el arnés (Claude Code), no generada por el motor.",
     "Claude Code built this dataset from public downloads with its own scripts; the Ontofill engine did not produce it. Every value still carries its source, locator and quote.":
