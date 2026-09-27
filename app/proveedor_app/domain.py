@@ -50,7 +50,7 @@ class Domain:
         if lang not in self._localized:
             from .i18n import ONTOLOGY_LABELS
 
-            onto = localize_ontology(self.raw, ONTOLOGY_LABELS.get(lang) or {})
+            onto = localize_ontology(self.raw, ONTOLOGY_LABELS.get(lang) or {}, lang)
             if onto is self.raw:
                 self._localized[lang] = self
             else:
@@ -144,14 +144,22 @@ LOCALIZABLE = ("label", "label_plural", "description", "checks", "verify")
 _ONTOLOGY_LISTS = ("classes", "properties", "relations", "rules", "source_classes")
 
 
-def localize_ontology(onto: dict, labels: dict[str, dict]) -> dict:
+def localize_ontology(onto: dict, labels: dict[str, dict], lang: str | None = None) -> dict:
     """Overlay translated text by ontology id ({id: {label, label_plural, description, checks, verify}}) without
-    changing the export's shape. Unchanged input comes back as is."""
+    changing the export's shape. Unchanged input comes back as is. An item's own translation (`labels: {lang: ...}`)
+    wins; an item added outside the approved ontology (`provenance`) keeps its own text rather than the app's
+    translation for that id, which may mean something else (a contact person is not a legal representative)."""
     out, changed = dict(onto), False
     for key in _ONTOLOGY_LISTS:
         items = []
         for item in onto.get(key) or []:
-            extra = labels.get(item.get("id")) if isinstance(item, dict) else None
+            own = (item.get("labels") or {}).get(lang) if isinstance(item, dict) and lang else None
+            if isinstance(item, dict) and item.get("provenance") and not own:
+                items.append(item)
+                continue
+            extra = ({"label": own} if isinstance(own, str) else own) or (
+                labels.get(item.get("id")) if isinstance(item, dict) else None
+            )
             if extra:
                 item = {**item, **{k: v for k, v in extra.items() if k in LOCALIZABLE and v}}
                 changed = True

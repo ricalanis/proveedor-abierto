@@ -34,3 +34,22 @@ def test_harness_relations_are_marked(fixture_root, tmp_path):
 
 def test_engine_relations_have_no_note(client):
     assert "conn-provenance" not in client.get("/relationships").text
+
+
+def test_an_extension_keeps_its_own_label_over_the_apps_translation():
+    """The harness's shared_representative is a shared CONTACT person, not a verified legal representative: the
+    app's Spanish for that id ("Mismo representante legal") must not relabel it. Its own `labels.es` wins."""
+    from proveedor_app.domain import localize_ontology
+    from proveedor_app.i18n import ONTOLOGY_ES
+
+    rel = {"id": "shared_representative", "label": "Shared contact person", "provenance": "harness extension"}
+    out = localize_ontology({"relations": [rel]}, ONTOLOGY_ES, "es")
+    assert out["relations"][0]["label"] == "Shared contact person"
+    rel_es = {**rel, "labels": {"es": "Misma persona de contacto"}}
+    assert localize_ontology({"relations": [rel_es]}, ONTOLOGY_ES, "es")["relations"][0]["label"] == (
+        "Misma persona de contacto"
+    )
+    engine = {"id": "shared_representative", "label": "Shared legal representative"}
+    assert localize_ontology({"relations": [engine]}, ONTOLOGY_ES, "es")["relations"][0]["label"] == (
+        "Mismo representante legal"
+    )
