@@ -86,8 +86,12 @@ Three tracks, each labelled for what it is.
    the portal now renders inside the gVisor sandbox (before, it was an empty shell); its open-data, buyer-registry and
    procurement pages have been captured. The blast radius stayed zero
    while egress widened: only sibling hosts of a trusted publisher were added, GET only. Third-party analytics and
-   font CDNs stay blocked, and POSTs are refused. **The engine run continues after submission; its status is live on the judges
-   console.**
+   font CDNs stay blocked, and POSTs are refused. At 18:42 UTC the run stopped for a person after P3's four
+   iterations. ComprasMX lists its contract CSVs through a GET API but serves them only through a POST carrying an
+   anti-bot token, so the read-only engine stopped and flagged it, by design. Next: finding the same contracts as
+   OCDS files that can be fetched by GET. **Work on this case continues after submission; its status is live on the
+   judges console.** The engine-authored PRDs, ontologies and DoD queries for both cases, with class diagrams, are
+   in [`docs/engine-output/`](docs/engine-output/README.md).
 2. **A harness-assisted run (Claude Code, not engine-authored).** To show what the definition of done looks like
    on real data, a Claude Code session built a dataset by hand-written scripts from public downloads, keyed to the
    **approved** ontology and measured by the same unmodified DoD probe. Result: 394 suppliers and 958 contracts;
