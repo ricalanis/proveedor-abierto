@@ -10,6 +10,10 @@ behind a wall.
 **Repos:** https://github.com/ricalanis/ontofill (engine, Apache-2.0) ·
 https://github.com/ricalanis/proveedor-abierto (case package and consumer app)
 
+**Built during the event:** everything shown was built Sat 11:30 → Sun 12:00 PT. Before the event each repo held
+only definition documents and an empty scaffold. Both READMEs have a "Built during the event" section, and the
+commit histories are public.
+
 **Live:** https://ontofill-console-judges.eu1.netbird.services (read-only console) ·
 https://proveedor-harness.eu1.netbird.services (product over the harness-assisted dataset). The password is in the
 proveedor-abierto README, under "For judges".
@@ -33,14 +37,16 @@ connections and a journal from any value back to the brief.
   secret hygiene (0 keys in the cell; the metadata IP and the mesh are BLOCKED).
 - **One key.** Only the inference gateway on the control VM holds the Vultr key. It issues per-session tokens,
   attributes every call to a run and step, and screens captured page text before any model sees it.
-- **Containment on a recorded run.** A prompt-injection page is quarantined, and a runaway extractor loop is killed
-  by its cell's limits. The host is untouched.
+- **Containment on a recorded run.** An extractor that runs `rm -rf /` and then loops forever is killed by its
+  cell's limits, and the host sentinel stays intact. A prompt-injection page is quarantined.
 - **Both patterns.**
-  - Pattern B: browser actions are checked by a Vultr vision model, and an approve-before-submit gate covers
-    anything beyond a read-only GET.
+  - Pattern B: Playwright Chromium in gVisor cells. Vision verification on Vultr Serverless Inference
+    (`qwen3.8-27b`) is proven live in a sandboxed browser cell. The case runs so far used document and page
+    capture, so their traces show no vision steps yet. An approve-before-submit gate covers anything beyond a
+    read-only GET.
   - Pattern A: the engine writes an extractor, runs it in a networkless cell, feeds the failure back, and patches;
     a passing extractor is promoted to a versioned macro.
-- **Zero open ports** on both VMs, SSH included. The URLs go through the NetBird reverse proxy, gated by role:
+- **NetBird bonus, all three tiers. Zero open ports** on both VMs, SSH included. The URLs go through the NetBird reverse proxy, gated by role:
   viewers get a read-only console that refuses writes with 403, and approvers sign in through SSO. The VMs talk
   peer-to-peer over WireGuard, one way. Each browser session's live-view URL dies with the session.
 

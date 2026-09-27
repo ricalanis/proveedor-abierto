@@ -1,0 +1,12 @@
+<section id="judge" data-transition="fade" style="background:#f3f5f8; color:#1b2233; font-family:'Public Sans', Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+<h2 style="font-size:72px; font-weight:600; line-height:1.1">The four questions, answered</h2>
+<table style="width:1664px; font-size:30px; border-collapse:collapse">
+<tr><th style="text-align:left; padding:18px; border-bottom:2px solid #1b2233; width:620px">The judge is asking</th><th style="text-align:left; padding:18px; border-bottom:2px solid #1b2233">Our answer, on screen</th></tr>
+<tr><td style="padding:18px; border-bottom:1px solid #d3d8e0"><b>Show me the instance.</b></td><td style="padding:18px; border-bottom:1px solid #d3d8e0">Two VX1 VMs: the control plane and the sandbox host. Each job's proof says where it ran.</td></tr>
+<tr><td style="padding:18px; border-bottom:1px solid #d3d8e0"><b>Is the model yours, or a borrowed key?</b></td><td style="padding:18px; border-bottom:1px solid #d3d8e0">Vultr Serverless Inference behind our own gateway. The Inference view lists every call: 100% of reasoning on Vultr.</td></tr>
+<tr><td style="padding:18px; border-bottom:1px solid #d3d8e0"><b>Is Vultr planning and dispatching?</b></td><td style="padding:18px; border-bottom:1px solid #d3d8e0">Every phase is planned on Vultr models, and jobs are dispatched from VM #1 to cells on VM #2.</td></tr>
+<tr><td style="padding:18px; border-bottom:1px solid #d3d8e0"><b>If I paste rm -rf /, what dies?</b></td><td style="padding:18px; border-bottom:1px solid #d3d8e0">The sandbox process. gVisor intercepts the syscalls, the limit kills the loop, and the cell is destroyed.</td></tr>
+</table>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-family:'IBM Plex Mono', monospace; font-size:24px; color:#4a5263">Questions from the track's own rubric slide</p>
+<aside>Answer each with the console open: a run's Sandbox proof panel, its Inference view, and the containment run.</aside>
+</section>
