@@ -30,8 +30,8 @@ NetBird.
 
 Honest caveat for Q&A: the scan is the proof, not the firewall screen. During provisioning an outside probe found
 SSH reachable while the group already showed zero inbound rules; the fix was on the host, whose firewall now allows
-SSH only on the NetBird interface (`wt0`). So both layers deny, and the scan checks the result. Before filming,
-confirm in the portal that both VMs are listed under the group's *Linked Instances*.
+SSH only on the NetBird interface (`wt0`). So both layers deny, and the scan checks the result. Both VMs are linked
+to the group (checked through the Vultr API on 2026-09-27).
 
 ## (b) Public URLs and their auth prompts
 
