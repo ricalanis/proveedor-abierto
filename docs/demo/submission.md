@@ -62,12 +62,12 @@ connections and a journal from any value back to the brief.
   contracts from public data, keyed to the approved ontology and measured by the same unmodified DoD probe.
   0.924 of suppliers have all six core fields, and 0 of 7,761 values lack evidence.
 - **Second brief, same engine:** "Which San Francisco Public Library branches offer free Wi-Fi, and when is each one
-  open?" Its PRD and factors are approved; its latest rerun is held at the ontology step by one remaining
-  validator gap, fix in progress. This simpler case found five
+  open?" Its PRD and factors are approved; it is rerunning on the fix for its last ontology-step gap, result
+  pending. This simpler case found five
   engine defects the hard case had hidden. Four are fixed in code with tests: city-level jurisdictions, invalid
   ontology rules exhausting the phase, a core field ("weekly opening hours") never bound to a property, and a runner
-  that reported a needs-human pause as a crash. One is in progress: the rule critic judged red-flag rules as if they
-  were passing checks, so no rule could pass.
+  that reported a needs-human pause as a crash. The fifth has a fix deployed and a rerun pending: the rule critic
+  judged red-flag rules as if they were passing checks, so no rule could pass.
 
 ## Challenges
 

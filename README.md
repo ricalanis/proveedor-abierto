@@ -83,7 +83,8 @@ Three tracks, each labelled for what it is.
    and the source critic has accepted none of the remaining candidates. We did not loosen the critic to get a
    number. The allowlist now admits ComprasMX's own API and CDN hosts (engine `378a8c0`, deployed 10:52 PT), and run
    `run-efc9be56964b` resumed on it. By 10:59 PT the data API host had been allowed 21 times and blocked 0 times, and
-   the portal now renders inside the gVisor sandbox (before, it was an empty shell). The blast radius stayed zero
+   the portal now renders inside the gVisor sandbox (before, it was an empty shell); its open-data, buyer-registry and
+   procurement pages have been captured. The blast radius stayed zero
    while egress widened: only sibling hosts of a trusted publisher were added, GET only. Third-party analytics and
    font CDNs stay blocked, and POSTs are refused. **The engine run continues after submission; its status is live on the judges
    console.**
@@ -99,8 +100,8 @@ Three tracks, each labelled for what it is.
    caveats are listed on every page of the harness instance.
 3. **A second, unrelated case (engine-authored).** *"Which San Francisco Public Library branches offer free Wi-Fi,
    and when is each one open?"* The same engine, no domain code: the PRD and factors are approved. The rerun
-   (`run-577d56beff9b`, on `3c1a2b0`) now gets past the core-field check and is held at the ontology step by one
-   remaining gap (R58b, below); the fix is in progress. Its answer page shows the run and fills with gold cards
+   now gets past the core-field check. The last gap at the ontology step (R58b, below) has a fix deployed (engine
+   `93816dc`), and the case is rerunning on it as `run-a12bcc59b7e2`, result pending. Its answer page shows the run and fills with gold cards
    when gold lands:
    https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
 
@@ -115,10 +116,10 @@ Three tracks, each labelled for what it is.
    - A core PRD field ("weekly opening hours") was never bound to a DoD property (R59). The first fix did not
      trigger; the second (`3c1a2b0`) is verified on a live rerun.
 
-   One is in progress (R58b). Ontology rules are red-flag patterns: a matching predicate raises a flag. The rule
+   The fifth has a fix deployed and a rerun pending (R58b). Ontology rules are red-flag patterns: a matching predicate raises a flag. The rule
    critic judged them as passing checks instead, so correct violation rules were rejected as "inverted", positive
-   checks as "tautologies", and no rule could pass. The fix is in the generator and critic prompts, with a
-   set-aside fallback.
+   checks as "tautologies", and no rule could pass. The fix (`829559e`) defines rules as flag violations in the
+   generator and critic prompts, with a set-aside fallback.
 
 ## Use case
 
