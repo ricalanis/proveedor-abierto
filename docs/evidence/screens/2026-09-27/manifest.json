@@ -1,0 +1,669 @@
+{
+ "captured_at": "2026-09-27T04:04:05+00:00",
+ "files": [
+  {
+   "file": "product-home-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/",
+   "site": "product"
+  },
+  {
+   "file": "product-dossier-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/entities/sup:fixture-005",
+   "site": "product"
+  },
+  {
+   "file": "product-dossier-receipt-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/entities/sup:fixture-005?ev=val%3A0001-005-legal_name#evidence",
+   "site": "product"
+  },
+  {
+   "file": "product-signal-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/signals/sup:fixture-001/0",
+   "site": "product"
+  },
+  {
+   "file": "product-signals-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/signals",
+   "site": "product"
+  },
+  {
+   "file": "product-como-se-hizo-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/como-se-hizo",
+   "site": "product"
+  },
+  {
+   "file": "product-como-leer-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/como-leer",
+   "site": "product"
+  },
+  {
+   "file": "product-fuentes-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/fuentes",
+   "site": "product"
+  },
+  {
+   "file": "product-completeness-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/completeness",
+   "site": "product"
+  },
+  {
+   "file": "product-home-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/",
+   "site": "product"
+  },
+  {
+   "file": "product-dossier-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/entities/sup:fixture-005",
+   "site": "product"
+  },
+  {
+   "file": "product-dossier-receipt-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/entities/sup:fixture-005?ev=val%3A0001-005-legal_name#evidence",
+   "site": "product"
+  },
+  {
+   "file": "product-signal-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/signals/sup:fixture-001/0",
+   "site": "product"
+  },
+  {
+   "file": "product-signals-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/signals",
+   "site": "product"
+  },
+  {
+   "file": "product-como-se-hizo-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/como-se-hizo",
+   "site": "product"
+  },
+  {
+   "file": "product-como-leer-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/como-leer",
+   "site": "product"
+  },
+  {
+   "file": "product-fuentes-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/fuentes",
+   "site": "product"
+  },
+  {
+   "file": "product-completeness-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/completeness",
+   "site": "product"
+  },
+  {
+   "file": "console-library-demo-tour-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/tour?case=library-demo",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-inbox-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/inbox",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-hub-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-operation-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/operation",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-run-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/runs/containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-definition-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/definition",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-discovery-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/discovery",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-pages-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/pages",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-sites-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/sites",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-output-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/output",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-graph-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/graph",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-inference-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/inference",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-failures-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/failures",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-summary-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/summary",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-watch-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/watch",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-new-case-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/new",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-tour-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/tour?case=library-demo&run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-inbox-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/inbox",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-hub-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-operation-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/operation?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-run-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/runs/containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-definition-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/definition?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-discovery-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/discovery?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-pages-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/pages?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-sites-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/sites?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-output-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/output?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-graph-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/graph?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-inference-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/inference?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-failures-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/failures?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-summary-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/library-demo/summary?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-watch-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/watch",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-new-case-1280-dark.png",
+   "status": 200,
+   "width": 1280,
+   "scheme": "dark",
+   "path": "/cases/new",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-tour-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/tour?case=library-demo",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-inbox-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/inbox",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-hub-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-operation-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/operation",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-run-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/runs/containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-definition-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/definition",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-discovery-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/discovery",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-pages-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/pages",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-sites-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/sites",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-output-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/output",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-graph-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/graph",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-inference-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/inference",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-failures-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/failures",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-summary-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/summary",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-watch-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/watch",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-new-case-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/new",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-tour-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/tour?case=library-demo&run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-inbox-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/inbox",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-hub-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-operation-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/operation?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-run-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/runs/containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-definition-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/definition?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-discovery-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/discovery?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-pages-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/pages?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-sites-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/sites?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-output-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/output?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-graph-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/graph?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-inference-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/inference?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-failures-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/failures?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-summary-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/library-demo/summary?run=containment-demo-202609270251",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-watch-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/watch",
+   "site": "console"
+  },
+  {
+   "file": "console-library-demo-containment-demo-202609270251-new-case-390-light.png",
+   "status": 200,
+   "width": 390,
+   "scheme": "light",
+   "path": "/cases/new",
+   "site": "console"
+  }
+ ],
+ "redactions": 0,
+ "product": "product (mesh address omitted)",
+ "console": "console (mesh address omitted)",
+ "targets": [
+  "library-demo",
+  "library-demo:containment-demo-202609270251"
+ ],
+ "subset": "1280-dark and 390-light committed; the other widths/schemes are regenerated by `uv run pa-app screens`"
+}
