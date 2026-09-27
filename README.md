@@ -105,7 +105,9 @@ Three tracks, each labelled for what it is.
 3. **A second, unrelated case (engine-authored).** *"Which San Francisco Public Library branches offer free Wi-Fi,
    and when is each one open?"* The same engine, no domain code: the PRD, factors and ontology are approved (run
    `run-09ed86537750`, the first ontology approval for this case), and it is now discovering sources on sfpl.org.
-   Its DoD numbers will read "not met" until R64 (below) lands and gold is re-refined from bronze. Its answer page
+   Its DoD numbers will read "not met" until R64 (below) lands and gold is re-refined from bronze. *Updated 11:54:
+   the R64/R64b fixes are deployed and await verification, and at 11:52 the run stopped at P3 on a new source-critic
+   defect (R66, fix in progress).* Its answer page
    shows the run and fills with gold cards when gold lands:
    https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
 
@@ -125,6 +127,10 @@ Three tracks, each labelled for what it is.
    One is in progress (R64): criteria written as "≤ 0" compile to counts of branches, so they can never be met,
    and three criteria measure through an address cross-check relation.
 
+   *Updated 11:54: nine found (R57, R58, R58b, R59, R60, R63, R64, R64b, R66). Six are verified fixed live. R64 and
+   R64b are deployed and await verification. R66 is in progress: the source critic rejected the library's own
+   branch pages and asked for a second publisher, contrary to the PRD.*
+
 ## Post-submission updates
 
 The project was submitted on Sun 27 Sep before the 12:00 PT deadline, and the 1-minute video is fixed as of then.
@@ -134,6 +140,8 @@ rewritten.
 
 | When (PT) | Commit | What changed |
 |-----------|--------|--------------|
+| Sun 11:54 | [ontofill `7eb528c`](https://github.com/ricalanis/ontofill/commit/7eb528c) deployed | The engine on the control VM now carries the R64/R64b definition-of-done fixes: zero-only criteria are set aside, each criterion compiles to its own query, and completeness counts all entities. It also adds a parser preview for large datasets and clean source-link labels. Verification is pending until the SF case runs on it. |
+| Sun 11:52 | [run `run-09ed86537750`](https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/runs/run-09ed86537750) | The SF case stopped at P3 discovery. The source critic rejected sfpl.org's branch pages ("no tabular listing") and asked for a second independent publisher, which the PRD does not require. Logged as R66; fix in progress. |
 | Sun 11:49 | [ontofill `0b81af0`](https://github.com/ricalanis/ontofill/commit/0b81af0) | The Ontofill README status now matches the submitted claims. It still read "six defects, five fixed" and "the run continues". |
 | Sun 11:44–11:48 | [ontofill `e226669`](https://github.com/ricalanis/ontofill/commit/e226669), [`52235c5`](https://github.com/ricalanis/ontofill/commit/52235c5) | R64/R64b definition-of-done fixes pushed: "≤ 0" criteria and explicit completeness shares no longer compile to counts that can never be met. Awaiting deploy at the SF case's next checkpoint. |
 
