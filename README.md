@@ -44,6 +44,18 @@ flowchart LR
   A -.->|gold gap reopens fan-out| P3
 ```
 
+## How it works
+
+From one open question to linked data, stage by stage (question → PRD → ontology → search → spiders → extraction →
+gold with receipts), with the evidence for each stage and an honest status of what is live:
+[`docs/planning/04-question-to-linked-data.md`](docs/planning/04-question-to-linked-data.md).
+
+## Runs on Vultr + NetBird
+
+What runs where on Vultr (the two VMs, Serverless Inference behind the gateway, Object Storage) and how NetBird is
+the network and the lock (zero open ports, gated URLs, one-way policies, per-session live views), without IDs, keys
+or device names: [`docs/reference/vultr-netbird-usage.md`](docs/reference/vultr-netbird-usage.md).
+
 ## Architecture: "Two instances. One boundary."
 
 A control plane that plans on Vultr models and dispatches disposable sandboxes. The full, canonical description is
