@@ -29,8 +29,8 @@
       <ul class="signals">
         {% for f in e.flags %}
         <li class="signal">
-          <a class="signal__label" href="/signals/{{ e.id }}/{{ loop.index0 }}">{{ loc(f, "label") }}</a>
-          <p>{{ loc(f, "explanation") }}</p>
+          <a class="signal__label" href="/signals/{{ e.id }}/{{ loop.index0 }}">{{ flag_label(f) }}</a>
+          <p>{{ f.explanation }}</p>
           <p class="signal__ev">{{ _("Based on:") }}
             {% for vid in f.evidence_value_ids %}{% set ref = run.values.get(vid) %}
               {% if ref %}<a href="/entities/{{ ref.entity_id }}?ev={{ vid|urlencode }}#evidence" data-evidence="{{ vid }}">{{ domain.prop_label(ref.prop) }}{% if ref.entity_id != e.id %} · {{ run.title(run.entities_by_id.get(ref.entity_id)) }}{% endif %}</a>{% else %}<span class="mono">{{ vid }}</span>{% endif %}{% if not loop.last %}, {% endif %}
@@ -56,10 +56,12 @@
             <span class="status status--{{ (f or {}).status or 'missing' }}">{{ status_word((f or {}).status or "missing") }}</span>
             {% if ((f or {}).generated_by or {}).backend == "jev" %}<span class="backend backend--jev" title="{{ _('Only a supporting model backs this value; it still needs a second check.') }}">{{ _("needs a second check") }}</span>{% endif %}
             {% if ev0 %}
-              <span class="fact__src">{{ host_of(ev0.url) }}</span>
-              <span class="fact__when">{{ _("captured {date}", date=ev0.captured_at|date) }}</span>
+              {% if ev0.url %}<span class="fact__src">{{ host_of(ev0.url) }}</span>{% elif ev0.source_type %}<span class="fact__src">{{ domain.source_label(ev0.source_type) }}</span>{% endif %}
+              {% if ev0.captured_at %}<span class="fact__when">{{ _("captured {date}", date=ev0.captured_at|date) }}</span>{% endif %}
               {% if f.status != "missing" %}<span class="fact__conf">{{ _("confidence {level}", level=confidence_word(f.confidence)) }}</span>{% endif %}
               <a class="ev-link" href="/entities/{{ e.id }}?ev={{ f.value_id|urlencode }}#evidence" data-evidence="{{ f.value_id }}">{{ ngettext("See receipt", "See {n} receipts", f.evidence|length) }}</a>
+            {% elif f and f.status != "missing" %}
+              <span class="fact__noreceipt">{{ _("No receipt published for this value") }}</span>
             {% endif %}
           </p>
         </li>

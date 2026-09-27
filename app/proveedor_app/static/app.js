@@ -35,6 +35,16 @@
   });
 })();
 
+// Receipts: a screenshot that cannot be loaded gives way to a plain note (the link and saved copy still work).
+document.addEventListener("error", (event) => {
+  const img = event.target;
+  if (!(img instanceof HTMLImageElement) || !img.matches("img[data-shot]")) return;
+  const figure = img.closest("figure");
+  figure?.querySelector(".shot__frame")?.remove();
+  figure?.querySelector("figcaption")?.remove();
+  figure?.querySelector(".shot__missing")?.removeAttribute("hidden");
+}, true);
+
 // My list: kept in this browser only (the site is read-only on the server).
 (() => {
   const KEY = "pa.watchlist";

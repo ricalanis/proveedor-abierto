@@ -49,7 +49,7 @@ def test_spanish_is_the_default_and_lang_switch_sticks(client, store, fixture_ro
     fresh = TestClient(create_app(Settings(store=store, case_dir=fixture_root / "case")))
     home = fresh.get("/").text
     assert '<html lang="es">' in home and "¿Quién recibe dinero público?" in home
-    assert "Proveedores" in home  # ontology label_es, not the English label
+    assert "Proveedores" in home  # the app's Spanish label for the ontology id, not the export's English
     r = fresh.get("/?lang=en")
     assert "Who receives public money?" in r.text and r.cookies.get(i18n.COOKIE) == "en"
     assert '<html lang="en">' in fresh.get("/signals").text  # the cookie keeps the choice
@@ -159,12 +159,27 @@ def test_date_labels_and_confidence_words():
     assert i18n.pick_lang("fr", "en") == "en" and i18n.pick_lang(None, None) == "es"
 
 
-def test_ontology_labels_localize_only_when_present():
-    onto = {"primary_class": "thing", "classes": [{"id": "thing", "label": "Thing", "label_es": "Cosa"}],
+def test_ontology_labels_localize_by_id_without_changing_the_export(monkeypatch):
+    onto = {"primary_class": "thing", "classes": [{"id": "thing", "label": "Thing"}],
             "properties": [{"id": "name", "label": "Name", "domain": "thing"}],
-            "rules": [{"id": "r", "label": "Rule", "checks": "Checks", "checks_es": "Revisa"}]}
+            "rules": [{"id": "r", "label": "Rule", "checks": "Checks"}]}
+    monkeypatch.setitem(i18n.ONTOLOGY_LABELS, "es", {"thing": {"label": "Cosa"}, "r": {"checks": "Revisa"}})
     d = Domain.from_ontology(onto)
     es = d.localized("es")
     assert es.class_label() == "Cosa" and es.prop_label("name") == "Name" and es.rule("r")["checks"] == "Revisa"
     assert d.localized("en") is d and d.class_label() == "Thing"
-    assert localize_ontology({"classes": [{"id": "x", "label": "X"}]}, "es") == {"classes": [{"id": "x", "label": "X"}]}
+    assert onto["classes"] == [{"id": "thing", "label": "Thing"}]  # the export itself is never rewritten
+    assert localize_ontology({"classes": [{"id": "x", "label": "X"}]}, {}) == {"classes": [{"id": "x", "label": "X"}]}
+
+
+def test_fixture_exports_carry_no_app_fields(fixture_root):
+    """The fixtures are engine-shaped exports: translations live in the app (i18n.ONTOLOGY_ES), not in the data."""
+    for path in (fixture_root / "lake").rglob("*.json*"):
+        assert "_es\"" not in path.read_text(), path
+    assert "_es\"" not in (fixture_root / "case" / "02-ontology" / "ontology.json").read_text()
+
+
+def test_where_labels_have_spanish():
+    from proveedor_app.web import WHERE_LABELS
+
+    assert [t for t in [*WHERE_LABELS.values(), "Where in the source"] if t not in i18n.ES] == []

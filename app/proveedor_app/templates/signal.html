@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}{{ loc(flag, "label") }} · {{ run.title(e) }}{% endblock %}
+{% block title %}{{ flag_label(flag) }} · {{ run.title(e) }}{% endblock %}
 {% block main %}
 <nav class="crumbs" aria-label="{{ _('Breadcrumb') }}"><a href="/signals">{{ _("Signals") }}</a> <span aria-hidden="true">/</span> <a href="/entities/{{ e.id }}">{{ run.title(e) }}</a></nav>
 <article class="explainer">
   <header class="explainer__head">
     <p class="explainer__kind">{{ _("Signal to verify") }}</p>
-    <h1>{{ loc(flag, "label") }}</h1>
+    <h1>{{ flag_label(flag) }}</h1>
     <p class="explainer__who"><a href="/entities/{{ e.id }}">{{ run.title(e) }}</a> <span class="mono muted">{{ run.identifier(e) or e.id }}</span></p>
   </header>
 
@@ -13,7 +13,7 @@
 
   <section class="block" aria-labelledby="why-h">
     <h2 id="why-h">{{ _("Why it appears") }}</h2>
-    <p class="explainer__text">{{ loc(flag, "explanation") }}</p>
+    <p class="explainer__text">{{ flag.explanation }}</p>
   </section>
 
   <section class="block" aria-labelledby="rule-h">

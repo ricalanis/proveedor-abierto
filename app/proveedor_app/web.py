@@ -58,7 +58,13 @@ def brief(value, limit: int = 240) -> str:
     return text if len(text) <= limit else text[: limit - 1] + "…"
 
 
-def host_of(url: str) -> str:
+WHERE_LABELS = {"html": "Where on the page", "pdf": "Where in the document", "xlsx": "Cell or row in the file",
+                "csv": "Row in the file", "json": "Field in the data", "api": "Field in the data"}
+
+
+def host_of(url: str | None) -> str:
+    if not url:
+        return ""
     return urlsplit(url).hostname or url
 
 
@@ -92,9 +98,9 @@ def dataset_stats(r: Run) -> dict:
             "latest": latest[1] if latest else None}
 
 
-def safe_url(url: str) -> str | None:
+def safe_url(url: str | None) -> str | None:
     """Only http(s) evidence links become clickable."""
-    return url if urlsplit(url).scheme in ("http", "https") else None
+    return url if url and urlsplit(url).scheme in ("http", "https") else None
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -106,6 +112,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     env = templates.env
     env.globals.update(
         host_of=host_of,
+        WHERE_LABELS=WHERE_LABELS,
         safe_url=safe_url,
     )
     env.filters["pct"] = lambda x: f"{round((x or 0) * 100)}%"
@@ -151,7 +158,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ctx.setdefault("nav", "")
         r = ctx.get("run")
         ctx.setdefault("domain", (r.domain if r else current_domain()).localized(lang))
-        ctx["loc"] = lambda obj, key: (obj or {}).get(f"{key}_{lang}") or (obj or {}).get(key)
+        labels = i18n.ONTOLOGY_LABELS.get(lang) or {}
+        # a flag's title in the reader's language when the app knows its rule; its explanation stays as exported
+        ctx["flag_label"] = lambda f: (labels.get(f.get("rule_id")) or {}).get("label") or f.get("label")
         ctx.setdefault("backend", r.inference_backend if r else None)
         ctx.setdefault("synthetic", bool(r and r.case_id.startswith("fixture")))
         ctx.setdefault("preview", bool(r and r.metrics.get("preview")))

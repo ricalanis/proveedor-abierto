@@ -10,7 +10,7 @@
 {% for g in groups %}
   <section class="rule" aria-labelledby="rule-{{ g.rule_id }}">
     <header class="rule__head">
-      <h2 id="rule-{{ g.rule_id }}">{{ loc(g.hits[0][2], "label") }}</h2>
+      <h2 id="rule-{{ g.rule_id }}">{{ flag_label(g.hits[0][2]) }}</h2>
       <p class="rule__meta"><span class="mono">{{ g.hits|length }}</span> {{ domain.class_label()|lower if g.hits|length == 1 else domain.class_label(plural=True)|lower }}</p>
       <p class="rule__checks"><span class="rule__kicker">{{ _("The rule:") }}</span> {{ domain.rule(g.rule_id, g.label).checks }}</p>
     </header>

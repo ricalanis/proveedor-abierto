@@ -22,21 +22,24 @@
   {% for e in selected.data.evidence or [] %}
     <li class="capture">
       <p class="capture__src">
-        <span class="capture__type">{{ domain.source_label(e.source_type) }}{% if e.format %} · <span class="mono">{{ e.format }}</span>{% endif %}</span>
+        <span class="capture__type">{{ domain.source_label(e.source_type) if e.source_type else _("Public source") }}{% if e.format %} · <span class="mono">{{ e.format }}</span>{% endif %}</span>
         {% set href = safe_url(e.url) %}
-        {% if href %}<a class="source-link" href="{{ href }}" target="_blank" rel="noopener noreferrer nofollow">{{ host_of(e.url) }}<span class="mono path">{{ e.url[(e.url.find(host_of(e.url)) + host_of(e.url)|length):] }}</span></a>{% else %}<span class="mono">{{ e.url }}</span>{% endif %}
+        {% if not e.url %}<span class="muted">{{ _("No link recorded") }}</span>{% elif href %}<a class="source-link" href="{{ href }}" target="_blank" rel="noopener noreferrer nofollow">{{ host_of(e.url) }}<span class="mono path">{{ e.url[(e.url.find(host_of(e.url)) + host_of(e.url)|length):] }}</span></a>{% else %}<span class="mono">{{ e.url }}</span>{% endif %}
       </p>
-      <p class="capture__when">{{ _("Captured {date}", date=e.captured_at|datetime) }}</p>
+      {% if e.captured_at %}<p class="capture__when">{{ _("Captured {date}", date=e.captured_at|datetime) }}</p>{% endif %}
+      {% if e.selector %}<p class="capture__where"><span class="capture__where-label">{{ _(WHERE_LABELS.get(e.format or "html", "Where in the source")) }}:</span> <code class="mono">{{ e.selector }}</code></p>{% endif %}
       {% if e.screenshot_key %}
-      <figure class="shot">
-        <a href="/bronze/{{ e.screenshot_key|urlencode }}" target="_blank" rel="noopener"><img src="/bronze/{{ e.screenshot_key|urlencode }}" alt="{{ _('Screenshot of {host} captured {date}', host=host_of(e.url), date=e.captured_at|date) }}" loading="lazy" width="640" height="360"></a>
-        <figcaption>{{ _("Screenshot of the page as the collector saw it. Open it full size.") }}</figcaption>
+      <figure class="shot shot--page">
+        <div class="shot__frame"><a href="/bronze/{{ e.screenshot_key|urlencode }}" target="_blank" rel="noopener"><img src="/bronze/{{ e.screenshot_key|urlencode }}" alt="{{ _('Screenshot of {host} captured {date}', host=host_of(e.url) or _('the source'), date=e.captured_at|date) }}" loading="lazy" width="640" height="360" data-shot></a></div>
+        <figcaption>{{ _("Screenshot of the whole page as the collector saw it. The value is in the part named above; open it full size to read it.") }}</figcaption>
+        <p class="shot__missing" hidden>{{ _("The screenshot could not be loaded. The saved copy and the link above still show the source.") }}</p>
       </figure>
+      {% elif e.bronze_key %}
+      <p class="note muted">{{ _("No screenshot for this capture; the saved copy below keeps what the collector read.") }}</p>
       {% endif %}
       <details class="capture__more">
         <summary>{{ _("Technical details") }}</summary>
         <dl class="capture__facts">
-          <div><dt>{{ _("Where on the page") }}</dt><dd class="mono">{{ e.selector or "—" }}</dd></div>
           <div><dt>{{ _("Saved copy") }}</dt><dd>{% if e.bronze_key %}<a class="mono" href="/bronze/{{ e.bronze_key|urlencode }}" target="_blank" rel="noopener">{{ e.bronze_key[:19] }}…</a>{% else %}—{% endif %}</dd></div>
           <div><dt>{{ _("Source ID") }}</dt><dd class="mono">{{ e.source_id }}</dd></div>
           <div><dt>{{ _("Timestamp") }}</dt><dd class="mono">{{ e.captured_at }}</dd></div>

@@ -136,6 +136,21 @@ ES: dict[str, str] = {
     "Source ID": "ID de la fuente",
     "Timestamp": "Marca de tiempo",
     "needs a second check": "necesita una segunda revisión",
+    "Public source": "Fuente pública",
+    "No link recorded": "Sin enlace registrado",
+    "the source": "la fuente",
+    "Screenshot of the whole page as the collector saw it. The value is in the part named above; open it full size to read it.":
+        "Captura de la página completa tal como la vio el recolector. El dato está en la parte indicada arriba; ábrela en tamaño completo para leerlo.",
+    "The screenshot could not be loaded. The saved copy and the link above still show the source.":
+        "No se pudo cargar la captura. La copia guardada y el enlace de arriba siguen mostrando la fuente.",
+    "No screenshot for this capture; the saved copy below keeps what the collector read.":
+        "Esta captura no tiene imagen; la copia guardada de abajo conserva lo que leyó el recolector.",
+    "No receipt published for this value": "No se publicó comprobante para este dato",
+    "Where in the document": "Lugar en el documento",
+    "Cell or row in the file": "Celda o fila en el archivo",
+    "Row in the file": "Fila en el archivo",
+    "Field in the data": "Campo en los datos",
+    "Where in the source": "Lugar en la fuente",
     "No receipt backs this value.": "Ningún comprobante respalda este dato.",
     # signals
     "Patterns in public records that are worth a closer look. Each one follows a written rule and links to the records it rests on. A signal is where to start checking, not a finding: many have an ordinary explanation.":
@@ -323,6 +338,56 @@ ES: dict[str, str] = {
     "Technical reason": "Motivo técnico",
     "Case package": "Paquete del caso",
 }
+
+
+# Spanish for ontology items, keyed by ontology id (classes, properties, relations, rules, source classes). The export
+# stays in the engine's shape; where an id is not listed here, the export's own label shows (Domain.localized).
+ONTOLOGY_ES: dict[str, dict] = {
+    "supplier": {"label": "Proveedor", "label_plural": "Proveedores"},
+    "contract": {"label": "Contrato", "label_plural": "Contratos"},
+    "legal_name": {"label": "Razón social"}, "tax_id": {"label": "RFC"}, "address": {"label": "Domicilio"},
+    "founding_date": {"label": "Fecha de constitución"}, "tax_list_status": {"label": "Lista del SAT (69-B)"},
+    "sanction_status": {"label": "Sanciones"}, "legal_representative": {"label": "Representante legal"},
+    "title": {"label": "Contrato"}, "buyer": {"label": "Comprador"}, "procedure_type": {"label": "Procedimiento"},
+    "date": {"label": "Fecha"}, "amount": {"label": "Monto"}, "currency": {"label": "Moneda"},
+    "shared_address": {"label": "Mismo domicilio"},
+    "shared_representative": {"label": "Mismo representante legal"},
+    "same_procedure": {"label": "Mismo procedimiento"}, "awarded": {"label": "Contratos"},
+    "awarded_to": {"label": "Adjudicado a"},
+    "tax_list_listed": {
+        "label": "Aparece en la lista del SAT de empresas que facturan operaciones simuladas",
+        "checks": "Si el RFC del proveedor aparece en la lista publicada por la autoridad fiscal de empresas "
+                     "que se presume o se confirmó que emiten facturas por operaciones simuladas.",
+        "verify": [("Abre la captura de la lista y confirma que el RFC coincide exactamente (no solo un nombre "
+                       "parecido)."),
+                      ("Revisa la etapa: «presunto» todavía se puede desvirtuar; «definitivo» es una resolución "
+                       "firme."),
+                      "Compara la fecha de publicación con las fechas de los contratos."]},
+    "sanctioned_supplier": {
+        "label": "Aparece en el registro de proveedores sancionados",
+        "checks": "Si el proveedor aparece en el registro de proveedores y contratistas sancionados.",
+        "verify": ["Confirma que el registro se refiere a esta persona moral (por RFC, no solo por nombre).",
+                      "Revisa las fechas de inicio y fin de la sanción y si alcanza a la dependencia contratante.",
+                      "Busca una resolución judicial posterior que suspenda la sanción."]},
+    "founded_shortly_before_award": {
+        "label": "Se constituyó poco antes de su primer contrato",
+        "checks": "Si la empresa se constituyó menos de un año antes de su primer contrato público registrado.",
+        "verify": ["Confirma la fecha de constitución en la captura del registro o del diario oficial.",
+                      "Revisa los requisitos de experiencia del procedimiento y si la empresa los cumplía.",
+                      "Busca una empresa anterior con los mismos socios o domicilio."]},
+    "shared_address_bidders": {
+        "label": "Comparte domicilio con otro participante del mismo procedimiento",
+        "checks": "Si dos participantes del mismo procedimiento declaran el mismo domicilio.",
+        "verify": ["Compara ambas capturas del domicilio carácter por carácter.",
+                      "Revisa si el domicilio es un edificio de oficinas grande o un centro de negocios.",
+                      "Busca representantes, socios o teléfonos compartidos entre las dos empresas."]},
+    "procurement_portal": {"label": "Portal de compras públicas"},
+    "tax_authority_list": {"label": "Lista de la autoridad fiscal"},
+    "sanctions_registry": {"label": "Registro de sancionados"},
+    "company_registry": {"label": "Registro de empresas"}, "official_gazette": {"label": "Diario oficial"},
+}
+
+ONTOLOGY_LABELS = {"es": ONTOLOGY_ES}
 
 
 def pick_lang(query: str | None, cookie: str | None) -> str:

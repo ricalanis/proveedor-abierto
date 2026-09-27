@@ -45,9 +45,12 @@ class Domain:
     _localized: dict = field(default_factory=dict, repr=False, compare=False)
 
     def localized(self, lang: str) -> Domain:
-        """The same domain with `<key>_<lang>` labels (label_es, checks_es, ...) where the ontology carries them."""
+        """The same domain with the app's own labels for `lang` (i18n.ONTOLOGY_LABELS, keyed by ontology id) where it
+        has them; everything else keeps the export's text."""
         if lang not in self._localized:
-            onto = localize_ontology(self.raw, lang)
+            from .i18n import ONTOLOGY_LABELS
+
+            onto = localize_ontology(self.raw, ONTOLOGY_LABELS.get(lang) or {})
             if onto is self.raw:
                 self._localized[lang] = self
             else:
@@ -131,18 +134,20 @@ class Domain:
         return bool(self.props())
 
 
-LOCALIZABLE = ("label", "label_plural", "description", "checks", "verify", "explanation")
+LOCALIZABLE = ("label", "label_plural", "description", "checks", "verify")
 _ONTOLOGY_LISTS = ("classes", "properties", "relations", "rules", "source_classes")
 
 
-def localize_ontology(onto: dict, lang: str) -> dict:
-    """Swap in `<key>_<lang>` values (an optional per-language twin of any label). Unchanged input comes back as is."""
+def localize_ontology(onto: dict, labels: dict[str, dict]) -> dict:
+    """Overlay translated text by ontology id ({id: {label, label_plural, description, checks, verify}}) without
+    changing the export's shape. Unchanged input comes back as is."""
     out, changed = dict(onto), False
     for key in _ONTOLOGY_LISTS:
         items = []
         for item in onto.get(key) or []:
-            if isinstance(item, dict) and any(f"{k}_{lang}" in item for k in LOCALIZABLE):
-                item = {**item, **{k: item[f"{k}_{lang}"] for k in LOCALIZABLE if item.get(f"{k}_{lang}")}}
+            extra = labels.get(item.get("id")) if isinstance(item, dict) else None
+            if extra:
+                item = {**item, **{k: v for k, v in extra.items() if k in LOCALIZABLE and v}}
                 changed = True
             items.append(item)
         out[key] = items
