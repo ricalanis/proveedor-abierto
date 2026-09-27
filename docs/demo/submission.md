@@ -66,8 +66,8 @@ connections and a journal from any value back to the brief.
   validator gap, fix in progress. This simpler case found five
   engine defects the hard case had hidden. Four are fixed in code with tests: city-level jurisdictions, invalid
   ontology rules exhausting the phase, a core field ("weekly opening hours") never bound to a property, and a runner
-  that reported a needs-human pause as a crash. One is in progress: presence rules the rule language can't express
-  yet.
+  that reported a needs-human pause as a crash. One is in progress: the rule critic judged red-flag rules as if they
+  were passing checks, so no rule could pass.
 
 ## Challenges
 

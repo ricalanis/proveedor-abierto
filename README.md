@@ -100,7 +100,7 @@ Three tracks, each labelled for what it is.
 3. **A second, unrelated case (engine-authored).** *"Which San Francisco Public Library branches offer free Wi-Fi,
    and when is each one open?"* The same engine, no domain code: the PRD and factors are approved. The rerun
    (`run-577d56beff9b`, on `3c1a2b0`) now gets past the core-field check and is held at the ontology step by one
-   remaining gap (R58b: presence rules the predicate language can't express yet); the fix is in progress. Its answer page shows the run and fills with gold cards
+   remaining gap (R58b, below); the fix is in progress. Its answer page shows the run and fills with gold cards
    when gold lands:
    https://ontofill-console-judges.eu1.netbird.services/cases/sf-library-branches/answer
 
@@ -115,8 +115,10 @@ Three tracks, each labelled for what it is.
    - A core PRD field ("weekly opening hours") was never bound to a DoD property (R59). The first fix did not
      trigger; the second (`3c1a2b0`) is verified on a live rerun.
 
-   One is in progress: the model writes presence rules that the predicate language can't express (no "exists"
-   operator), so they come out inverted or tautological and the checker rejects them (R58b).
+   One is in progress (R58b). Ontology rules are red-flag patterns: a matching predicate raises a flag. The rule
+   critic judged them as passing checks instead, so correct violation rules were rejected as "inverted", positive
+   checks as "tautologies", and no rule could pass. The fix is in the generator and critic prompts, with a
+   set-aside fallback.
 
 ## Use case
 
