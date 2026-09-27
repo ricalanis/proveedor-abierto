@@ -29,7 +29,7 @@ def product_paths(run) -> list[str]:
     return ["/", "/?q=Ejemplo", "/?show=signals", "/?show=incomplete", "/?show=conflicts", f"/entities/{e['id']}",
             f"/entities/{e['id']}?ev={v.value_id}", f"/fragments/evidence/{v.value_id}", "/signals",
             f"/signals/{e['id']}/0", "/relationships", "/journal", f"/journal/{v.value_id}", "/completeness",
-            f"/watchlist?ids={e['id']}", "/watchlist", "/data", "/about", "/case-file?path=brief.md"]
+            f"/watchlist?ids={e['id']}", "/watchlist", "/data", "/about", "/como-se-hizo", "/case-file?path=brief.md"]
 
 
 def test_every_product_route_renders_in_both_languages(make_client, run):
@@ -38,6 +38,7 @@ def test_every_product_route_renders_in_both_languages(make_client, run):
         for path in product_paths(run):
             r = c.get(path)
             assert r.status_code == 200, (lang, path)
+            assert "built-in method" not in r.text and "Undefined" not in r.text, (lang, path)
             if not path.startswith("/fragments"):
                 assert f'<html lang="{lang}">' in r.text, (lang, path)
 

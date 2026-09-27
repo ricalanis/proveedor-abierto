@@ -6,6 +6,9 @@
   <p class="lede">{{ _("Public records are scattered and often incomplete. This page says plainly how much we found, and what is still missing, so you know how far to trust an empty field.") }}</p>
 </section>
 
+{% if not m.total %}
+<p class="notice">{{ _("No {plural} have been published yet, so there is nothing to measure. This page fills in as values are confirmed.", plural=m.primary_label|lower) }}</p>
+{% endif %}
 <p class="headline-figure">
   <span class="headline-figure__num">{{ m.complete }}</span>
   <span class="headline-figure__text">{{ _("of {total} {plural} have a complete basic profile ({pct}).", total=m.total, plural=m.primary_label|lower, pct=(m.complete_ratio|pct)) }}</span>

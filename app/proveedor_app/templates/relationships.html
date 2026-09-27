@@ -6,6 +6,7 @@
   <p class="lede">{{ _("{plural} that share something in public records, such as an address or a representative. A shared detail is a lead to check, not proof of a relationship. Each line links to the record that connects them.", plural=domain.class_label(plural=True)) }}</p>
 </section>
 
+{% if LINK_TYPES %}
 <form class="filters filters--types" method="get" action="/relationships">
   {% if focus %}<input type="hidden" name="focus" value="{{ focus }}">{% endif %}
   <fieldset>
@@ -16,8 +17,9 @@
     <button type="submit" class="btn btn--quiet">{{ _("Apply") }}</button>
   </fieldset>
 </form>
+{% endif %}
 
-<p class="count">{{ ngettext("{n} group of connected records", "{n} groups of connected records", clusters|length) }}</p>
+{% if clusters %}<p class="count">{{ ngettext("{n} group of connected records", "{n} groups of connected records", clusters|length) }}</p>{% endif %}
 <div class="clusters">
 {% for c in clusters %}
   {% set pos = c.layout(280) %}
@@ -53,7 +55,17 @@
     </div>
   </section>
 {% else %}
-  <p class="empty">{{ _("No connections of the chosen kinds in this data.") }}</p>
+  <section class="empty-state" aria-labelledby="none-h">
+  {% if LINK_TYPES %}
+    <h2 id="none-h">{{ _("No connections found in the data published so far") }}</h2>
+    <p>{{ _("The case looks for {plural} that share any of these in public records:", plural=domain.class_label(plural=True)|lower) }}</p>
+    <ul class="rule-list">{% for t in LINK_TYPES %}<li><strong>{{ domain.relation_label(t) }}</strong>{% if t not in chosen %}<span>{{ _("not selected above") }}</span>{% endif %}</li>{% endfor %}</ul>
+    <p>{{ _("None were found yet. A connection needs the same value, taken from a public record, on two {plural}; as more facts are collected, connections can appear.", plural=domain.class_label(plural=True)|lower) }}</p>
+  {% else %}
+    <h2 id="none-h">{{ _("Connections are not defined yet") }}</h2>
+    <p>{{ _("The case has not published which connections to look for (for example, a shared address or legal representative). When it does, they will be drawn here, each linked to the record that connects them.") }}</p>
+  {% endif %}
+  </section>
 {% endfor %}
 </div>
 {% endblock %}

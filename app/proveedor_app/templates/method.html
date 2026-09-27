@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ _("How this was made") }}{% endblock %}
+{% block main %}
+<section class="page-head">
+  <h1>{{ _("How this was made") }}</h1>
+  <p class="lede">{{ _("Nobody typed these records in. It started with one question; from there, software agents defined the case, found the public sources on their own and read them, and each definition goes to a person for approval. These are the steps, in order, each with what it produced.") }}</p>
+</section>
+
+<ol class="path">
+  <li class="path__step" id="question">
+    <h2>{{ _("The question") }}</h2>
+    {% if m.brief %}
+    <blockquote class="path__quote">{{ m.brief }}</blockquote>
+    <p class="note muted">{{ _("This is the only thing a person wrote by hand. Everything below was produced from it.") }} <a href="/case-file?path=brief.md">{{ _("See the file") }}</a></p>
+    {% else %}
+    <p class="muted">{{ _("The case's question has not been published yet.") }}</p>
+    {% endif %}
+  </li>
+
+  <li class="path__step" id="definition">
+    <h2>{{ _("The definition") }}</h2>
+    {% if m.prd %}
+    {% if m.prd.pending %}<p class="notice">{{ _("This definition is still waiting for a person's approval, so it may change.") }}</p>{% endif %}
+    <div class="path__cols">
+      {% if m.prd.personas %}<div><h3>{{ _("Who it is for") }}</h3><ul class="plain-list">{% for x in m.prd.personas %}<li>{{ x }}</li>{% endfor %}</ul></div>{% endif %}
+      {% if m.prd.jobs %}<div><h3>{{ _("What they need to find out") }}</h3><ul class="plain-list">{% for x in m.prd.jobs %}<li>{{ x }}</li>{% endfor %}</ul></div>{% endif %}
+      {% if m.prd.constraints or m.prd.non_goals %}<div><h3>{{ _("The ground rules") }}</h3><ul class="plain-list">{% for x in m.prd.constraints %}<li>{{ x }}</li>{% endfor %}{% for x in m.prd.non_goals %}<li>{{ _("Not a goal:") }} {{ x }}</li>{% endfor %}</ul></div>{% endif %}
+      {% if m.prd.done %}<div><h3>{{ _("When it counts as done") }}</h3><ul class="plain-list">{% for c in m.prd.done %}<li>{{ c.what }} {{ c.op }} <span class="mono">{{ c.target }}</span></li>{% endfor %}</ul></div>{% endif %}
+    </div>
+    <p class="note"><a href="/case-file?path=01-scope/prd.md">{{ _("Read the full definition") }}</a> · <a href="/completeness">{{ _("How close the data is to done") }}</a></p>
+    {% else %}
+    <p class="muted">{{ _("The case definition has not been published yet.") }}</p>
+    {% endif %}
+  </li>
+
+  <li class="path__step" id="model">
+    <h2>{{ _("What is recorded") }}</h2>
+    <p>{{ _("From the definition, the case describes what kinds of records exist and which facts matter:") }}</p>
+    <dl class="path__facts">
+      <div><dt>{{ _("Kinds of record") }}</dt><dd>{% for c in m.classes %}{{ c.label }}{% if not loop.last %} · {% endif %}{% endfor %}</dd></div>
+      {% if m.basic %}<div><dt>{{ _("Basic facts per {cls}", cls=domain.class_label()|lower) }}</dt><dd>{{ m.basic|join(" · ") }}</dd></div>{% endif %}
+      <div><dt>{{ _("Signals it checks") }}</dt><dd>{% if m.rules %}{{ m.rules|join(" · ") }}{% else %}<span class="muted">{{ _("none defined yet") }}</span>{% endif %}</dd></div>
+      <div><dt>{{ _("Connections it looks for") }}</dt><dd>{% if m.relations %}{{ m.relations|join(" · ") }}{% else %}<span class="muted">{{ _("none defined yet") }}</span>{% endif %}</dd></div>
+    </dl>
+  </li>
+
+  <li class="path__step" id="sources">
+    <h2>{{ _("The public sources") }}</h2>
+    <p>{{ _("The agents searched for where each fact is published and kept only public sites: no logins, no captchas, nothing submitted but searches.") }}{% if m.found_sources %} {{ ngettext("They found {n} candidate source.", "They found {n} candidate sources.", m.found_sources) }}{% endif %}</p>
+    {% if m.sources %}
+    <table class="ledger ledger--plain">
+      <thead><tr><th scope="col">{{ _("Source") }}</th><th scope="col">{{ _("Kind") }}</th><th scope="col" class="num">{{ _("Values it backs") }}</th></tr></thead>
+      <tbody>
+      {% for s in m.sources %}
+        <tr><th scope="row" class="mono">{{ s.host }}</th><td>{{ s.kind or "—" }}</td><td class="num mono">{{ s.backs }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">{{ _("No values have been published from any source yet.") }}</p>
+    {% endif %}
+  </li>
+
+  <li class="path__step" id="evidence">
+    <h2>{{ _("The evidence") }}</h2>
+    {% set ev = m.evidence %}
+    {% if ev and ev.published %}
+    <p>{{ _("Every published value keeps its receipt: the page it came from, a screenshot of that page and a saved copy, with the time it was captured.") }}</p>
+    <dl class="tally tally--inline">
+      <div><dt>{{ _("values published") }}</dt><dd>{{ ev.published }}</dd></div>
+      <div><dt>{{ _("with a receipt") }}</dt><dd>{{ ev.with_receipt }}</dd></div>
+      <div><dt>{{ _("screenshots kept") }}</dt><dd>{{ ev.screenshots }}</dd></div>
+      {% if ev.first %}<div><dt>{{ _("captured between") }}</dt><dd class="tally__date">{{ ev.first|date }}{% if ev.last|date != ev.first|date %} – {{ ev.last|date }}{% endif %}</dd></div>{% endif %}
+    </dl>
+    {% if ev.sample %}<p><a class="btn btn--quiet" href="/journal/{{ ev.sample.value_id|urlencode }}">{{ _("Follow one value back to the question") }}</a></p>{% endif %}
+    {% else %}
+    <p class="muted">{{ _("No values have been published yet.") }}</p>
+    {% endif %}
+  </li>
+</ol>
+
+<section class="block path__more" aria-labelledby="more-h">
+  <h2 id="more-h">{{ _("Check it yourself") }}</h2>
+  <ul class="plain-list">
+    <li><a href="/journal">{{ _("Case journal") }}</a>: {{ _("any value, traced step by step back to the question.") }}</li>
+    <li><a href="{{ m.engine_repo }}" rel="noopener">github.com/ricalanis/ontofill</a>: {{ _("the open-source engine that did the work; it runs any question, not only this one.") }}</li>
+    <li><a href="{{ m.case_repo }}" rel="noopener">github.com/ricalanis/proveedor-abierto</a>: {{ _("this case (question, definition, sources, rules) and this site, ready to fork.") }}</li>
+  </ul>
+</section>
+{% endblock %}

@@ -376,6 +376,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return render(request, "about.html", nav="about", run=r, sources=list(case.sources().values()),
                       latest=dataset_stats(r)["latest"] if r else None)
 
+    @app.get("/como-se-hizo", response_class=HTMLResponse)
+    @app.get("/how-it-was-made", response_class=HTMLResponse, include_in_schema=False)
+    def how_it_was_made(request: Request):
+        from . import method
+
+        try:
+            r = settings.store.run(request.query_params.get("run"))
+        except LookupError:
+            r = None
+        lang = i18n.pick_lang(request.query_params.get("lang"), request.cookies.get(i18n.COOKIE))
+        d = (r.domain if r else current_domain()).localized(lang)
+        return render(request, "method.html", nav="method", run=r, m=method.build(r, case, d))
+
     @app.get("/data", response_class=HTMLResponse)
     def open_data(request: Request):
         from . import export as ex

@@ -41,7 +41,7 @@
         {% endfor %}
       </ul>
       {% else %}
-      <p class="muted">{{ _("No signal in this data.") }}</p>
+      <p class="muted">{{ _("No signal has fired for this {cls} in the data published so far. That is not a clean record; it means none of the case's rules matched the values found.", cls=domain.class_label(cls)|lower) }} <a href="/signals">{{ _("What is checked") }}</a></p>
       {% endif %}
     </section>
 
@@ -105,7 +105,7 @@
         {% endfor %}
       </ul>
       <p><a href="/relationships?focus={{ e.id|urlencode }}">{{ _("Open in the connections map") }}</a></p>
-      {% else %}<p class="muted">{{ _("No connection to another {cls} in this data.", cls=domain.class_label(cls)|lower) }}</p>{% endif %}
+      {% else %}<p class="muted">{{ _("No connection to another {cls} in the data published so far.", cls=domain.class_label(cls)|lower) }}{% if domain.peer_relations() %} {{ _("The case looks for:") }} {% for rel in domain.peer_relations() %}{{ domain.relation_label(rel)|lower }}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>{% endif %}
     </section>
   </div>
 

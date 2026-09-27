@@ -26,6 +26,20 @@
 {% endfor %}
 </div>
 {% else %}
-<p class="empty">{{ _("No signal in this data.") }}</p>
+<section class="empty-state" aria-labelledby="none-h">
+  <h2 id="none-h">{{ _("No signal has fired in the data published so far") }}</h2>
+  {% set rule_ids = domain.rules.keys()|list %}
+  {% if rule_ids %}
+  <p>{{ _("Every {cls} is checked against the rules below. None matched yet. That is not a clean record: a rule can only fire on values the collectors have found, and some facts are still missing.", cls=domain.class_label()|lower) }}</p>
+  <ul class="rule-list">
+    {% for rid in rule_ids %}{% set info = domain.rule(rid) %}
+    <li><strong>{{ info.label }}</strong><span>{{ info.checks }}</span></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>{{ _("The case has not published its signal rules yet. Each one will be a written rule, checked against the public records on this site, with the records it rests on and how to verify it.") }}</p>
+  {% endif %}
+  <p class="note"><a href="/completeness">{{ _("See how complete the data is") }}</a> · <a href="/como-se-hizo">{{ _("How this was made") }}</a></p>
+</section>
 {% endif %}
 {% endblock %}

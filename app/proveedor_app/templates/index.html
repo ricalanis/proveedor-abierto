@@ -60,6 +60,8 @@
     {% if page < pages %}<a rel="next" href="/?q={{ q|urlencode }}&show={{ show }}&page={{ page + 1 }}">{{ _("Next") }}</a>{% endif %}
   </nav>
   {% endif %}
+  {% elif not stats.total %}
+  <p class="empty">{{ _("No {plural} have been published yet. The collection is still under way; this page fills in as values are confirmed.", plural=plural|lower) }} <a href="/como-se-hizo">{{ _("How this was made") }}</a></p>
   {% else %}
   <p class="empty">{{ _("Nothing matches. Check the spelling, try the {idlabel}, or clear the filter.", idlabel=domain.prop_label(id_prop) if id_prop else _("identifier")) }} <a href="/">{{ _("Show everything") }}</a></p>
   {% endif %}

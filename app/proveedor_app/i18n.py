@@ -331,6 +331,121 @@ ES: dict[str, str] = {
     "Open the full document": "Abrir el documento completo",
     "Not in this copy of the case package.": "No está en esta copia del paquete del caso.",
     "not in this copy of the case package yet": "aún no está en esta copia del paquete del caso",
+    # empty states and how this was made
+    'How this was made':
+        'Cómo se hizo',
+    'No {plural} have been published yet, so there is nothing to measure. This page fills in as values are confirmed.':
+        'Aún no se publican {plural}, así que no hay nada que medir. Esta página se llena conforme se confirman datos.',
+    "No signal has fired for this {cls} in the data published so far. That is not a clean record; it means none of the case's rules matched the values found.":
+        'Ninguna señal se ha activado para este {cls} en los datos publicados hasta ahora. Eso no es un historial limpio; significa que ninguna regla del caso coincidió con los datos encontrados.',
+    'What is checked':
+        'Qué se revisa',
+    'No connection to another {cls} in the data published so far.':
+        'Sin conexión con otro {cls} en los datos publicados hasta ahora.',
+    'The case looks for:':
+        'El caso busca:',
+    'No {plural} have been published yet. The collection is still under way; this page fills in as values are confirmed.':
+        'Aún no se publican {plural}. La recolección sigue en curso; esta página se llena conforme se confirman datos.',
+    'Nobody typed these records in. It started with one question; from there, software agents defined the case, found the public sources on their own and read them, and each definition goes to a person for approval. These are the steps, in order, each with what it produced.':
+        'Nadie capturó estos registros a mano. Todo empezó con una pregunta; a partir de ella, agentes de software definieron el caso, encontraron por su cuenta las fuentes públicas y las leyeron, y cada definición pasa por la aprobación de una persona. Estos son los pasos, en orden, cada uno con lo que produjo.',
+    'The question':
+        'La pregunta',
+    'This is the only thing a person wrote by hand. Everything below was produced from it.':
+        'Es lo único que escribió una persona a mano. Todo lo de abajo se produjo a partir de ella.',
+    'See the file':
+        'Ver el archivo',
+    "The case's question has not been published yet.":
+        'La pregunta del caso aún no se publica.',
+    'The definition':
+        'La definición',
+    "This definition is still waiting for a person's approval, so it may change.":
+        'Esta definición todavía espera la aprobación de una persona, así que puede cambiar.',
+    'Who it is for':
+        'Para quién es',
+    'What they need to find out':
+        'Qué necesitan averiguar',
+    'The ground rules':
+        'Las reglas del juego',
+    'Not a goal:':
+        'No es objetivo:',
+    'When it counts as done':
+        'Cuándo se considera terminado',
+    'Read the full definition':
+        'Leer la definición completa',
+    'How close the data is to done':
+        'Qué tan cerca están los datos de terminar',
+    'The case definition has not been published yet.':
+        'La definición del caso aún no se publica.',
+    'What is recorded':
+        'Qué se registra',
+    'From the definition, the case describes what kinds of records exist and which facts matter:':
+        'A partir de la definición, el caso describe qué tipos de registro existen y qué datos importan:',
+    'Kinds of record':
+        'Tipos de registro',
+    'Basic facts per {cls}':
+        'Datos básicos por {cls}',
+    'Signals it checks':
+        'Señales que revisa',
+    'none defined yet':
+        'ninguna definida todavía',
+    'Connections it looks for':
+        'Conexiones que busca',
+    'The public sources':
+        'Las fuentes públicas',
+    'The agents searched for where each fact is published and kept only public sites: no logins, no captchas, nothing submitted but searches.':
+        'Los agentes buscaron dónde se publica cada dato y se quedaron solo con sitios públicos: sin inicios de sesión, sin captchas, sin enviar nada que no sea una búsqueda.',
+    'They found {n} candidate source.':
+        'Encontraron {n} fuente candidata.',
+    'They found {n} candidate sources.':
+        'Encontraron {n} fuentes candidatas.',
+    'Values it backs':
+        'Datos que respalda',
+    'No values have been published from any source yet.':
+        'Aún no se publican datos de ninguna fuente.',
+    'The evidence':
+        'La evidencia',
+    'Every published value keeps its receipt: the page it came from, a screenshot of that page and a saved copy, with the time it was captured.':
+        'Cada dato publicado conserva su comprobante: la página de donde salió, una captura de esa página y una copia guardada, con la hora en que se capturó.',
+    'values published':
+        'datos publicados',
+    'with a receipt':
+        'con comprobante',
+    'screenshots kept':
+        'capturas guardadas',
+    'captured between':
+        'capturados entre',
+    'Follow one value back to the question':
+        'Seguir un dato hasta la pregunta',
+    'No values have been published yet.':
+        'Aún no se publican datos.',
+    'Check it yourself':
+        'Revísalo tú',
+    'any value, traced step by step back to the question.':
+        'cualquier dato, rastreado paso a paso hasta la pregunta.',
+    'the open-source engine that did the work; it runs any question, not only this one.':
+        'el motor de código abierto que hizo el trabajo; sirve para cualquier pregunta, no solo esta.',
+    'this case (question, definition, sources, rules) and this site, ready to fork.':
+        'este caso (pregunta, definición, fuentes, reglas) y este sitio, listos para copiarse.',
+    'No connections found in the data published so far':
+        'No se encontraron conexiones en los datos publicados hasta ahora',
+    'The case looks for {plural} that share any of these in public records:':
+        'El caso busca {plural} que compartan alguno de estos datos en los registros públicos:',
+    'not selected above':
+        'no seleccionado arriba',
+    'None were found yet. A connection needs the same value, taken from a public record, on two {plural}; as more facts are collected, connections can appear.':
+        'Aún no se encontró ninguna. Una conexión necesita el mismo dato, tomado de un registro público, en dos {plural}; conforme se recolecten más datos pueden aparecer conexiones.',
+    'Connections are not defined yet':
+        'Las conexiones aún no están definidas',
+    'The case has not published which connections to look for (for example, a shared address or legal representative). When it does, they will be drawn here, each linked to the record that connects them.':
+        'El caso aún no publica qué conexiones buscar (por ejemplo, un domicilio o un representante legal compartido). Cuando lo haga, se dibujarán aquí, cada una enlazada al registro que las conecta.',
+    'No signal has fired in the data published so far':
+        'Ninguna señal se ha activado en los datos publicados hasta ahora',
+    'Every {cls} is checked against the rules below. None matched yet. That is not a clean record: a rule can only fire on values the collectors have found, and some facts are still missing.':
+        'Cada {cls} se revisa con las reglas de abajo. Ninguna coincidió todavía. Eso no es un historial limpio: una regla solo se activa con datos que los recolectores encontraron, y aún faltan datos.',
+    'The case has not published its signal rules yet. Each one will be a written rule, checked against the public records on this site, with the records it rests on and how to verify it.':
+        'El caso aún no publica sus reglas de señales. Cada una será una regla escrita, revisada contra los registros públicos de este sitio, con los registros en que se basa y cómo verificarla.',
+    'See how complete the data is':
+        'Ver qué tan completos son los datos',
     # no gold / case file
     "Nothing published yet": "Aún no hay nada publicado",
     "This case has not published its data yet, or this site is not connected to it. Please come back later.":
