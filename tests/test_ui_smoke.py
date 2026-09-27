@@ -129,31 +129,3 @@ def test_watch_toggle_feeds_watchlist(page, base_url):
     page.locator("[data-unwatch]").click()
     page.wait_for_url("**/watchlist?ids=")
     assert page.locator(".watch__item").count() == 0
-
-
-def test_engine_report_card_renders(page, base_url):
-    page.goto(base_url + "/engine")
-    assert page.locator("h1").inner_text() == "Engine report card"
-    assert page.locator(".taxonomy").count() >= 2
-    assert page.locator(".mock-tag").count() >= 4  # fixtures declare recorded provenance
-
-
-def test_loop_thread_toggles_and_fits_a_phone(browser, base_url):
-    """v0.9.6: the phase-loop thread is a real <details> the reader can close and reopen, and the run view with it
-    open has no horizontal scroll at 390 px."""
-    ctx = browser.new_context(viewport={"width": 390, "height": 844})
-    pg = ctx.new_page()
-    errors = []
-    pg.on("pageerror", lambda exc: errors.append(str(exc)))
-    pg.goto(base_url + "/run/run-fixture-0001?limit=2000")
-    thread = pg.locator("#loop-p1-1 details.loop")
-    assert thread.evaluate("d => d.open")
-    thread.locator("summary").scroll_into_view_if_needed()
-    assert pg.evaluate("document.documentElement.scrollWidth") <= 390
-    thread.locator("summary").click()
-    assert not thread.evaluate("d => d.open")
-    thread.locator("summary").click()
-    assert thread.evaluate("d => d.open") and pg.locator("#loop-p1-1 .objections li").count() == 2
-    assert pg.evaluate("document.documentElement.scrollWidth") <= 390
-    ctx.close()
-    assert errors == []

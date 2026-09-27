@@ -5,35 +5,26 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from urllib.parse import parse_qs, quote, urlencode, urlsplit
+from urllib.parse import urlencode, urlsplit
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from jinja2 import pass_context
 
-from . import dod, i18n, investigate, live
+from . import dod, i18n, investigate
 from .domain import LEGACY_ONTOLOGY, Domain
-from .gold import GoldStore, Run, UnavailableStore, backend_of, load_store, sniff_media_type
+from .gold import GoldStore, Run, UnavailableStore, load_store, sniff_media_type
 
 HERE = Path(__file__).parent
 REPO_ROOT = HERE.parent.parent
-ROLES = ("investigator", "approver")
 
 @dataclass
 class Settings:
     store: GoldStore | UnavailableStore
     case_dir: Path
-    role: str = "investigator"
-    identity_header: str | None = None  # header the NetBird proxy sets with the signed-in user, if any
-    operator_links: bool = True  # footer links to the control pages until they move to the Ontofill Console
-
-    def __post_init__(self) -> None:
-        if self.role not in ROLES:
-            raise ValueError(f"PA_ROLE must be one of {ROLES}, got {self.role!r}")
 
 
 def settings_from_env() -> Settings:
@@ -44,8 +35,6 @@ def settings_from_env() -> Settings:
     return Settings(
         store=store,
         case_dir=Path(os.environ.get("PA_CASE_DIR", REPO_ROOT / "case")),
-        role=os.environ.get("PA_ROLE", "investigator"),
-        identity_header=os.environ.get("PA_IDENTITY_HEADER") or None,
     )
 
 
@@ -72,6 +61,8 @@ def brief(value, limit: int = 240) -> str:
 def host_of(url: str) -> str:
     return urlsplit(url).hostname or url
 
+
+PAGE_SIZE = 25  # browse list rows per page
 
 STATUS_WORDS = {"gold": "Confirmed", "conflict": "Sources disagree", "missing": "Not found"}
 
@@ -116,7 +107,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     env.globals.update(
         host_of=host_of,
         safe_url=safe_url,
-        role=settings.role,
     )
     env.filters["pct"] = lambda x: f"{round((x or 0) * 100)}%"
     env.filters["money"] = lambda x: f"{x:,.2f}" if isinstance(x, (int, float)) else (x or "—")
@@ -157,8 +147,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         query = [(k, v) for k, v in request.query_params.multi_items() if k != "lang"] + [("lang", other)]
         ctx.update(lang=lang, other_lang=other, lang_href=f"{request.url.path}?{urlencode(query)}", _=_,
                    ngettext=i18n.ngettext(lang), status_word=lambda s: _(STATUS_WORDS.get(s or "missing", s or "")),
-                   confidence_word=lambda c: _(confidence_level(c)), lang_param=asked in i18n.LANGS,
-                   operator_links=settings.operator_links)
+                   confidence_word=lambda c: _(confidence_level(c)), lang_param=asked in i18n.LANGS)
         ctx.setdefault("nav", "")
         r = ctx.get("run")
         ctx.setdefault("domain", (r.domain if r else current_domain()).localized(lang))
@@ -183,10 +172,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             run_id = settings.store.latest_run_id() if isinstance(settings.store, GoldStore) else None
         except LookupError:
             run_id = None
-        return {"ok": True, "role": settings.role, "run_id": run_id}
+        # "investigator" = read-only; kept so deploy checks keep working (operator and approver work is in the console)
+        return {"ok": True, "role": "investigator", "run_id": run_id}
 
     @app.get("/", response_class=HTMLResponse)
-    def index(request: Request, q: str = "", show: str = "all"):
+    def index(request: Request, q: str = "", show: str = "all", page: int = 1):
         r = run(request)
         d = r.domain
         searchable = [p for p in (d.title_property(), d.identifier_property()) if p]
@@ -211,8 +201,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                          "linked": sum(1 for link in e.get("links") or [] if link.get("target") in r.entities_by_id
                                        and r.entities_by_id[link["target"]].get("class") != d.primary_class)})
         rows.sort(key=lambda row: (-len(row["e"].get("flags") or []), r.title(row["e"])))
-        return render(request, "index.html", nav="entities", run=r, rows=rows, q=q, show=show,
-                      stats=dataset_stats(r))
+        pages = max(1, -(-len(rows) // PAGE_SIZE))
+        page = min(max(page, 1), pages)
+        return render(request, "index.html", nav="entities", run=r, rows=rows[(page - 1) * PAGE_SIZE: page * PAGE_SIZE],
+                      matched=len(rows), page=page, pages=pages, q=q, show=show, stats=dataset_stats(r))
 
     @app.get("/entities/{entity_id}", response_class=HTMLResponse)
     @app.get("/suppliers/{entity_id}", response_class=HTMLResponse, include_in_schema=False)
@@ -359,14 +351,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                       e=r.entities_by_id.get(ref.entity_id), replays=investigate.journal_chain(r, case, value_id),
                       anchors=anchors)
 
-    @app.get("/engine", response_class=HTMLResponse)
-    def engine_report(request: Request):
-        from . import report
-
-        r = run(request)
-        card = report.build(settings.store, r, case)
-        return render(request, "engine.html", nav="engine", run=r, card=card, MODE_NAMES=live.MODE_NAMES)
-
     @app.get("/case-file", response_class=HTMLResponse)
     def case_file(request: Request, path: str):
         text = case.read(path, limit=200_000)
@@ -425,162 +409,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ext = name.rsplit(".", 1)[1]
         return Response(body, media_type=media,
                         headers={"Content-Disposition": f'attachment; filename="{stem}.{ext}"'})
-
-    def require_approver(request: Request) -> None:
-        if settings.role != "approver":
-            raise HTTPException(403, "approvals are only available on the approver URL")
-
-    def identity(request: Request) -> str:
-        return request.headers.get(settings.identity_header, "") if settings.identity_header else ""
-
-    @app.get("/evidence", response_class=HTMLResponse)
-    def track_evidence(request: Request):
-        """The track checklist with proof from saved files only (both roles; no API calls, no probing)."""
-        from . import evidence
-
-        synthetic = str(getattr(settings.store, "case_id", "") or "").startswith("fixture")
-        return render(request, "track_evidence.html", nav="evidence", run=None, ev=evidence.rows(settings.store),
-                      synthetic=synthetic)
-
-    @app.get("/spend", response_class=HTMLResponse)
-    def spend(request: Request):
-        """Operator billing view: reads the spend tracker's history file only; never calls billing APIs."""
-        require_approver(request)
-        path = Path(os.environ.get("PA_SPEND_HISTORY", REPO_ROOT.parent / ".cache" / "spend" / "history.jsonl"))
-        history = []
-        if path.is_file():
-            for raw in path.read_text().splitlines():
-                try:
-                    history.append(json.loads(raw))
-                except ValueError:
-                    continue
-        latest = history[-1] if history else None
-        try:
-            r = settings.store.run(None)
-        except LookupError:
-            r = None
-        per_supplier = None
-        eng = (latest or {}).get("engine") or {}
-        if r and eng.get("reported") and r.run_id in (eng.get("runs") or {}):
-            complete = sum(dod.dod_ratio(e, r.domain) >= r.domain.dod_threshold for e in r.primary)
-            gold_values = sum(1 for v in r.values.values() if dod.is_filled(v.data))
-            usd = eng["runs"][r.run_id]
-            per_supplier = {"run_id": r.run_id, "usd": usd, "per_complete_supplier": usd / complete if complete else None,
-                            "per_gold_value": usd / gold_values if gold_values else None}
-        rows, prev = [], None
-        for s in history[-48:]:
-            dt = (datetime.fromisoformat(s["ts"]) - datetime.fromisoformat(prev["ts"])).total_seconds() / 3600 if prev else 0
-            rate = (s["credit_used"] - prev["credit_used"]) / dt if prev and dt > 0 else None
-            rows.append({"ts": s["ts"], "used": s["credit_used"], "left": s["credit_remaining"], "rate": rate})
-            prev = s
-        deadline = datetime(2026, 9, 27, 12, 0, tzinfo=timezone(timedelta(hours=-7)))
-        hours_left = max(0.0, (deadline - datetime.fromisoformat(latest["ts"])).total_seconds() / 3600) if latest else 0
-        rates = [x["rate"] for x in rows[-1:] if x["rate"] is not None] + [(latest or {}).get("resource_rate_usd_per_hour") or 0]
-        projected = (latest["credit_used"] + max(rates) * hours_left) if latest else None
-        return render(request, "spend.html", nav="spend", run=None, latest=latest, rows=rows[::-1],
-                      projected=projected, hours_left=hours_left, per_supplier=per_supplier, history_path=str(path))
-
-    @app.get("/approvals", response_class=HTMLResponse)
-    def approvals(request: Request, done: str = "", error: str = ""):
-        require_approver(request)
-        items = investigate.approvals(case)
-        return render(request, "approvals.html", nav="approvals", run=None, items=items, done=done, error=error)
-
-    def review_page(request: Request, item, error: str = "", reason: str = "") -> HTMLResponse:
-        docs = investigate.load_artifacts(case, item)
-        paths = [{"path": p, "exists": case.exists(p)} for p in investigate.artifact_paths(item)]
-        gen = item.meta.get("generated_by") or next((d.get("generated_by") for d in docs.values() if d.get("generated_by")), None)
-        shot = item.meta.get("screenshot_key") if item.checkpoint == "action" else None
-        has_screenshot = bool(shot) and settings.store.bronze(str(shot)) is not None
-        return render(request, "approval.html", nav="approvals", run=None, a=item, docs=docs, paths=paths,
-                      who=identity(request), error=error, gen=gen, backend=(gen or {}).get("backend"),
-                      taxonomy_stats=investigate.taxonomy_stats, has_screenshot=has_screenshot,
-                      history=investigate.revision_history(docs), drafts=investigate.archived_drafts(case, item),
-                      reason=reason, reason_max=investigate.DENY_REASON_MAX)
-
-    @app.get("/approvals/{phase_dir:path}", response_class=HTMLResponse)
-    def approval_detail(request: Request, phase_dir: str, error: str = ""):
-        require_approver(request)
-        item = next((a for a in investigate.approvals(case) if a.phase_dir == phase_dir), None)
-        if not item:
-            raise HTTPException(404, f"no approval checkpoint in {phase_dir}")
-        return review_page(request, item, error)
-
-    @app.post("/approvals")
-    async def approve(request: Request):
-        require_approver(request)
-        origin = request.headers.get("origin")
-        if origin and urlsplit(origin).netloc != request.headers.get("host"):
-            raise HTTPException(403, "cross-origin approval refused")
-        form = {k: v[0] for k, v in parse_qs((await request.body()).decode()).items()}
-        phase_dir = form.get("phase_dir", "")
-        decisions = {k.removeprefix("decision."): v for k, v in form.items() if k.startswith("decision.")}
-        try:
-            investigate.approve(case, phase_dir, form.get("approver", ""), decisions=decisions or None,
-                                decision=form.get("decision"), reason=form.get("reason"))
-        except investigate.ReasonRequired as exc:  # v0.9.5: a deny without a reason is a bad request, nothing written
-            item = next(a for a in investigate.approvals(case) if a.phase_dir == phase_dir)
-            response = review_page(request, item, str(exc), reason=form.get("reason", "")[:5000])
-            response.status_code = 400
-            return response
-        except ValueError as exc:
-            back = f"/approvals/{quote(phase_dir)}" if phase_dir and case.exists(phase_dir) else "/approvals"
-            return RedirectResponse(f"{back}?error={quote(str(exc))}", status_code=303)
-        return RedirectResponse(f"/approvals?done={quote(phase_dir)}", status_code=303)
-
-    def run_view_model(run_id: str, after: int = 0) -> dict:
-        steps = live.annotate(settings.store.live_steps(run_id))
-        status = settings.store.live_status(run_id)
-        if not steps and status is None:
-            raise HTTPException(404, f"no live feed for run {run_id}")
-        jobs = settings.store.live_jobs(run_id)
-        backend = backend_of((status or {}).get("metrics"), [*steps, status or {}])
-        panel = live.summarize(steps, status, current_domain())
-        known = case.sources()
-        for src in panel["sources"]:
-            src.setdefault("discovered_by", investigate.discovered_by(src)
-                           or (known.get(src.get("source_id")) or {}).get("discovered_by"))
-        return {"run_id": run_id, "steps": steps, "new": steps[after:][::-1], "panel": panel,
-                "threads": live.loop_threads(steps), "proof": live.proof(jobs, steps), "backend": backend}
-
-    @app.get("/run")
-    def run_latest():
-        run_id = settings.store.live_run_id()
-        if not run_id:
-            raise NoGold("No live run feed yet: the engine writes runs/<case_id>/latest.json when a run starts.")
-        return RedirectResponse(f"/run/{run_id}", status_code=307)
-
-    @app.get("/run/{run_id}", response_class=HTMLResponse)
-    def run_view(request: Request, run_id: str, limit: int = 150):
-        m = run_view_model(run_id)
-        limit = max(1, min(limit, 2000))
-        status = settings.store.live_status(run_id) or {}
-        items, _ = live.stream_items(m["steps"], max(0, len(m["steps"]) - limit), m["threads"])
-        return render(request, "run.html", nav="run", run=None, live_run_id=run_id, m=m, items=items,
-                      limit=limit,
-                      backend=m["backend"], synthetic=settings.store.case_id.startswith("fixture"),
-                      preview=bool(status.get("preview") or (status.get("metrics") or {}).get("preview")),
-                      PHASES=live.PHASES, MODE_NAMES=live.MODE_NAMES,
-                      CHECKPOINT_PHASE=live.CHECKPOINT_PHASE, others=settings.store.live_run_ids())
-
-    @app.get("/api/run/{run_id}")
-    def run_api(request: Request, run_id: str, after: int = 0) -> dict:
-        m = run_view_model(run_id, max(after, 0))
-        env = templates.env
-        d = current_domain()
-        start = max(after, 0, len(m["steps"]) - 150)
-        items, updated = live.stream_items(m["steps"], start, m["threads"], incremental=after > 0)
-        steps_html = env.get_template("_steps.html").render(items=items, MODE_NAMES=live.MODE_NAMES)
-        thread_tpl = env.get_template("_loop_thread.html")
-        threads_html = [{"id": t["id"], "html": thread_tpl.render(t=t, MODE_NAMES=live.MODE_NAMES)} for t in updated]
-        panel_html = env.get_template("_run_panel.html").render(
-            m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE, MODE_NAMES=live.MODE_NAMES, domain=d)
-        proof_html = env.get_template("_proof.html").render(m=m)
-        timeline_html = env.get_template("_timeline.html").render(
-            m=m, PHASES=live.PHASES, CHECKPOINT_PHASE=live.CHECKPOINT_PHASE)
-        return {"count": len(m["steps"]), "state": m["panel"]["state"], "steps_html": steps_html,
-                "threads_html": threads_html, "panel_html": panel_html, "timeline_html": timeline_html,
-                "proof_html": proof_html}
 
     @app.get("/bronze/{key}")
     def bronze(key: str):

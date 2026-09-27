@@ -49,11 +49,6 @@
       <a href="/journal">{{ _("Case journal") }}</a>
       <a href="https://github.com/ricalanis/proveedor-abierto" rel="noopener">{{ _("Source code and case package") }}</a>
     </p>
-    {% if operator_links %}
-    <p class="colophon__ops">{{ _("Engine operation (moving to the Ontofill Console):") }}
-      <a href="/run">{{ _("Live run") }}</a> · <a href="/engine">{{ _("Engine report") }}</a> · <a href="/evidence">{{ _("Track evidence") }}</a>{% if role == "approver" %} · <a href="/spend">{{ _("Spend") }}</a> · <a href="/approvals">{{ _("Approvals") }}</a>{% endif %}
-    </p>
-    {% endif %}
   </footer>
 </body>
 </html>

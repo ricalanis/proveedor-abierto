@@ -47,13 +47,10 @@ def test_every_screen_renders_without_procurement_words(libraries):
     lib = run.primary[5]  # has a missing opening-hours value and a signal
     value = lib["properties"]["address"]["value_id"]
     pages = ["/", "/signals", f"/signals/{lib['id']}/0", "/relationships", "/journal", f"/journal/{value}",
-             "/completeness", "/engine", f"/entities/{lib['id']}", f"/entities/{lib['id']}?ev={value}",
-             f"/watchlist?ids={lib['id']}", "/run/nope"]
+             "/completeness", "/data", "/about", f"/entities/{lib['id']}", f"/entities/{lib['id']}?ev={value}",
+             f"/watchlist?ids={lib['id']}"]
     for path in pages:
         r = client.get(path)
-        if path == "/run/nope":
-            assert r.status_code == 404
-            continue
         assert r.status_code == 200, path
         leaked = PROCUREMENT_WORDS.findall(_visible_text(r.text))
         assert not leaked, (path, sorted(set(leaked)))

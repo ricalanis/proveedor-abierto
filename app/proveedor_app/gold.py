@@ -313,47 +313,6 @@ class GoldStore:
             return None
         return self.bronze_key_template.format(hex=hexdigest)
 
-    # Live run feed (CONTRACT section 4b): runs/<case_id>/latest.json, <run_id>/status.json, trace.live.jsonl
-
-    def live_run_id(self) -> str | None:
-        if self.pinned_run_id:
-            return self.pinned_run_id
-        raw = self.source.read(f"runs/{self.case_id}/latest.json")
-        return json.loads(raw)["run_id"] if raw else None
-
-    def live_run_ids(self) -> list[str]:
-        return self.source.list_dirs(f"runs/{self.case_id}")
-
-    def live_status(self, run_id: str) -> dict | None:
-        raw = self.source.read(f"runs/{self.case_id}/{run_id}/status.json")
-        try:
-            return json.loads(raw) if raw else None
-        except ValueError:  # caught mid-rewrite; the next poll gets it
-            return None
-
-    def live_steps(self, run_id: str) -> list[dict]:
-        raw = self.source.read(f"runs/{self.case_id}/{run_id}/trace.live.jsonl")
-        steps = []
-        for line in (raw or b"").decode("utf-8", "replace").splitlines():
-            try:
-                steps.append(json.loads(line))
-            except ValueError:  # a line still being appended
-                break
-        return steps
-
-    def live_jobs(self, run_id: str) -> list[dict]:
-        """Sandbox jobs with their proof checkpoints (section 8); the last record per job_id wins."""
-        raw = self.source.read(f"runs/{self.case_id}/{run_id}/jobs.jsonl")
-        jobs: dict[str, dict] = {}
-        for line in (raw or b"").decode("utf-8", "replace").splitlines():
-            try:
-                rec = json.loads(line)
-            except ValueError:
-                break
-            if rec.get("job_id"):
-                jobs[rec["job_id"]] = {**jobs.get(rec["job_id"], {}), **rec}
-        return list(jobs.values())
-
     def bronze(self, key: str) -> bytes | None:
         path = self._bronze_path(key)
         return self.source.read(path) if path else None
@@ -425,7 +384,7 @@ def iter_evidence(field_data: dict) -> Iterable[dict]:
 
 
 class UnavailableStore:
-    """Stands in when no gold source is configured yet (the approver URL must work before any gold exists)."""
+    """Stands in when no gold source is configured yet (the site says so instead of failing)."""
 
     def __init__(self, reason: str):
         self.reason = reason
@@ -442,21 +401,6 @@ class UnavailableStore:
 
     def bronze(self, key: str) -> bytes | None:
         return None
-
-    def live_run_id(self) -> str | None:
-        return None
-
-    def live_run_ids(self) -> list[str]:
-        return []
-
-    def live_status(self, run_id: str) -> dict | None:
-        return None
-
-    def live_steps(self, run_id: str) -> list[dict]:
-        return []
-
-    def live_jobs(self, run_id: str) -> list[dict]:
-        return []
 
     def bronze_meta(self, key: str) -> dict:
         return {}

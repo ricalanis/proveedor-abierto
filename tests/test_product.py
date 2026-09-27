@@ -65,7 +65,7 @@ def test_home_tally_is_recomputed_from_gold(es, run):
     assert stats["sources"] == len(sources)
     text = es.get("/").text
     assert f"<dd>{stats['total']}</dd>" in text and f"<dd>{stats['flagged']}</dd>" in text
-    assert es.get("/").text.count('class="roster__item"') == 60
+    assert sum(es.get(f"/?page={n}").text.count('class="roster__item"') for n in (1, 2, 3)) == 60
 
 
 def test_dossier_shows_a_receipt_on_every_value(es, run):

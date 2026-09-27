@@ -88,61 +88,6 @@ def test_exports_over_http(client, store):
     assert client.get("/export/nope.xml").status_code == 404
 
 
-def test_investigator_cannot_approve(make_client, case_copy):
-    c = make_client(case_dir=case_copy)
-    assert c.get("/approvals").status_code == 403
-    r = c.post("/approvals", data={"phase_dir": "01-scope", "approver": "X"})
-    assert r.status_code == 403
-    assert not (case_copy / "01-scope" / "APPROVED").exists()
-    assert "Approvals" not in c.get("/").text.split("<main")[0]
-
-
-def test_approver_flow_writes_marker_once(make_client, case_copy):
-    c = make_client(role="approver", case_dir=case_copy)
-    page = c.get("/approvals")
-    assert page.status_code == 200 and page.text.count("Review and sign off") == 4  # PRD, factors, ontology + one action request
-    review = c.get("/approvals/01-scope")
-    assert review.status_code == 200 and "Definition of done" in review.text and "suppliers_at_80pct_core" in review.text
-    r = c.post("/approvals", data={"phase_dir": "01-scope", "approver": "  Ana   Revisora "}, follow_redirects=False)
-    assert r.status_code == 303 and "done=01-scope" in r.headers["location"]
-    marker = json.loads((case_copy / "01-scope" / "APPROVED").read_text())
-    assert marker["approver"] == "Ana Revisora" and marker["checkpoint"] == "prd" and len(marker["date"]) == 10
-    again = c.post("/approvals", data={"phase_dir": "01-scope", "approver": "B"}, follow_redirects=False)
-    assert "error=" in again.headers["location"]
-    assert "Approved by Ana Revisora" in c.get("/approvals").text
-
-
-def test_factor_decisions(make_client, case_copy, validator_for):
-    c = make_client(role="approver", case_dir=case_copy)
-    review = c.get("/approvals/02-ontology/factors")
-    assert review.status_code == 200 and 'name="decision.economic_sector"' in review.text
-    base = {"phase_dir": "02-ontology/factors", "approver": "Ana"}
-    ids = ["legitimacy_signal", "procedure_type", "economic_sector", "company_age", "buyer_level"]
-    for bad in ({}, {"decision.legitimacy_signal": "accept"}, {f"decision.{i}": "reject" for i in ids},
-                {**{f"decision.{i}": "accept" for i in ids}, "decision.invented": "accept"},
-                {**{f"decision.{i}": "accept" for i in ids}, "decision.company_age": "maybe"}):
-        r = c.post("/approvals", data={**base, **bad}, follow_redirects=False)
-        assert "error=" in r.headers["location"], bad
-    assert not (case_copy / "02-ontology/factors/APPROVED").exists()
-    good = {f"decision.{i}": "accept" for i in ids} | {"decision.buyer_level": "reject"}
-    r = c.post("/approvals", data={**base, **good}, follow_redirects=False)
-    assert "done=" in r.headers["location"]
-    marker = json.loads((case_copy / "02-ontology/factors/APPROVED").read_text())
-    assert marker["checkpoint"] == "factors" and marker["decisions"]["buyer_level"] == "reject"
-    assert not list(validator_for("approved.schema.json").iter_errors(marker))
-    assert "no decision recorded" not in c.get("/approvals/02-ontology/factors").text
-
-
-def test_ontology_review_shows_numbers(make_client, case_copy):
-    c = make_client(role="approver", case_dir=case_copy)
-    page = c.get("/approvals/02-ontology").text
-    for needle in ("Soundness", "0.86", "Coverage", "critic--Bad", "https://schema.org/Organization", "shapes.ttl"):
-        assert needle in page, needle
-    r = c.post("/approvals", data={"phase_dir": "02-ontology", "approver": "Ana", "decision.x": "accept"},
-               follow_redirects=False)
-    assert "error=" in r.headers["location"]  # decisions only belong to the factors checkpoint
-
-
 def test_fixture_case_artifacts_match_engine_schemas(fixture_root, validator_for):
     import yaml
 
@@ -163,40 +108,13 @@ def test_fixture_case_artifacts_match_engine_schemas(fixture_root, validator_for
         assert not list(validator_for("approval-pending.schema.json").iter_errors(meta)), pending
 
 
-def test_approver_guards(make_client, case_copy):
-    c = make_client(role="approver", case_dir=case_copy)
-    for phase_dir in ("..", "../..", "", "03-fanout", "01-scope/../.."):
-        r = c.post("/approvals", data={"phase_dir": phase_dir, "approver": "X"}, follow_redirects=False)
-        assert "error=" in r.headers["location"], phase_dir
-    r = c.post("/approvals", data={"phase_dir": "01-scope", "approver": ""}, follow_redirects=False)
-    assert "error=" in r.headers["location"]
-    r = c.post("/approvals", data={"phase_dir": "01-scope", "approver": "X"},
-               headers={"origin": "https://evil.example"})
-    assert r.status_code == 403
-    assert not (case_copy / "01-scope" / "APPROVED").exists()
-
-
-def test_approved_marker_matches_engine_schema(case_copy, validator_for):
-    investigate.approve(investigate.CaseDir(case_copy), "01-scope", "Ana")
-    marker = json.loads((case_copy / "01-scope" / "APPROVED").read_text())
-    assert not list(validator_for("approved.schema.json").iter_errors(marker))
-
-
-def test_front_matter_metadata(tmp_path):
-    (tmp_path / "02-ontology").mkdir()
-    (tmp_path / "02-ontology" / "APPROVAL_PENDING.md").write_text(
-        '---\ncheckpoint: factors\nartifact_paths: ["02-ontology/factors.yaml"]\n---\n# Factors\n')
-    [a] = investigate.approvals(investigate.CaseDir(tmp_path))
-    assert a.checkpoint == "factors" and a.meta["artifact_paths"] == ["02-ontology/factors.yaml"]
-
-
-def test_approver_works_before_any_gold(fixture_root, case_copy, tmp_path):
+def test_site_works_before_any_gold(fixture_root, case_copy, tmp_path):
     from fastapi.testclient import TestClient
     from proveedor_app.gold import UnavailableStore
     from proveedor_app.web import Settings, create_app
 
-    c = TestClient(create_app(Settings(store=UnavailableStore("no lake.yaml"), case_dir=case_copy, role="approver")))
-    assert c.get("/approvals").status_code == 200
+    c = TestClient(create_app(Settings(store=UnavailableStore("no lake.yaml"), case_dir=case_copy)))
+    assert c.get("/about").status_code == 200 and c.get("/healthz").json()["ok"]
     r = c.get("/")
     assert r.status_code == 503 and "Aún no hay nada publicado" in r.text  # Spanish by default
     assert c.get("/healthz").json()["run_id"] is None
@@ -220,24 +138,3 @@ def test_discovered_by_shown_where_sources_appear(case_copy, store, fixture_root
                if store.run().lineage(v.value_id) and v.data["evidence"]
                and v.data["evidence"][0]["source_id"] == doc["objectives"][0]["source_id"])
     assert "Cómo se encontró esta fuente" in c.get(f"/journal/{ref.value_id}").text
-    assert "Found by" in c.get("/run/run-fixture-0001").text
-
-
-def test_spend_page_is_approver_only_and_reads_history(make_client, case_copy, tmp_path, monkeypatch):
-    snap = {"ts": "2026-09-26T22:00:00+00:00", "credit_total": 200.0, "credit_used": 12.34, "credit_remaining": 187.66,
-            "resource_rate_usd_per_hour": 0.24,
-            "by_category": {"compute": 0.6, "storage": 0.25, "inference": 11.49, "bandwidth": 0.0, "other": 0.0},
-            "inference": [{"label": "sub", "models": [{"model": "glm-5.3", "input_tokens": 2000000,
-                                                       "output_tokens": 1000000, "est_usd": 4.5}]}],
-            "engine": {"reported": True, "runs": {"run-fixture-0001": 1.2}, "by_mode": {"D0": 0.0, "S1": 1.2},
-                       "by_backend": {"vultr": 1.1, "jev": 0.1}}}
-    hist = tmp_path / "history.jsonl"
-    hist.write_text(json.dumps({**snap, "ts": "2026-09-26T21:00:00+00:00", "credit_used": 10.0}) + "\n" + json.dumps(snap) + "\n")
-    monkeypatch.setenv("PA_SPEND_HISTORY", str(hist))
-    assert make_client(case_dir=case_copy).get("/spend").status_code == 403
-    page = make_client(role="approver", case_dir=case_copy).get("/spend")
-    assert page.status_code == 200
-    for needle in ("$12.34", "$187.66", "glm-5.3", "2,000,000", "Within the credit", "per supplier at", "2.34"):
-        assert needle in page.text, needle
-    monkeypatch.setenv("PA_SPEND_HISTORY", str(tmp_path / "missing.jsonl"))
-    assert "No spend snapshot yet" in make_client(role="approver", case_dir=case_copy).get("/spend").text
