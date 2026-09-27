@@ -125,6 +125,18 @@ Three tracks, each labelled for what it is.
    One is in progress (R64): criteria written as "≤ 0" compile to counts of branches, so they can never be met,
    and three criteria measure through an address cross-check relation.
 
+## Post-submission updates
+
+The project was submitted on Sun 27 Sep before the 12:00 PT deadline, and the 1-minute video is fixed as of then.
+Work continues in the open. Every change after submission is listed here, newest first, with its commit. Text
+written before submission is kept; where a fact changed, the text carries an "Updated HH:MM" note instead of being
+rewritten.
+
+| When (PT) | Commit | What changed |
+|-----------|--------|--------------|
+| Sun 11:49 | [ontofill `0b81af0`](https://github.com/ricalanis/ontofill/commit/0b81af0) | The Ontofill README status now matches the submitted claims. It still read "six defects, five fixed" and "the run continues". |
+| Sun 11:44–11:48 | [ontofill `e226669`](https://github.com/ricalanis/ontofill/commit/e226669), [`52235c5`](https://github.com/ricalanis/ontofill/commit/52235c5) | R64/R64b definition-of-done fixes pushed: "≤ 0" criteria and explicit completeness shares no longer compile to counts that can never be met. Awaiting deploy at the SF case's next checkpoint. |
+
 ## Use case
 
 **Who uses it.** Investigative journalists, civil-society watchdogs and auditors who need to check a company that
