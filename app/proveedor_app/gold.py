@@ -105,6 +105,16 @@ FLAG_LABELS = {
 }
 
 
+FLAG_NOTES_ES = {
+    "SAT check-digit algorithm does not validate this RFC as published":
+        "El algoritmo del dígito verificador del SAT no valida este RFC tal como se publicó",
+    "government supplier register, not the Registro Público de Comercio":
+        "padrón de proveedores de gobierno, no el Registro Público de Comercio",
+}
+EXPLAIN_WORDS = {"values": ("Seen as", "Visto como"), "suppliers": ("With", "Con"), "value": ("Value", "Valor"),
+                 "proxy_for": ("Stands in for", "Sustituye a"), "source_id": ("Source", "Fuente")}
+
+
 def _items(v, cap: int = 5) -> str:
     vals = [str(x) for x in (v if isinstance(v, list) else [v]) if x not in (None, "")]
     return " · ".join(vals[:cap]) + (f" (+{len(vals) - cap})" if len(vals) > cap else "")
@@ -117,18 +127,21 @@ def normalize_flag(f) -> dict | None:
     if f.get("rule_id") and f.get("label"):
         return {**f, "evidence_value_ids": list(f.get("evidence_value_ids") or [])}
     rid = str(f.get("rule_id") or f.get("flag") or f.get("type") or "flag")
-    parts = [str(f["note"])] if f.get("note") else []
-    for key, word in (("values", "Seen as"), ("suppliers", "With"), ("value", "Value"), ("proxy_for", "Stands in for"),
-                      ("source_id", "Source")):
+    note = str(f["note"]) if f.get("note") else ""
+    parts, parts_es = ([note], [FLAG_NOTES_ES.get(note, note)]) if note else ([], [])
+    for key, (word, word_es) in EXPLAIN_WORDS.items():
         if f.get(key) not in (None, "", []):
             parts.append(f"{word}: {_items(f[key])}")
+            parts_es.append(f"{word_es}: {_items(f[key])}")
     if isinstance(f.get("rows"), list):
         parts.append(f"{len(f['rows'])} matching rows")
+        parts_es.append(f"{len(f['rows'])} filas coincidentes")
     return {
         **f,
         "rule_id": rid,
         "label": f.get("label") or f.get("title") or FLAG_LABELS.get(rid) or rid.replace("_", " ").capitalize(),
         "explanation": f.get("explanation") or ". ".join(parts),
+        **({} if f.get("explanation") else {"explanation_es": ". ".join(parts_es)}),
         "evidence_value_ids": [v for v in f.get("evidence_value_ids") or [] if isinstance(v, str)],
     }
 

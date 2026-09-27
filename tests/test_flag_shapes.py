@@ -23,4 +23,14 @@ def test_normalize_flags_drops_junk_and_fills_missing_rule_ids():
     es = gold.normalize_flags([{"id": "e", "flags": [None, {"flag": "sabg_sanctioned"}]}])
     assert es[0]["flags"] == [{"flag": "sabg_sanctioned", "rule_id": "sabg_sanctioned",
                                "label": "Listed in the federal sanctions directory (SABG)", "explanation": "",
-                               "evidence_value_ids": []}]
+                               "explanation_es": "", "evidence_value_ids": []}]
+
+
+def test_generated_explanations_have_spanish():
+    f = gold.normalize_flag({"flag": "rfc_check_digit_mismatch",
+                             "note": "SAT check-digit algorithm does not validate this RFC as published"})
+    assert f["explanation_es"].startswith("El algoritmo del dígito verificador del SAT")
+    v = gold.normalize_flag({"flag": "name_variants", "values": ["A", "B"]})
+    assert v["explanation_es"] == "Visto como: A · B" and v["explanation"] == "Seen as: A · B"
+    for pid in ("supplier_name", "registered_address", "supplier_awarded_contract", "public_contract"):
+        assert pid in i18n.ONTOLOGY_ES

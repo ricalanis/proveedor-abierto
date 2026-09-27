@@ -28,7 +28,9 @@ def test_harness_relations_are_marked(fixture_root, tmp_path):
     lake, peer = harness_lake(fixture_root, tmp_path)
     c = TestClient(create_app(Settings(store=GoldStore(LocalSource(lake)), case_dir=fixture_root / "case")))
     en = c.get(f"/relationships?t={peer}&lang=en").text
-    assert "Not in the approved ontology:" in en and "(harness extension, not in the approved ontology)" in en
+    assert "Not in the approved ontology:" in en and 'title="harness extension, not in the approved ontology"' in en
+    es = c.get(f"/relationships?t={peer}&lang=es").text
+    assert "(harness extension" not in es  # no English parenthetical on the Spanish page
     assert "Fuera de la ontología aprobada:" in c.get(f"/relationships?t={peer}&lang=es").text
 
 

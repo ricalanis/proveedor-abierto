@@ -31,7 +31,7 @@
         {% for f in e.flags %}
         <li class="signal">
           <a class="signal__label" href="/signals/{{ e.id }}/{{ loop.index0 }}">{{ flag_label(f) }}</a>
-          <p>{{ f.explanation }}</p>
+          <p>{{ f.explanation_es if lang == "es" and f.explanation_es else f.explanation }}</p>
           <p class="signal__ev">{{ _("Based on:") }}
             {% for vid in f.evidence_value_ids %}{% set ref = run.values.get(vid) %}
               {% if ref %}<a href="/entities/{{ ref.entity_id }}?ev={{ vid|urlencode }}#evidence" data-evidence="{{ vid }}">{{ domain.prop_label(ref.prop) }}{% if ref.entity_id != e.id %} · {{ run.title(run.entities_by_id.get(ref.entity_id)) }}{% endif %}</a>{% else %}<span class="mono">{{ vid }}</span>{% endif %}{% if not loop.last %}, {% endif %}

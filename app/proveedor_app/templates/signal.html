@@ -13,7 +13,7 @@
 
   <section class="block" aria-labelledby="why-h">
     <h2 id="why-h">{{ _("Why it appears") }}</h2>
-    <p class="explainer__text">{{ flag.explanation }}</p>
+    <p class="explainer__text">{{ flag.explanation_es if lang == "es" and flag.explanation_es else flag.explanation }}</p>
   </section>
 
   <section class="block" aria-labelledby="rule-h">

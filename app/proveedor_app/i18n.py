@@ -598,6 +598,18 @@ ES: dict[str, str] = {
 # Spanish for ontology items, keyed by ontology id (classes, properties, relations, rules, source classes). The export
 # stays in the engine's shape; where an id is not listed here, the export's own label shows (Domain.localized).
 ONTOLOGY_ES: dict[str, dict] = {
+    # ids of the approved Proveedor Abierto ontology (the harness-assisted instance serves it as is)
+    "public_contract": {"label": "Contrato público", "label_plural": "Contratos públicos"},
+    "evidence_record": {"label": "Registro de evidencia", "label_plural": "Registros de evidencia"},
+    "supplier_name": {"label": "Razón social"}, "supplier_rfc": {"label": "RFC"},
+    "registered_address": {"label": "Domicilio registrado"}, "contract_id": {"label": "ID del contrato"},
+    "contract_title": {"label": "Título del contrato"}, "contract_rfc": {"label": "RFC del proveedor en el contrato"},
+    "awarding_agency": {"label": "Dependencia contratante"}, "contract_value": {"label": "Monto del contrato"},
+    "award_date": {"label": "Fecha de adjudicación"}, "evidence_id": {"label": "ID de la evidencia"},
+    "evidence_label": {"label": "Etiqueta de la evidencia"}, "source_class": {"label": "Clase de fuente"},
+    "authority_tier": {"label": "Nivel de autoridad"}, "source_url": {"label": "URL de la fuente"},
+    "retrieved_at": {"label": "Fecha de consulta"}, "supplier_awarded_contract": {"label": "Contratos adjudicados"},
+    "r_primary_authority": {"label": "Las fuentes oficiales mexicanas son la autoridad primaria"},
     # flags of a harness-assisted export (gold.FLAG_LABELS)
     "address_variants": {"label": "Domicilio escrito de distintas formas en los registros"},
     "name_variants": {"label": "Nombre escrito de distintas formas en los registros"},
