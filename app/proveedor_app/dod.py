@@ -138,8 +138,14 @@ def _condition(entity: dict, cond: dict) -> bool:
     return (value == cond.get("value")) if cond.get("operator") == "eq" else (value != cond.get("value"))
 
 
-def evaluate_query(query: dict, entities: list[dict], domain: Domain) -> float:
-    """Exact value of one declarative DoD query over the gold entities."""
+def _linked(e: dict, relation: str | None) -> bool:
+    return bool(relation) and any(isinstance(ln, dict) and ln.get("property") == relation for ln in e.get("links") or [])
+
+
+def evaluate_query(query: dict, entities: list[dict], domain: Domain, relation: str | None = None) -> float:
+    """Exact value of one declarative DoD query over the gold entities (the engine's semantics, as eval/gold_probe.py
+    checks them). `relation` is the case's linkage relation (another query's relation_id), used when a completeness
+    query is measured as a share of the linked entities."""
     cls = query.get("class_id") or query.get("class")
     if query.get("aggregate") == "entities_meeting_completeness":
         cls = cls or domain.primary_class
@@ -155,9 +161,18 @@ def evaluate_query(query: dict, entities: list[dict], domain: Domain) -> float:
             values = e.get("properties") or {}
             return sum(is_filled(values.get(n)) for n in names) / len(names) if names else 0.0
 
+        target = query.get("target")
+        as_share = query.get("measure") == "share" or (
+            query.get("measure") is None and isinstance(target, (int, float)) and target < 1)
+        if as_share:  # the share of linked entities (e.g. suppliers with a contract) that meet the ratio
+            rel = query.get("relation_id") or relation
+            linked = [e for e in pool if _linked(e, rel)] if rel else pool
+            return round(sum(share(e) >= ratio - 1e-9 for e in linked) / len(linked), 3) if linked else 0.0
         return sum(share(e) >= ratio - 1e-9 for e in pool)
     if agg == "count_entities":
         return len(pool)
+    if agg == "count_entities_with_relation":
+        return sum(_linked(e, query.get("relation_id")) for e in pool)
     if agg == "count_entities_with_properties":
         return sum(all(is_filled((e.get("properties") or {}).get(p)) for p in query.get("properties") or [])
                    for e in pool)
@@ -213,6 +228,7 @@ def criteria(recomputed: dict, engine: dict, domain: Domain, backend: str | None
     for the criterion is available, else when the query names a metric we can recompute. Recorded (simulated)
     inference never counts as met."""
     by_id = {q["criterion_id"]: q for q in queries or [] if isinstance(q, dict) and q.get("criterion_id")}
+    relation = next((q["relation_id"] for q in by_id.values() if q.get("relation_id")), None)
     rows = engine.get("dod") if isinstance(engine.get("dod"), list) else None
     source = "engine" if rows else ("queries" if by_id else "default")
     if not rows and by_id:
@@ -226,9 +242,14 @@ def criteria(recomputed: dict, engine: dict, domain: Domain, backend: str | None
         target = row.get("target")
         declared = by_id.get(str(row.get("criterion_id") or ""))
         key = query.lower() + " " + str(row.get("criterion_id") or "").lower()
+        note = None
         if declared is not None and entities is not None:
-            ours = evaluate_query(declared, entities, domain)
-            met_ours = OPS.get(declared.get("operator", ">="), OPS[">="])(ours, declared.get("target", target))
+            try:
+                ours = evaluate_query(declared, entities, domain, relation)
+            except ValueError as exc:  # an aggregate this app does not know: say so, never fail the page
+                ours, note = None, f"not evaluable here ({exc})"
+            met_ours = (None if ours is None
+                        else OPS.get(declared.get("operator", ">="), OPS[">="])(ours, declared.get("target", target)))
         else:
             ours = _resolve(query, recomputed, domain)
             met_ours = _met(key, ours, target)
@@ -243,5 +264,5 @@ def criteria(recomputed: dict, engine: dict, domain: Domain, backend: str | None
                     "recomputed": ours is not None,
                     "agrees": None if ours is None or not rows or row.get("actual") is None
                     else abs(float(row["actual"]) - float(ours)) < 1e-6,
-                    "mock": mock, "source": source})
+                    "mock": mock, "source": source, "note": note})
     return out
