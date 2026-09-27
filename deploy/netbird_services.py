@@ -2,6 +2,9 @@
 
 Two public services exist: the product (Proveedor Abierto, the consumer app; investigator credential) and the
 Ontofill Console (the engine's operator/approver console, CONTRACT §14; NetBird SSO for the approvers group).
+With PA_JUDGES_PASSWORD set, a third one exists for public judging: a read-only console instance
+(ONTOFILL_CONSOLE_IDENTITY=readonly, its own container on PA_CONSOLE_JUDGES_PORT), and the product URL takes the judges
+password too. That password is published in the README; it never equals an internal credential.
 
     uv run python deploy/netbird_services.py plan     # show what would be sent (secrets redacted); no changes
     uv run python deploy/netbird_services.py apply    # create or update the product and console services
@@ -22,7 +25,9 @@ Configuration comes from the environment (deploy/.env or the repo's .env, both g
     PA_CONSOLE_SERVICE          default "ontofill-console" -> ontofill-console.<free domain>
     PA_APPROVER_GROUP           IdP distribution group for SSO on the console URL (preferred), or PA_CONSOLE_PIN
                                 (PA_APPROVER_PIN is accepted as a fallback name); never the product's credential
-    PA_ALLOWED_COUNTRIES        optional, e.g. "US,MX": country allowlist on both services
+    PA_JUDGES_PASSWORD          optional, public: the product URL's password and the read-only judges console's
+    PA_CONSOLE_JUDGES_SERVICE   default "ontofill-console-judges"; PA_CONSOLE_JUDGES_PORT default 8411
+    PA_ALLOWED_COUNTRIES        optional, e.g. "US,MX": country allowlist on every service
 
 The retired services (<prefix>-approver and <prefix>-replay: approvals and replay moved to the console) are never
 created; `retire` deletes them if they still exist and touches nothing else.
@@ -129,7 +134,14 @@ def desired(api, env: dict[str, str]) -> list[dict]:
     host = env.get("PA_TARGET_HOST") or peer.get("ip")
     domain, prefix = naming(api, env)
 
-    if env.get("PA_INVESTIGATOR_PASSWORD"):
+    judges = env.get("PA_JUDGES_PASSWORD")
+    if judges:
+        internal = [env.get(k) for k in ("PA_INVESTIGATOR_PASSWORD", "PA_INVESTIGATOR_PIN", "PA_CONSOLE_PIN",
+                                         "PA_APPROVER_PIN")]
+        if judges in internal:
+            raise ApiError("PA_JUDGES_PASSWORD is public: it must differ from every internal credential")
+        inv_auth = {"password_auth": {"enabled": True, "password": judges}}
+    elif env.get("PA_INVESTIGATOR_PASSWORD"):
         inv_auth = {"password_auth": {"enabled": True, "password": env["PA_INVESTIGATOR_PASSWORD"]}}
     elif env.get("PA_INVESTIGATOR_PIN"):
         inv_auth = {"pin_auth": {"enabled": True, "pin": env["PA_INVESTIGATOR_PIN"]}}
@@ -158,9 +170,14 @@ def desired(api, env: dict[str, str]) -> list[dict]:
                 "targets": [{"target_id": peer["id"], "target_type": "peer", "protocol": "http", "host": host,
                              "port": port, "path": "/", "enabled": True}]}
 
-    return [service(prefix, int(env.get("PA_INVESTIGATOR_PORT", 8400)), inv_auth),
-            service(env.get("PA_CONSOLE_SERVICE", "ontofill-console"), int(env.get("PA_CONSOLE_PORT", 8410)),
-                    console_auth)]
+    services = [service(prefix, int(env.get("PA_INVESTIGATOR_PORT", 8400)), inv_auth),
+                service(env.get("PA_CONSOLE_SERVICE", "ontofill-console"), int(env.get("PA_CONSOLE_PORT", 8410)),
+                        console_auth)]
+    if judges:  # the read-only console instance: it refuses every write whatever headers the proxy passes
+        services.append(service(env.get("PA_CONSOLE_JUDGES_SERVICE", "ontofill-console-judges"),
+                                int(env.get("PA_CONSOLE_JUDGES_PORT", 8411)),
+                                {"password_auth": {"enabled": True, "password": judges}}))
+    return services
 
 
 def ours(api, names: set[str]) -> dict[str, dict]:

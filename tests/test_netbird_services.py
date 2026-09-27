@@ -126,3 +126,25 @@ def test_token_never_in_output(monkeypatch):
 
     code, text = run(failing, "plan")
     assert code == 1 and "tok-should-not-leak" not in text and json.dumps(ENV).find("tok") == -1
+
+
+def test_judges_password_gates_the_product_and_a_readonly_console():
+    api = FakeApi([VM])
+    env = {**ENV, "PA_JUDGES_PASSWORD": "judges-public"}
+    assert run(api, "apply", env)[0] == 0
+    mine = {s["name"]: s for s in api.services if s["id"] != "other"}
+    assert set(mine) == {"proveedor.eu1.netbird.services", "ontofill-console.eu1.netbird.services",
+                         "ontofill-console-judges.eu1.netbird.services"}
+    judges = mine["ontofill-console-judges.eu1.netbird.services"]
+    assert judges["auth"] == {"password_auth": {"enabled": True, "password": "judges-public"}}
+    assert judges["targets"][0]["port"] == 8411
+    assert mine["proveedor.eu1.netbird.services"]["auth"]["password_auth"]["password"] == "judges-public"
+    assert mine["ontofill-console.eu1.netbird.services"]["auth"]["bearer_auth"]["distribution_groups"] == ["g-approvers"]
+
+
+def test_judges_password_never_reuses_an_internal_credential():
+    for key in ("PA_INVESTIGATOR_PASSWORD", "PA_APPROVER_PIN"):
+        env = {**ENV, key: "same", "PA_JUDGES_PASSWORD": "same"}
+        code, text = run(FakeApi([VM]), "plan", env)
+        assert code == 1 and "differ from every internal credential" in text and "same" not in text.replace(
+            "differ from every internal credential", "")

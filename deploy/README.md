@@ -49,13 +49,17 @@ uv run python netbird_services.py plan && uv run python netbird_services.py appl
 # (or install systemd/proveedor-expose.service with /etc/proveedor-abierto/expose.env, chmod 600)
 
 # From a laptop outside the mesh:
-./verify.sh remote <vm-public-ip> https://proveedor.<domain> https://ontofill-console.<domain>
+./verify.sh remote <vm-public-ip> https://proveedor.<domain> https://ontofill-console.<domain> \
+    https://ontofill-console-judges.<domain>     # optional 4th URL; signs in with PA_JUDGES_PASSWORD
 ```
 
 The console is deployed from the engine repo (`ontofill/console`: `Dockerfile`, `deploy/compose.yaml`, README),
-bound to the same NetBird IP on `8410`.
+bound to the same NetBird IP on `8410`. The judges' read-only instance runs from the same compose file as a second
+project on `8411`: `ONTOFILL_CONSOLE_IDENTITY=readonly CONSOLE_WRITE_MODE=ro CONSOLE_PORT=8411 docker compose -p
+ontofill-console-judges ...` (every non-GET request is refused, and every case, registry and runner mount is
+read-only).
 
-## How the two URLs are protected (NetBird Cloud reverse proxy, **beta**)
+## How the URLs are protected (NetBird Cloud reverse proxy, **beta**)
 
 The proxy terminates TLS and enforces auth at the edge, then forwards over WireGuard to this VM; the VM has no
 public IP exposure for either service. Protection options offered: SSO/OIDC, password, 6-digit PIN, API-key header,
@@ -63,8 +67,9 @@ NetBird-peers-only, IP and country rules, CrowdSec reputation. **Our choice:**
 
 | URL | Protection | Why |
 |-----|------------|-----|
-| product | password (or 6-digit PIN) + optional country rule | read-only, shareable with the judges on the day |
+| product | the judges password (`PA_JUDGES_PASSWORD`, public in the README) + optional country rule | read-only, shared with the judges |
 | console | SSO/OIDC restricted to the `approvers` group | approves and denies checkpoints; each decision is tied to the SSO identity |
+| judges console | the judges password | a separate read-only console instance: it cannot decide whatever headers arrive |
 
 1. **Primary: two reverse-proxy services in NetBird Cloud**, scripted against the Services API with
    `deploy/netbird_services.py` (`plan` → `apply`, idempotent; `status` and `delete` touch only these two services;
@@ -95,8 +100,9 @@ Names must be neutral (for example `pa-control-plane`, `pa-sandbox`). Never capt
 contains an employer's or client's name; rename the peer in the dashboard first, or leave it out of the capture.
 Also keep account emails, setup keys, and the PIN or password fields out of frame.
 
-- [x] `./verify.sh remote <ip> <product-url> <console-url>`: PASS (all checked ports closed, port 22 included; both
-      URLs refuse unauthenticated requests)
+- [x] `./verify.sh remote <ip> <product-url> <console-url> <judges-url>`: PASS (all checked ports closed, 22 and 8411
+      included; every URL refuses unauthenticated requests; with the judges password, 9 write routes → 403 under a
+      forged approvers header, and the product serves the app)
 - [ ] `./verify.sh local` output on the VM (not yet captured for the README)
 - [x] NetBird services with their authentication: [`docs/evidence/netbird-services.png`](../docs/evidence/netbird-services.png)
 - [x] Groups and access policies (sandbox → control plane: tcp/8700 only, one way):

@@ -22,6 +22,26 @@ accusations.
 This is the track's own **"Research with Receipts"** example: every claim in the app links to a screenshot of its
 source.
 
+## For judges
+
+Two live URLs, one public password. Both are read-only for you: nothing you click can change the case or a run.
+
+| URL | What you see |
+|-----|--------------|
+| **https://proveedor.eu1.netbird.services** | Proveedor Abierto, the product: dossiers, red flags with their explanation, the journal that traces a value back to the brief. Spanish first; add `?lang=en` for English. |
+| **https://ontofill-console-judges.eu1.netbird.services** | The Ontofill Console, read-only: every case, its runs, checkpoints, gold completeness, spend and inference calls, evidence. Approvals, case edits, start/pause and the kill switch are refused (403). |
+
+**Password (both URLs): `pas89-auar7-gju9z-msyn9`**
+
+The password is shared on purpose and will be rotated after the hackathon. It is not used anywhere else. Decisions
+happen on a third URL, `https://ontofill-console.eu1.netbird.services`, which only members of the approvers group
+can open through NetBird SSO. All three are NetBird reverse-proxy services. The VMs behind them have no open inbound
+port, SSH included ([`deploy/verify.sh`](deploy/verify.sh) `remote` checks this from outside, along with the refusals
+above).
+
+What the pages show depends on how far the real run has got: until it reaches gold, the product shows the last
+published export, and the console shows the run waiting at its current checkpoint.
+
 ## Use case
 
 **Who uses it.** Investigative journalists, civil-society watchdogs and auditors who need to check a company that
@@ -196,10 +216,12 @@ artifact's sha256 and appended to the case's `decisions.jsonl`.
 **Deploy** ([`deploy/README.md`](deploy/README.md)): two Vultr VMs joined by NetBird. The control VM runs the product
 container (`deploy/compose.yaml`, bound to its NetBird IP), the console (`ontofill/console/deploy/compose.yaml`), the
 gateway, controller and cell API; the sandbox VM runs Docker with gVisor `runsc`. `deploy/netbird_services.py
-plan|apply|status|retire` manages the two public services; `deploy/verify.sh remote <vm-ip> <product-url>
-<console-url>` proves zero open ports and that both URLs refuse unauthenticated requests.
+plan|apply|status|retire` manages the public services; `deploy/verify.sh remote <vm-ip> <product-url>
+<console-url> [<judges-console-url>]` proves zero open ports, that every URL refuses unauthenticated requests, and that
+the judges console refuses every write.
 
-**Public URLs:** the product at https://proveedor.eu1.netbird.services (password) and the Ontofill Console at
+**Public URLs:** the product at https://proveedor.eu1.netbird.services (the judges password), the read-only
+console at https://ontofill-console-judges.eu1.netbird.services (the judges password) and the Ontofill Console at
 https://ontofill-console.eu1.netbird.services (NetBird SSO, approvers group). The product currently serves the
 **synthetic** fixture export: the real case is paused at its PRD checkpoint and has no gold yet.
 
@@ -247,15 +269,16 @@ CONTRACT §14), behind its own SSO-gated URL.
 Fixtures are synthetic and obviously fake: "Proveedor Ejemplo NN", RFC-shaped IDs starting with `ZZZ`, and
 hosts on the reserved `.example` domain. They validate against the engine's contract JSON Schemas.
 
-## Access: two products, two gated URLs
+## Access: two products, three gated URLs
 
-Two services are public, each behind NetBird's reverse proxy with its own access policy. Neither VM opens an
+Three services are public, each behind NetBird's reverse proxy with its own access policy. Neither VM opens an
 inbound port.
 
 | URL | What it is | Can | NetBird access policy |
 |-----|------------|-----|-----------------------|
-| `https://proveedor.<domain>` | this app, the consumer product | Read one case's published gold export and export it. Server side is read-only; the watchlist lives in the browser. | shared password (or PIN) |
+| `https://proveedor.<domain>` | this app, the consumer product | Read one case's published gold export and export it. Server side is read-only; the watchlist lives in the browser. | shared password (the judges password, above) |
 | `https://ontofill-console.<domain>` | the Ontofill Console (engine repo) | Cases, runs and live view, approvals, spend, evidence, replay. Each decision takes its approver from the SSO identity header, is bound to the digest of the exact artifact reviewed (409 if it changed), and is appended to `decisions.jsonl`. | SSO restricted to the approvers group |
+| `https://ontofill-console-judges.<domain>` | the same console, a separate read-only instance | View everything above. Every non-GET request is refused (403) before any route runs, whatever headers arrive, and its case, registry and runner mounts are read-only. | shared password (the judges password) |
 
 The product has no write routes at all (approval, run and spend routes return 404) and runs in a container with the
 case mounted read-only.
@@ -267,7 +290,7 @@ How it is deployed and gated: [`deploy/README.md`](deploy/README.md). Management
 | Bonus criterion (NetBird deck) | Our setup | Evidence |
 |---|---|---|
 | 1. No open ports | The containers bind to the VM's NetBird IP, not a public interface. The public URLs go through the NetBird reverse proxy. The VMs allow zero public inbound ports, SSH included (admin over NetBird). | `deploy/verify.sh remote` ✓ (all checked ports closed, port 22 included) · `verify.sh local` ✓ |
-| 2. Gated access tied to a role | Two URLs, two credentials: the product = password or PIN; the Ontofill Console = SSO restricted to the approvers group, and each approval records the SSO identity. The product has no approval routes at all (404) and a read-only container. | `verify.sh remote` ✓ (both URLs refuse unauthenticated requests) · [services and their auth](docs/evidence/netbird-services.png) ✓ |
+| 2. Gated access tied to a role | Three URLs, two roles: viewers (the product and the read-only judges console, one shared password) and approvers (the Ontofill Console, SSO restricted to the approvers group; each approval records the verified group). The product has no approval routes at all (404); the judges console refuses every write (403) even with a forged group header. | `verify.sh remote` ✓ (every URL refuses unauthenticated requests; judges writes → 403) · [services and their auth](docs/evidence/netbird-services.png) ✓ |
 | 3. Peer-to-peer | The control-plane VM and the sandbox VM talk over WireGuard; the sandbox host sits in its own group, which can reach only the control plane's ports (the deck's "fence in your agents"). | [VM peers and groups](docs/evidence/netbird-peers-groups.png) ✓ · [access policies](docs/evidence/netbird-policies.png) ✓ (sandbox → control plane: tcp/8700 only, one way; the Default all-to-all policy is disabled) |
 | 4. Lifecycle-bound URLs (clarification) | Each browser session's live view gets its own `netbird expose` for exactly the session's lifetime: the controller starts it at `session.open` and kills it at `session.close`, so the URL itself stops existing. A per-session view token gates it too. | outside check ✓ (200 with the token, 404 without, 404 from NetBird after close; saved on the console's `/evidence`) |
 

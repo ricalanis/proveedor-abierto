@@ -11,7 +11,7 @@ run ID in a corner so the numbers are checkable. Cut anything that is not visibl
 | 0:20–0:30 | the console's run view: a browser action, its vision verdict, a repair attempt | "Agents browse in gVisor sandboxes. A Vultr vision model checks each step; failing code gets its error back and retries." |
 | 0:30–0:42 | **Containment:** the hostile page quarantined and BLOCKED, a limit kill, then the Sandbox proof | "A hostile page and an `rm -rf /` hit the sandbox. They are quarantined, blocked or killed. Only the cell dies." |
 | 0:42–0:54 | Dossier: click a capture, open a signal, trace the value to the brief | "Every value has its capture. Red flags explain themselves, and any value traces back to the brief." |
-| 0:54–1:00 | NetBird peer list, then the two repo URLs, engine first | "Zero open ports. Swap the brief, get a different investigation." |
+| 0:54–1:00 | NetBird peer list (or the three bonus moments in [`netbird-bonus-moments.md`](netbird-bonus-moments.md)), then the two repo URLs, engine first | "Zero open ports. Swap the brief, get a different investigation." |
 
 The containment shot depends on the engine's on-demand scenarios *(pending)*. If they are not ready, record them
 from the console's replay and caption the shot "recorded run".

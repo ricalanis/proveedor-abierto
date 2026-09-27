@@ -6,14 +6,19 @@
 #       loopback (or PA_BIND_IP) only, nothing listens on a public interface, it has no approval routes (404) and
 #       cannot write the case or its own root filesystem.
 #
-#   deploy/verify.sh remote <vm-public-ip> <product-url> <console-url>
-#       From outside: the VM exposes no inbound port at all (SSH included), and both NetBird URLs refuse
+#   deploy/verify.sh remote <vm-public-ip> <product-url> <console-url> [<judges-console-url>]
+#       From outside: the VM exposes no inbound port at all (SSH included), and every NetBird URL refuses
 #       unauthenticated requests (no product page and no console page is served without the credential).
 #       Optional: PA_INVESTIGATOR_COOKIE="name=value" (a session cookie after logging in to the product URL)
 #       also checks that the product URL serves the app and has no approval routes.
+#       With a judges console URL and PA_JUDGES_PASSWORD (env, or the repo .env): signs in with that public password
+#       and checks the judges console serves pages but refuses every decision, case edit, runner action and the kill
+#       switch (403, even with a forged approvers group header), and that the product serves the app with it.
 set -uo pipefail
 cd "$(dirname "$0")"
 [[ -f .env ]] && set -a && . ./.env && set +a
+# only the public judges password is read from the repo .env; nothing else from it enters this script
+[[ -z "${PA_JUDGES_PASSWORD:-}" && -f ../.env ]] && PA_JUDGES_PASSWORD=$(sed -n 's/^PA_JUDGES_PASSWORD=//p' ../.env)
 
 INV_PORT="${PA_INVESTIGATOR_PORT:-8400}"
 BIND_IP="${PA_BIND_IP:-127.0.0.1}"
@@ -94,9 +99,9 @@ local_mode() {
 }
 
 remote_mode() {
-  local vm=$1 product=$2 console=$3
+  local vm=$1 product=$2 console=$3 judges=${4:-}
   echo "Remote gate checks (VM ${vm})"
-  for port in 80 443 3000 5000 5432 7700 7878 8000 8080 8400 8401 8402 8410 8443 8700 8702 8766 9000; do
+  for port in 80 443 3000 5000 5432 7700 7878 8000 8080 8400 8401 8402 8410 8411 8443 8700 8702 8766 9000; do
     if port_open "$vm" "$port" 3; then fail "VM port $port is open"; else pass "VM port $port closed"; fi
   done
   # Zero public inbound ports, SSH included: administration goes over NetBird.
@@ -116,6 +121,42 @@ remote_mode() {
     else pass "unauthenticated $url refused (HTTP $c, no console content)"; fi
   done
 
+  if [[ -n "$judges" ]]; then
+    for url in "$judges" "$judges/cases/x" "$judges/whoami"; do
+      body=$(curl -s -L --max-time 10 "$url")
+      c=$(code -L "$url")
+      if grep -q "$CONSOLE_MARKER" <<<"$body"; then fail "unauthenticated $url served the console (HTTP $c)"
+      else pass "unauthenticated $url refused (HTTP $c, no console content)"; fi
+    done
+    c=$(code -F password=not-the-password "$judges/")
+    [[ "$c" == 401 ]] && pass "judges URL with a wrong password -> 401" || fail "judges URL wrong password -> $c"
+  fi
+  if [[ -n "$judges" && -n "${PA_JUDGES_PASSWORD:-}" ]]; then
+    jar=$(mktemp); pjar=$(mktemp)
+    curl -s -o /dev/null --max-time 10 -c "$jar" -F "password=${PA_JUDGES_PASSWORD}" "$judges/"
+    curl -s -o /dev/null --max-time 10 -c "$pjar" -F "password=${PA_JUDGES_PASSWORD}" "$product/"
+    for path in / /watch /whoami; do
+      if grep -q "$CONSOLE_MARKER" <<<"$(curl -s --max-time 15 -b "$jar" "$judges$path")"; then
+        pass "judges console with the judges password serves $path"
+      else fail "judges console $path not served with the judges password"; fi
+    done
+    forged=(-b "$jar" -H "X-NetBird-Groups: approvers" -H "Origin: $judges")
+    form='state=on&action=pause&display_name=verify&phase_dir=01-scope&decision=deny&reason=verify&title=x&question=x'
+    case_id=proveedor-abierto
+    for path in "/cases/$case_id/approvals" "/cases/$case_id/runner" /runner/kill /cases "/cases/$case_id/brief" \
+                "/cases/$case_id/meta" "/cases/$case_id/revise" "/cases/$case_id/archive" "/cases/$case_id/restore"; do
+      c=$(code "${forged[@]}" -d "$form" "$judges$path")
+      [[ "$c" == 403 ]] && pass "judges POST $path -> 403 (forged approvers header)" || fail "judges POST $path -> $c (want 403)"
+    done
+    grep -q "$APP_MARKER" <<<"$(curl -s --max-time 15 -b "$pjar" "$product/")" \
+      && pass "product URL with the judges password serves the app" || fail "product URL not served with the judges password"
+    c=$(code -b "$pjar" "$product/approvals")
+    [[ "$c" == 404 ]] && pass "product URL has no approval routes -> 404" || fail "product /approvals -> $c (want 404)"
+    rm -f "$jar" "$pjar"
+  elif [[ -n "$judges" ]]; then
+    warn "PA_JUDGES_PASSWORD not set: skipped the signed-in judges checks"
+  fi
+
   if [[ -n "${PA_INVESTIGATOR_COOKIE:-}" ]]; then
     c=$(code -H "Cookie: ${PA_INVESTIGATOR_COOKIE}" "$product/")
     [[ "$c" == 200 ]] && pass "product URL with its credential -> 200" || fail "product URL with credential -> $c"
@@ -128,9 +169,9 @@ remote_mode() {
 
 case "${1:-}" in
   local) local_mode ;;
-  remote) [[ $# -eq 4 ]] || { echo "usage: $0 remote <vm-ip> <product-url> <console-url>" >&2; exit 2; }
-          remote_mode "$2" "$3" "$4" ;;
-  *) echo "usage: $0 local | remote <vm-ip> <product-url> <console-url>" >&2; exit 2 ;;
+  remote) [[ $# -eq 4 || $# -eq 5 ]] || { echo "usage: $0 remote <vm-ip> <product-url> <console-url> [<judges-url>]" >&2; exit 2; }
+          remote_mode "$2" "$3" "$4" "${5:-}" ;;
+  *) echo "usage: $0 local | remote <vm-ip> <product-url> <console-url> [<judges-url>]" >&2; exit 2 ;;
 esac
 
 if (( fails )); then echo "RESULT: FAIL ($fails)"; exit 1; fi
