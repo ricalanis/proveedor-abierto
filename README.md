@@ -98,14 +98,15 @@ A control plane that plans on Vultr models and dispatches disposable sandboxes. 
 | S1 | the native agent loop: observe → Jev gate → plan (Vultr tool call) → Jev action guard → act → Jev check → Vultr vision verify |
 | S2 | Skyvern in its own cell, through the gateway |
 
-**Two execution patterns, both visible in the app:**
+**Two execution patterns, both visible in the Ontofill Console** (the engine's operator console, a separate product
+at `https://ontofill-console.<domain>`; this app shows only the published result):
 
 | Pattern | Loop | Where you see it |
 |---|---|---|
-| B, browser use (primary) | browser action → a Vultr vision model verifies the screenshot against the step goal → retry if not achieved. A person approves anything final through the **approve-before-submit gate**. | `/run` step stream: verify verdicts per action; `/approvals`: action requests with screenshot and risk tier |
-| A, code execution | extractor code attempt → run in the sandbox against stored captures → stderr fed back → patch → retry; a passing extractor is promoted to a macro | `/run` step stream: repair attempts with result, stderr excerpt and diff |
+| B, browser use (primary) | browser action → a Vultr vision model verifies the screenshot against the step goal → retry if not achieved. A person approves anything final through the **approve-before-submit gate**. | console run view: verify verdicts per action; console approvals: action requests with screenshot and risk tier |
+| A, code execution | extractor code attempt → run in the sandbox against stored captures → stderr fed back → patch → retry; a passing extractor is promoted to a macro | console run view: repair attempts with result, stderr excerpt and diff |
 
-Every sandbox job reports **six proof checks** on `/run` → Sandbox proof: host check, task result, where it ran,
+Every sandbox job reports **six proof checks** on the console's run view → Sandbox proof: host check, task result, where it ran,
 isolation probe (BLOCKED), teardown and secret hygiene (no keys in the pod; metadata IP and mesh BLOCKED). The
 proof also shows each job's resource limits (memory, CPU, processes, timeout, steps) and any job a limit killed.
 
@@ -115,8 +116,7 @@ proof also shows each job's resource limits (memory, CPU, processes, timeout, st
 
 ```bash
 uv sync --all-extras
-uv run pa-app serve --fixtures                        # http://127.0.0.1:8400, investigator role
-uv run pa-app serve --fixtures --role approver --port 8401
+uv run pa-app serve --fixtures                        # http://127.0.0.1:8400
 uv run pa-app fixtures --domain libraries .cache/libs  # a second, unrelated domain (see below)
 uv run pytest -q                                      # unit, HTTP, schema and headless-browser tests
 ```
@@ -163,30 +163,28 @@ vocabulary from the case ontology.
 - **Completeness** (`/completeness`): the definition of done recomputed from gold and cross-checked against the
   engine's own `metrics.json`, including each declarative DoD query. It shows per-property bars and taxonomy
   coverage per level, and can follow a run live.
-- **Live run** (`/run`): phase timeline, step stream (modes, verify verdicts, repair attempts, escalations), live
-  completeness, and the sandbox proof with six checks and resource limits.
-- **Approvals** (`/approvals`, approver role only): sign off the PRD, the factors and the ontology, and approve or
-  deny action requests from the approve-before-submit gate. Approving writes the `APPROVED` marker the engine waits
-  for.
+
+Operator and approver work is not in this app: the live run view, approvals (PRD, factors, ontology and
+approve-before-submit actions), spend, evidence and replay are the **Ontofill Console**'s (`ontofill/console`,
+CONTRACT §14), behind its own SSO-gated URL.
 
 `uv run pa-app dod` recomputes the definition of done from gold and cross-checks `metrics.json`.
 
 Fixtures are synthetic and obviously fake: "Proveedor Ejemplo NN", RFC-shaped IDs starting with `ZZZ`, and
 hosts on the reserved `.example` domain. They validate against the engine's contract JSON Schemas.
 
-## Access: two roles, two gated URLs
+## Access: two products, two gated URLs
 
-The app runs as one process per role, and NetBird exposes each role on its own URL with its own access policy.
-Neither VM opens an inbound port.
+Two services are public, each behind NetBird's reverse proxy with its own access policy. Neither VM opens an
+inbound port.
 
-| Role | Process | Can | NetBird access policy |
-|------|---------|-----|-----------------------|
-| Investigator | `PA_ROLE=investigator` (default) | Read everything and export. Server side is read-only; the watchlist lives in the browser. | investigators group → investigator URL |
-| Approver | `PA_ROLE=approver` | Everything above, plus phase sign-off in `/approvals`, which writes `case/<phase>/APPROVED` | SSO restricted to the approvers group → approver URL |
+| URL | What it is | Can | NetBird access policy |
+|-----|------------|-----|-----------------------|
+| `https://proveedor.<domain>` | this app, the consumer product | Read one case's published gold export and export it. Server side is read-only; the watchlist lives in the browser. | shared password (or PIN) |
+| `https://ontofill-console.<domain>` | the Ontofill Console (engine repo) | Cases, runs and live view, approvals, spend, evidence, replay. Each decision takes its approver from the SSO identity header, is bound to the digest of the exact artifact reviewed (409 if it changed), and is appended to `decisions.jsonl`. | SSO restricted to the approvers group |
 
-The role boundary is enforced in the app as well as at the gateway: the investigator process returns 403 for
-approval routes, refuses cross-origin approval posts, and runs in a container with the case mounted read-only.
-The proxy's `X-NetBird-User` header only prefills the approver's name; `APPROVED` records the name typed in.
+The product has no write routes at all (approval, run and spend routes return 404) and runs in a container with the
+case mounted read-only.
 
 ### NetBird: the Zero-Port Access bonus
 
@@ -194,10 +192,10 @@ How it is deployed and gated: [`deploy/README.md`](deploy/README.md). Management
 
 | Bonus criterion (NetBird deck) | Our setup | Evidence |
 |---|---|---|
-| 1. No open ports | The app containers bind to loopback. The public URLs go through the NetBird reverse proxy. The VMs allow zero public inbound ports, SSH included (admin over NetBird). | `deploy/verify.sh local` ✓ (laptop rehearsal) · `deploy/verify.sh remote` *(pending VM)* |
-| 2. Gated access tied to a role | Two URLs, two credentials: investigator = password or PIN; approver = SSO restricted to the approvers group. The app enforces the same boundary (investigator process: 403 on approval routes, read-only container). | `verify.sh local` ✓ · proxy auth settings screenshot *(pending VM)* |
-| 3. Peer-to-peer | The control-plane VM and the sandbox VM talk over WireGuard; the sandbox host sits in its own group, which can reach only the control plane's ports (the deck's "fence in your agents"). | peers list + access policy screenshot *(pending VM; engine side)* |
-| 4. Lifecycle-bound URLs (clarification) | Each agent pod's live view is exposed with `netbird expose --with-pin` for exactly the pod's lifetime; the run view links it from `status.json.live_view_url`. | run view "Watch the agent's browser" link *(pending engine)* |
+| 1. No open ports | The containers bind to the VM's NetBird IP, not a public interface. The public URLs go through the NetBird reverse proxy. The VMs allow zero public inbound ports, SSH included (admin over NetBird). | `deploy/verify.sh remote` ✓ (all checked ports closed, port 22 included) · `verify.sh local` ✓ |
+| 2. Gated access tied to a role | Two URLs, two credentials: the product = password or PIN; the Ontofill Console = SSO restricted to the approvers group, and each approval records the SSO identity. The product has no approval routes at all (404) and a read-only container. | `verify.sh remote` ✓ (both URLs refuse unauthenticated requests) · proxy auth settings screenshot (to capture) |
+| 3. Peer-to-peer | The control-plane VM and the sandbox VM talk over WireGuard; the sandbox host sits in its own group, which can reach only the control plane's ports (the deck's "fence in your agents"). | peers list + access policy screenshot (to capture; engine side) |
+| 4. Lifecycle-bound URLs (clarification) | Each browser session's live view gets its own `netbird expose` for exactly the session's lifetime: the controller starts it at `session.open` and kills it at `session.close`, so the URL itself stops existing. A per-session view token gates it too. | outside check ✓ (200 with the token, 404 without, 404 from NetBird after close; saved on the console's `/evidence`) |
 
 Before any screenshot: every peer, group and service name on screen is neutral (no employer or client names),
 and no emails, keys or PIN fields are in frame.

@@ -1,5 +1,10 @@
 # Rehearsal log
 
+> **Current setup (Sun):** two products. The approval, run-view and replay beats are the **Ontofill Console**'s
+> (SSO for approvers), rehearsed there by hand; `docs/demo/rehearse.py` now times the product beats and keeps the
+> console and terminal beats as narration pauses. The Saturday log below predates the split and ran every beat in the
+> old single app; its app pages and commands (`pa-app snapshot`, `serve --replay`) no longer exist in the product.
+
 ## Automated run against the replay (Sat 14:2x PT)
 
 `uv run python docs/demo/rehearse.py --replay-seconds 40` drives the whole script in a headless browser on the
@@ -28,8 +33,8 @@ instant, so the talking sets the pace there.
 - **A real run will not fill 50 suppliers in 45 s.** Operator run 1 (engine C3, mocked inference) took about
   11 s for one source and one supplier. On stage, show a run that started before the demo and is mid-climb, or
   the snapshot replay of the best real run. Say which one it is.
-- **Fallback path, rehearsed:** `pa-app snapshot` followed by `pa-app serve --gold-dir <snapshot> --replay <run>`.
-  The snapshot of the fixture run held 826 captures with none missing, and it replays offline.
+- **Fallback path (Saturday, old app):** a snapshot of the fixture run held 826 captures with none missing and
+  replayed offline. The fallback is now the console's replay (`ontofill-console serve --replay CASE[:RUN]`).
 
 ## Still to rehearse with people
 

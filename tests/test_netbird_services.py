@@ -56,24 +56,25 @@ def test_plan_redacts_and_changes_nothing():
     api = FakeApi([VM, LAPTOP])
     code, text = run(api, "plan")
     assert code == 0 and "inv-secret" not in text and "<redacted>" in text
-    assert "create proveedor.eu1.netbird.services" in text and "create proveedor-approver.eu1.netbird.services" in text
+    assert "create proveedor.eu1.netbird.services" in text and "create ontofill-console.eu1.netbird.services" in text
+    assert "proveedor-approver" not in text and "proveedor-replay" not in text
     assert not [c for c in api.calls if c[0] != "GET"]
 
 
-def test_apply_is_idempotent_and_role_scoped():
+def test_apply_creates_product_and_console_only_and_is_idempotent():
     api = FakeApi([VM, LAPTOP])
     assert run(api, "apply")[0] == 0
     assert run(api, "apply")[0] == 0  # second run updates, never duplicates
-    mine = [s for s in api.services if s["name"].startswith("proveedor")]
-    assert len(mine) == 2 and sum(1 for c in api.calls if c[0] == "POST") == 2
-    inv = next(s for s in mine if s["name"] == "proveedor.eu1.netbird.services")
-    app = next(s for s in mine if s["name"] == "proveedor-approver.eu1.netbird.services")
-    assert inv["auth"] == {"password_auth": {"enabled": True, "password": "inv-secret"}}
-    assert app["auth"] == {"bearer_auth": {"enabled": True, "distribution_groups": ["g-approvers"]}}
-    target = inv["targets"][0]
+    mine = {s["name"]: s for s in api.services if s["id"] != "other"}
+    assert set(mine) == {"proveedor.eu1.netbird.services", "ontofill-console.eu1.netbird.services"}
+    assert sum(1 for c in api.calls if c[0] == "POST") == 2
+    product, console = mine["proveedor.eu1.netbird.services"], mine["ontofill-console.eu1.netbird.services"]
+    assert product["auth"] == {"password_auth": {"enabled": True, "password": "inv-secret"}}
+    assert console["auth"] == {"bearer_auth": {"enabled": True, "distribution_groups": ["g-approvers"]}}
+    target = product["targets"][0]
     assert (target["target_id"], target["host"], target["port"]) == ("p-vm", "100.64.0.10", 8400)
-    assert app["targets"][0]["port"] == 8401
-    assert inv["access_restrictions"]["allowed_countries"] == ["US", "MX"]
+    assert console["targets"][0]["port"] == 8410
+    assert product["access_restrictions"]["allowed_countries"] == ["US", "MX"]
 
 
 def test_delete_only_touches_our_services():
@@ -81,6 +82,24 @@ def test_delete_only_touches_our_services():
     run(api, "apply")
     code, _ = run(api, "delete")
     assert code == 0 and [s["id"] for s in api.services] == ["other"]
+
+
+def test_retire_deletes_only_the_two_legacy_services():
+    api = FakeApi([VM])
+    run(api, "apply")
+    api.services += [{"id": "old-app", "name": "proveedor-approver.eu1.netbird.services"},
+                     {"id": "old-rep", "name": "proveedor-replay.eu1.netbird.services"},
+                     {"id": "near", "name": "proveedor-approver-2.eu1.netbird.services"}]
+    code, text = run(api, "retire", env={"PA_CONTROL_PLANE_PEER": "pa-control-plane"})  # needs no credentials
+    assert code == 0 and "retired proveedor-approver.eu1.netbird.services" in text
+    left = {s["name"] for s in api.services}
+    assert "proveedor-approver.eu1.netbird.services" not in left and "proveedor-replay.eu1.netbird.services" not in left
+    assert {"other" if s["id"] == "other" else s["name"] for s in api.services} >= {
+        "other", "proveedor-approver-2.eu1.netbird.services", "proveedor.eu1.netbird.services",
+        "ontofill-console.eu1.netbird.services"}
+    assert [c for c in api.calls if c[0] == "DELETE"] == [("DELETE", "/reverse-proxies/services/old-app"),
+                                                          ("DELETE", "/reverse-proxies/services/old-rep")]
+    assert run(api, "retire")[0] == 0  # idempotent: nothing left to retire
 
 
 def test_refuses_laptop_and_ambiguous_peers():
@@ -91,9 +110,10 @@ def test_refuses_laptop_and_ambiguous_peers():
 
 
 def test_roles_need_distinct_credentials():
-    env = {"PA_CONTROL_PLANE_PEER": "pa-control-plane", "PA_INVESTIGATOR_PIN": "123456", "PA_APPROVER_PIN": "123456"}
-    code, text = run(FakeApi([VM]), "plan", env)
-    assert code == 1 and "must not share" in text
+    for pin_key in ("PA_CONSOLE_PIN", "PA_APPROVER_PIN"):
+        env = {"PA_CONTROL_PLANE_PEER": "pa-control-plane", "PA_INVESTIGATOR_PIN": "123456", pin_key: "123456"}
+        code, text = run(FakeApi([VM]), "plan", env)
+        assert code == 1 and "must not share" in text
     code, text = run(FakeApi([VM]), "plan", {"PA_CONTROL_PLANE_PEER": "pa-control-plane"})
     assert code == 1 and "PA_INVESTIGATOR" in text
 
@@ -106,23 +126,3 @@ def test_token_never_in_output(monkeypatch):
 
     code, text = run(failing, "plan")
     assert code == 1 and "tok-should-not-leak" not in text and json.dumps(ENV).find("tok") == -1
-
-
-def test_replay_service_only_when_configured_and_gated_like_the_investigator():
-    api = FakeApi([VM])
-    assert run(api, "apply")[0] == 0
-    assert not [s for s in api.services if s["name"].startswith("proveedor-replay")]
-    api = FakeApi([VM])
-    assert run(api, "apply", env={**ENV, "PA_REPLAY_PORT": "8402"})[0] == 0
-    replay = next(s for s in api.services if s["name"] == "proveedor-replay.eu1.netbird.services")
-    inv = next(s for s in api.services if s["name"] == "proveedor.eu1.netbird.services")
-    assert replay["auth"] == inv["auth"] and replay["targets"][0]["port"] == 8402
-
-
-
-def test_console_service_gated_like_the_approver():
-    api = FakeApi([VM])
-    assert run(api, "apply", env={**ENV, "PA_CONSOLE_PORT": "8410"})[0] == 0
-    console = next(s for s in api.services if s["name"] == "ontofill-console.eu1.netbird.services")
-    approver = next(s for s in api.services if s["name"] == "proveedor-approver.eu1.netbird.services")
-    assert console["auth"] == approver["auth"] and console["targets"][0]["port"] == 8410

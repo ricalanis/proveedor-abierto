@@ -1,11 +1,12 @@
-"""Timed rehearsal of docs/demo/demo-script.md against the replay (no engine, no network).
+"""Timed rehearsal of docs/demo/demo-script.md on synthetic fixtures (no engine, no network).
 
-    uv run python docs/demo/rehearse.py [--out .cache/rehearsal] [--replay-seconds 45] [--no-pauses]
+    uv run python docs/demo/rehearse.py [--out .cache/rehearsal] [--no-pauses]
 
-Starts two app processes on synthetic fixtures (investigator :8410, approver :8411, approver writing only to a
-scratch copy of the fixture case), replays the fixture run into the live feed during the execution beat, walks
-every beat in a headless browser with a narration pause sized to the beat's budget, and records a video plus
-a timing table (budget vs actual). Exit code 1 if a beat fails or the total exceeds 3:00.
+Starts the product (this app) on synthetic fixtures and walks the product beats (discovery, the output, the close)
+in a headless browser. The engine and generic beats run in a terminal, and the approval, run-view and containment
+beats are the Ontofill Console's (a separate product behind its own SSO URL): here they are narration pauses sized
+to their budget, and they are rehearsed by hand on the console. Records a video plus a timing table (budget vs
+actual). Exit code 1 if a product beat fails or the total exceeds 3:00.
 """
 
 from __future__ import annotations
@@ -27,14 +28,14 @@ sys.path.insert(0, str(ROOT / "app"))
 
 from proveedor_app import fixtures
 from proveedor_app.gold import GoldStore, LocalSource
-from proveedor_app.live import Replayer
 from proveedor_app.web import Settings, create_app
 
 # (beat, budget seconds) from demo-script.md
 # Brief 08 order: the engine first (terminal beats, narration only here), then Proveedor Abierto as its test case.
-BUDGET = [("The engine + generic by construction (terminal)", 35), ("Test case: brief -> PRD", 15),
-          ("Ontology + gate", 15), ("Discovery", 15), ("Execution: Pattern B + A", 35), ("Containment", 30),
-          ("The output: dossier, signal, trace", 20), ("Close: zero ports + repos", 15)]
+# "(terminal)" and "(console)" beats are narration pauses here; the product beats are driven in the browser.
+BUDGET = [("The engine + generic by construction (terminal)", 35), ("Test case: brief -> PRD (console)", 15),
+          ("Ontology + gate (console)", 15), ("Discovery", 15), ("Execution: Pattern B + A (console)", 35),
+          ("Containment (console)", 30), ("The output: dossier, signal, trace", 20), ("Close: zero ports + repos", 15)]
 
 
 def serve(app, port: int) -> uvicorn.Server:
@@ -58,20 +59,19 @@ def free_port(preferred: int) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / ".cache" / "rehearsal"))
-    ap.add_argument("--replay-seconds", type=float, default=40.0)
+    ap.add_argument("--replay-seconds", type=float, default=0.0, help="ignored: replay is the console's now")
     ap.add_argument("--no-pauses", action="store_true", help="skip narration pauses (smoke run)")
     args = ap.parse_args()
 
     out = Path(args.out)
     shutil.rmtree(out, ignore_errors=True)
     lake = fixtures.generate(out / "fixtures")
-    case = out / "case-scratch"  # the approver writes APPROVED here, never in the tracked case/
+    case = out / "case-scratch"  # a copy; the product only reads it
     shutil.copytree(out / "fixtures" / "case", case)
     store = GoldStore(LocalSource(lake))
-    inv_port, app_port = free_port(8410), free_port(8411)
-    servers = [serve(create_app(Settings(store=store, case_dir=case, role="investigator")), inv_port),
-               serve(create_app(Settings(store=store, case_dir=case, role="approver")), app_port)]
-    inv, apr = f"http://127.0.0.1:{inv_port}", f"http://127.0.0.1:{app_port}"
+    inv_port = free_port(8420)
+    servers = [serve(create_app(Settings(store=store, case_dir=case)), inv_port)]
+    inv = f"http://127.0.0.1:{inv_port}"
     rows: list[dict] = []
 
     with sync_playwright() as p:
@@ -95,71 +95,37 @@ def main() -> int:
             rows.append({"beat": name, "budget_s": budget, "app_s": round(spent, 1),
                          "total_s": round(time.monotonic() - t0, 1), "ok": ok, "note": note})
 
-        def engine_intro():  # architecture frame and two briefs / two ontologies live in the terminal
-            page.goto(f"{inv}/engine")
-
-        def prd():
-            page.goto(f"{apr}/approvals")
-            page.click("text=Global PRD")
-            page.wait_for_selector("text=Definition of done")
-            page.fill("#approver", "Rehearsal Approver")
-            page.click("button:has-text('Approve the PRD')")
-            page.wait_for_selector("text=Approved 01-scope")
-
-        def ontology():
-            page.goto(f"{apr}/approvals/02-ontology/factors")
-            page.check("input[name='decision.buyer_level'][value='reject']")
-            page.fill("#approver", "Rehearsal Approver")
-            page.click("button:has-text('Approve the accepted factors')")
-            page.wait_for_selector("text=Approved 02-ontology/factors")
-            page.goto(f"{apr}/approvals/02-ontology")
-            page.wait_for_selector("text=Soundness")
-            page.fill("#approver", "Rehearsal Approver")
-            page.click("button:has-text('Approve the ontology')")
-            page.wait_for_selector("text=Approved 02-ontology")
+        def narration():  # a terminal or console beat: rehearse it by hand; here it is timed talk only
+            pass
 
         def sources():
-            page.goto(f"{inv}/journal")
+            page.goto(f"{inv}/journal?lang=en")
             page.click("a[href*='04-local']")
             page.wait_for_selector("pre.record")
 
-        replayer = Replayer(lake, "run-fixture-0001", duration=args.replay_seconds, new_run_id="rehearsal-live")
+        def visit(path: str, needle: str | None = None) -> None:
+            resp = page.goto(f"{inv}{path}{'&' if '?' in path else '?'}lang=en")
+            if resp is None or resp.status != 200:
+                raise AssertionError(f"{path} -> {resp.status if resp else 'no response'}")
+            if needle and needle not in page.content():
+                raise AssertionError(f"{path}: {needle!r} not on the page")
 
-        def execution():
-            replayer.start()
-            page.wait_for_timeout(1500)
-            page.goto(f"{inv}/run/rehearsal-live")
-            page.wait_for_function("document.querySelectorAll('#steps li').length > 20", timeout=20_000)
+        def output():  # dossier with receipts, a signal with its dispute path, a value traced back to the brief
+            visit("/entities/sup:fixture-005", "founding")
+            visit("/signals", "Dispute")
+            visit("/journal/val:0001-005-founding_date", "brief")
 
-        def containment():
-            page.wait_for_function("document.getElementById('run-state').textContent.trim() === 'done'",
-                                   timeout=int(args.replay_seconds * 1000) + 20_000)
-            page.goto(f"{inv}/run/rehearsal-live?limit=2000")  # the whole trail, not the latest 150 steps
-            if not page.locator("#steps li.step--quarantine").count():
-                raise AssertionError("no quarantined hostile page in the step stream")
-            page.locator("#proof-h").scroll_into_view_if_needed()
-            if "BLOCKED" not in page.locator("#proof").inner_text():
-                raise AssertionError("sandbox proof shows no BLOCKED probe")
-
-        def output():
-            page.goto(f"{inv}/suppliers/sup:fixture-005")
-            page.click("a.ev-link[data-evidence$='founding_date']")
-            page.wait_for_selector("#evidence-panel a.source-link")
-            page.click(".signal a.signal__label >> nth=0")
-            page.wait_for_selector("text=Dispute this signal")
-            page.goto(f"{inv}/suppliers/sup:fixture-005?ev=val:0001-005-founding_date#evidence")
-            page.click("text=Trace this value to the brief")
-            page.wait_for_selector(".stop--anchor")
-            page.locator(".stop--anchor").last.scroll_into_view_if_needed()
-
-        def close():
+        def close():  # an open export downloads
             with page.expect_download() as dl:
-                page.goto(f"{inv}/watchlist?ids=sup:fixture-005")
-                page.click("a:has-text('OCDS JSON') >> nth=0")
+                try:
+                    page.goto(f"{inv}/export/ocds.json?lang=en")
+                except Exception as exc:
+                    if "Download is starting" not in str(exc):
+                        raise
             if not dl.value.suggested_filename.endswith(".json"):
                 raise AssertionError("OCDS export did not download")
 
-        beats = (engine_intro, prd, ontology, sources, execution, containment, output, close)
+        beats = (narration, narration, narration, sources, narration, narration, output, close)
         for (name, budget), fn in zip(BUDGET, beats, strict=True):
             beat(name, budget, fn)
         video = page.video.path() if page.video else None

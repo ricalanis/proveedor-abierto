@@ -1,25 +1,31 @@
-"""Create or update the app's two NetBird Cloud reverse-proxy services, idempotently.
+"""Create or update this project's NetBird Cloud reverse-proxy services, idempotently.
+
+Two public services exist: the product (Proveedor Abierto, the consumer app; investigator credential) and the
+Ontofill Console (the engine's operator/approver console, CONTRACT §14; NetBird SSO for the approvers group).
 
     uv run python deploy/netbird_services.py plan     # show what would be sent (secrets redacted); no changes
-    uv run python deploy/netbird_services.py apply    # create or update our two services
-    uv run python deploy/netbird_services.py status   # our services: domain, enabled, certificate status
-    uv run python deploy/netbird_services.py delete   # remove our two services (and nothing else)
+    uv run python deploy/netbird_services.py apply    # create or update the product and console services
+    uv run python deploy/netbird_services.py status   # those services: domain, enabled, certificate status
+    uv run python deploy/netbird_services.py delete   # remove those services (and nothing else)
+    uv run python deploy/netbird_services.py retire   # remove ONLY the retired <prefix>-approver/-replay services
 
 Configuration comes from the environment (deploy/.env or the repo's .env, both gitignored):
 
     NETBIRD_API_TOKEN           personal access token (header `Authorization: Token ...`); never printed
     PA_CONTROL_PLANE_PEER       exact NetBird peer name (or id) of the control-plane VM. Required.
-    PA_SERVICE_PREFIX           default "proveedor" -> proveedor.<free domain>, proveedor-approver.<free domain>
+    PA_SERVICE_PREFIX           default "proveedor" -> the product at proveedor.<free domain>
     PA_PROXY_DOMAIN             default: the account's free reverse-proxy domain
     PA_TARGET_HOST              default: the peer's NetBird IP (bind the containers there: PA_BIND_IP)
-    PA_INVESTIGATOR_PORT/PA_APPROVER_PORT   default 8400 / 8401
-    PA_INVESTIGATOR_PASSWORD or PA_INVESTIGATOR_PIN     investigator URL credential
-    PA_APPROVER_GROUP           IdP distribution group for SSO on the approver URL (preferred), or PA_APPROVER_PIN
+    PA_INVESTIGATOR_PORT        default 8400 (the product)
+    PA_INVESTIGATOR_PASSWORD or PA_INVESTIGATOR_PIN     the product URL's credential
+    PA_CONSOLE_PORT             default 8410 (the Ontofill Console container)
+    PA_CONSOLE_SERVICE          default "ontofill-console" -> ontofill-console.<free domain>
+    PA_APPROVER_GROUP           IdP distribution group for SSO on the console URL (preferred), or PA_CONSOLE_PIN
+                                (PA_APPROVER_PIN is accepted as a fallback name); never the product's credential
     PA_ALLOWED_COUNTRIES        optional, e.g. "US,MX": country allowlist on both services
-    PA_CONSOLE_PORT             optional: also the Ontofill Console service (name PA_CONSOLE_SERVICE, default
-                                "ontofill-console"), gated like the approver (SSO group, or the approver PIN)
-    PA_REPLAY_PORT              optional: also a third service <prefix>-replay (the demo-insurance replay role,
-                                compose profile `replay`), gated by the investigator credential
+
+The retired services (<prefix>-approver and <prefix>-replay: approvals and replay moved to the console) are never
+created; `retire` deletes them if they still exist and touches nothing else.
 
 API reference: https://docs.netbird.io/api/resources/services (reverse proxy is in beta). Per
 docs/reference/netbird.md the peer target type is `peer` and the proxy dials the peer's NetBird IP (not
@@ -107,12 +113,21 @@ def free_domain(api) -> str:
     return free[0]
 
 
+def naming(api, env: dict[str, str]) -> tuple[str, str]:
+    """(proxy domain, service prefix)."""
+    return env.get("PA_PROXY_DOMAIN") or free_domain(api), env.get("PA_SERVICE_PREFIX", "proveedor")
+
+
+def retired_names(api, env: dict[str, str]) -> set[str]:
+    domain, prefix = naming(api, env)
+    return {f"{prefix}-approver.{domain}", f"{prefix}-replay.{domain}"}
+
+
 def desired(api, env: dict[str, str]) -> list[dict]:
-    """The service bodies we want to exist: investigator + approver, and replay when PA_REPLAY_PORT is set."""
+    """The service bodies we want to exist: the product and the Ontofill Console."""
     peer = find_peer(api, env["PA_CONTROL_PLANE_PEER"])
     host = env.get("PA_TARGET_HOST") or peer.get("ip")
-    domain = env.get("PA_PROXY_DOMAIN") or free_domain(api)
-    prefix = env.get("PA_SERVICE_PREFIX", "proveedor")
+    domain, prefix = naming(api, env)
 
     if env.get("PA_INVESTIGATOR_PASSWORD"):
         inv_auth = {"password_auth": {"enabled": True, "password": env["PA_INVESTIGATOR_PASSWORD"]}}
@@ -120,14 +135,16 @@ def desired(api, env: dict[str, str]) -> list[dict]:
         inv_auth = {"pin_auth": {"enabled": True, "pin": env["PA_INVESTIGATOR_PIN"]}}
     else:
         raise ApiError("set PA_INVESTIGATOR_PASSWORD or PA_INVESTIGATOR_PIN")
+    console_pin = env.get("PA_CONSOLE_PIN") or env.get("PA_APPROVER_PIN")
     if env.get("PA_APPROVER_GROUP"):
-        app_auth = {"bearer_auth": {"enabled": True, "distribution_groups": [group_id(api, env["PA_APPROVER_GROUP"])]}}
-    elif env.get("PA_APPROVER_PIN"):
-        if env.get("PA_APPROVER_PIN") == env.get("PA_INVESTIGATOR_PIN"):
-            raise ApiError("the two roles must not share a credential")
-        app_auth = {"pin_auth": {"enabled": True, "pin": env["PA_APPROVER_PIN"]}}
+        console_auth = {"bearer_auth": {"enabled": True,
+                                        "distribution_groups": [group_id(api, env["PA_APPROVER_GROUP"])]}}
+    elif console_pin:
+        if console_pin == env.get("PA_INVESTIGATOR_PIN"):
+            raise ApiError("the product and the console must not share a credential")
+        console_auth = {"pin_auth": {"enabled": True, "pin": console_pin}}
     else:
-        raise ApiError("set PA_APPROVER_GROUP (SSO) or PA_APPROVER_PIN")
+        raise ApiError("set PA_APPROVER_GROUP (SSO) or PA_CONSOLE_PIN for the console")
 
     restrictions = {}
     if env.get("PA_ALLOWED_COUNTRIES"):
@@ -141,13 +158,9 @@ def desired(api, env: dict[str, str]) -> list[dict]:
                 "targets": [{"target_id": peer["id"], "target_type": "peer", "protocol": "http", "host": host,
                              "port": port, "path": "/", "enabled": True}]}
 
-    services = [service(prefix, int(env.get("PA_INVESTIGATOR_PORT", 8400)), inv_auth),
-                service(f"{prefix}-approver", int(env.get("PA_APPROVER_PORT", 8401)), app_auth)]
-    if env.get("PA_CONSOLE_PORT"):  # the B2B engine console (CONTRACT §14): approvers only, like the approver URL
-        services.append(service(env.get("PA_CONSOLE_SERVICE", "ontofill-console"), int(env["PA_CONSOLE_PORT"]), app_auth))
-    if env.get("PA_REPLAY_PORT"):  # read-only replay of a recorded run: same credential as the investigator
-        services.append(service(f"{prefix}-replay", int(env["PA_REPLAY_PORT"]), inv_auth))
-    return services
+    return [service(prefix, int(env.get("PA_INVESTIGATOR_PORT", 8400)), inv_auth),
+            service(env.get("PA_CONSOLE_SERVICE", "ontofill-console"), int(env.get("PA_CONSOLE_PORT", 8410)),
+                    console_auth)]
 
 
 def ours(api, names: set[str]) -> dict[str, dict]:
@@ -160,6 +173,11 @@ def main(argv: list[str], api=request, env: dict[str, str] | None = None, out=pr
         load_env()
         env = dict(os.environ)
     try:
+        if cmd == "retire":  # delete only the retired services; needs no credentials for the live ones
+            for name, s in ours(api, retired_names(api, env)).items():
+                api("DELETE", f"/reverse-proxies/services/{s['id']}")
+                out(f"retired {name}")
+            return 0
         want = desired(api, env)
         names = {s["name"] for s in want}
         have = ours(api, names)

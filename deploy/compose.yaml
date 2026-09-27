@@ -1,80 +1,34 @@
-# Two app processes on the control-plane VM, one per role. Host ports bind to loopback (or the NetBird
-# interface IP) only, so the VM opens no public app port; NetBird's reverse proxy is the only way in.
+# The consumer product on the control-plane VM: one read-only app process over one case's published gold export.
+# The host port binds to loopback (or the NetBird interface IP) only, so the VM opens no public app port; NetBird's
+# reverse proxy is the only way in. Approvals, runs, live view, spend, evidence and replay are the Ontofill Console's
+# (ontofill/console, its own container and NetBird service), not this app's.
 name: proveedor-abierto
 
-x-app: &app
-  build:
-    context: ..
-    dockerfile: deploy/Dockerfile
-  image: proveedor-abierto-app:local
-  restart: unless-stopped
-  read_only: true
-  tmpfs: [/tmp]
-  cap_drop: [ALL]
-  security_opt: ["no-new-privileges:true"]
-  environment: &env
-    # File lake: PA_GOLD_DIR=/lake (mounted below). S3 lake: set PA_GOLD_DIR to empty in .env and provide
-    # lake.yaml (mounted at /config/lake.yaml) plus AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY.
-    PA_GOLD_DIR: ${PA_GOLD_DIR_IN_CONTAINER-/lake}
-    PA_LAKE_YAML: /config/lake.yaml
-    PA_CASE_DIR: /case
-    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
-    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
-    AWS_REGION: ${AWS_REGION:-}
-    # /evidence reads saved files only: track-checklist.md, verify-remote.txt, spend-history.jsonl (optional)
-    PA_EVIDENCE_DIR: /evidence
-    PA_SPEND_HISTORY: /evidence/spend-history.jsonl
-
 services:
-  investigator:
-    <<: *app
+  investigator:  # the product; the service keeps this name so the VM's container stays proveedor-abierto-investigator-1
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: proveedor-abierto-app:local
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
     environment:
-      <<: *env
-      PA_ROLE: investigator
+      # File lake: PA_GOLD_DIR=/lake (mounted below). S3 lake: set PA_GOLD_DIR_IN_CONTAINER to empty in .env and
+      # provide lake.yaml (mounted at /config/lake.yaml) plus AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY.
+      PA_GOLD_DIR: ${PA_GOLD_DIR_IN_CONTAINER-/lake}
+      PA_LAKE_YAML: /config/lake.yaml
+      PA_CASE_DIR: /case
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_REGION: ${AWS_REGION:-}
     volumes:
       - ${PA_LAKE_DIR:-../.lake}:/lake:ro
-      # read-only: the investigator process cannot write anything. PA_INVESTIGATOR_CASE_HOST_DIR (optional) keeps the
-      # investigator on the case that matches its gold (e.g. the synthetic fixture case) until real gold exists.
+      # read-only: the product cannot write anything. PA_INVESTIGATOR_CASE_HOST_DIR (optional) keeps it on the case
+      # that matches its gold (e.g. the synthetic fixture case) until real gold exists; else PA_CASE_HOST_DIR.
       - ${PA_INVESTIGATOR_CASE_HOST_DIR:-${PA_CASE_HOST_DIR:-../case}}:/case:ro
       - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
-      - ${PA_EVIDENCE_HOST_DIR:-../.cache/evidence}:/evidence:ro
     ports:
       - "${PA_BIND_IP:-127.0.0.1}:${PA_INVESTIGATOR_PORT:-8400}:8400"
-
-  # Demo insurance (profile `replay`): replays a recorded run as live at /run, read-only, investigator role. The lake
-  # is mounted read-only and copied into a tmpfs at start, because a replay writes its live feed into the lake.
-  # Replay again: docker compose --profile replay up -d --no-build --force-recreate replay
-  replay:
-    <<: *app
-    image: ${PA_CONTROL_IMAGE:-proveedor-abierto-app:local}  # control pages live in the console; this role
-                                                          # stays on the last image that has them until retired
-    profiles: [replay]
-    environment:
-      <<: *env
-      PA_ROLE: investigator
-      PA_GOLD_DIR: /work
-    tmpfs: ["/tmp", "/work:size=${PA_REPLAY_TMPFS:-1g},uid=10001,gid=10001"]
-    command: ["sh", "-c", "cp -a /lake-src/. /work/ && exec pa-app serve --host 0.0.0.0 --port 8400 --gold-dir /work --replay ${PA_REPLAY_RUN_ID:-} --duration ${PA_REPLAY_DURATION:-45} --delay ${PA_REPLAY_DELAY:-20}"]
-    volumes:
-      - ${PA_REPLAY_LAKE_DIR:-${PA_LAKE_DIR:-../.lake}}:/lake-src:ro
-      - ${PA_INVESTIGATOR_CASE_HOST_DIR:-${PA_CASE_HOST_DIR:-../case}}:/case:ro
-      - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
-      - ${PA_EVIDENCE_HOST_DIR:-../.cache/evidence}:/evidence:ro
-    ports:
-      - "${PA_BIND_IP:-127.0.0.1}:${PA_REPLAY_PORT:-8402}:8400"
-
-  approver:
-    <<: *app
-    image: ${PA_CONTROL_IMAGE:-proveedor-abierto-app:local}  # control pages live in the console; this role
-                                                          # stays on the last image that has them until retired
-    environment:
-      <<: *env
-      PA_ROLE: approver
-      PA_IDENTITY_HEADER: X-NetBird-User              # prefills the approver's name; nothing depends on it
-    volumes:
-      - ${PA_LAKE_DIR:-../.lake}:/lake:ro
-      - ${PA_CASE_HOST_DIR:-../case}:/case:rw          # only the approver writes, and only APPROVED markers
-      - ${PA_LAKE_YAML_HOST:-../lake.example.yaml}:/config/lake.yaml:ro
-      - ${PA_EVIDENCE_HOST_DIR:-../.cache/evidence}:/evidence:ro
-    ports:
-      - "${PA_BIND_IP:-127.0.0.1}:${PA_APPROVER_PORT:-8401}:8400"
