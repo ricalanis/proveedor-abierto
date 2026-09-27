@@ -40,6 +40,17 @@ can open through NetBird SSO. All four are NetBird reverse-proxy services. The V
 port, SSH included ([`deploy/verify.sh`](deploy/verify.sh) `remote` checks this from outside, along with the refusals
 above).
 
+**What you will see** (screenshots over the public URLs, Sun 27 Sep ~17:45 UTC, in [`docs/evidence/screens/2026-09-27-final/`](docs/evidence/screens/2026-09-27-final/)):
+
+| | |
+|---|---|
+| ![A harness-assisted dossier with its receipt open](docs/evidence/screens/2026-09-27-final/harness-dossier-receipt-1440-dark.png) | ![The containment run in the read-only console](docs/evidence/screens/2026-09-27-final/console-library-demo-containment-1440-dark.png) |
+| A dossier on the harness-assisted instance with a value's receipt open: source, capture, locator, confidence | The recorded containment run: hostile page quarantined, code attempt stopped by a limit, isolation and secrets checkpoints blocked |
+| ![Connections on the harness-assisted instance](docs/evidence/screens/2026-09-27-final/harness-relationships-1440-dark.png) | ![Inference view of the live run](docs/evidence/screens/2026-09-27-final/console-proveedor-abierto-inference-run-efc9be56964b-1440-dark.png) |
+| Supplier connections, marked as outside the approved ontology | The live engine run's inference calls: all reasoning on Vultr, every call attributed |
+| ![The completeness page on the harness-assisted instance](docs/evidence/screens/2026-09-27-final/harness-completeness-1440-dark.png) | ![The SF library case's answer page](docs/evidence/screens/2026-09-27-final/console-sf-library-branches-answer-1440-dark.png) |
+| The DoD recounted from gold on the harness-assisted instance. "100%" is the approved rule (≥ 80% of core fields); 0.924 of suppliers have all six. Source classes: 3 of 4 approved (no company registry reachable), as its banner says | The second, engine-authored case: its answer page says "no answer yet" until gold lands |
+
 ### Where things stand (Sun 27 Sep, 17:45 UTC)
 
 Three tracks, each labelled for what it is.
